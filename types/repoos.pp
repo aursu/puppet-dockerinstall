@@ -1,0 +1,1 @@
+type Docker::RepoOS = Enum['centos', 'debian', 'fedora', 'ubuntu']

@@ -1,0 +1,5 @@
+[Service]
+EnvironmentFile=-/etc/sysconfig/docker
+EnvironmentFile=-/etc/sysconfig/docker-storage
+ExecStart=/usr/bin/dockerd $OPTIONS \
+      $DOCKER_STORAGE_OPTIONS

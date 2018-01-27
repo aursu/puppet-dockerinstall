@@ -1,0 +1,1 @@
+type Docker::Repo = Enum['stable', 'test', 'edge']

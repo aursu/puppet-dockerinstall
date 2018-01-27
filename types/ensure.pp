@@ -1,0 +1,1 @@
+type Docker::Ensure = Enum['stopped', 'running']

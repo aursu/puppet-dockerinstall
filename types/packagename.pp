@@ -1,0 +1,1 @@
+type Docker::PackageName = Enum['docker', 'docker-ce', 'docker-ee']

@@ -1,0 +1,1 @@
+type Docker::LogLevel = Enum['debug', 'info', 'warn', 'error', 'fatal']
