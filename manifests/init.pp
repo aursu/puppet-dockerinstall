@@ -36,7 +36,7 @@ class docker (
             $storage_config_template,
     Optional[String]
             $root_dir,
-    Optional[Docker::Multiple]  
+    Optional[Docker::Multiple]
             $tcp_bind,
     Boolean $tls_enable,
     Boolean $tls_verify,
@@ -88,7 +88,7 @@ class docker (
             $storage_driver,
     Optional[String]
             $dm_basesize,
-    Optional[Docker::DmFS] 
+    Optional[Docker::DmFS]
             $dm_fs,
     Optional[String]
             $dm_mkfsarg,
@@ -110,7 +110,7 @@ class docker (
     Boolean $dm_use_deferred_deletion,
     Boolean $dm_blkdiscard,
     Boolean $dm_override_udev_sync_check,
-    Boolean $overlay2_override_kernel_check, 
+    Boolean $overlay2_override_kernel_check,
 )
 {
   contain 'docker::repos'
