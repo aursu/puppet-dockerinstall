@@ -4,6 +4,7 @@ docker::repo: 'stable'
 docker::repo_location: 'https://download.docker.com/linux'
 docker::repo_os: ~
 docker::repo_gpgcheck: true
+docker::prerequired_packages: {}
 docker::manage_package: true
 docker::package_name: 'docker-ce'
 docker::manage_os_users: true
