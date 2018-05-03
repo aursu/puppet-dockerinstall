@@ -8,12 +8,21 @@ class docker::install (
     Docker::Version
             $version        = $docker::version,
     Boolean $manage_package = $docker::manage_package,
+    Array[String]
+            $prerequired_packages   = $docker::prerequired_packages,
 )
 {
+    $prerequired_packages.each |String $reqp| {
+        package { $reqp:
+            ensure => installed,
+        }
+    }
+
     if $manage_package {
-        package { 'docker':
-            ensure   => $version,
-            name     => $package_name,
+        package { $package_name:
+            ensure => $version,
+            name   => $package_name,
+            alias  => 'docker',
         }
     }
 }

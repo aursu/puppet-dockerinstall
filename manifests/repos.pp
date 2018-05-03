@@ -9,20 +9,16 @@ class docker::repos (
     Docker::RepoOS
             $os                     = $docker::repo_os,
     Boolean $gpgcheck               = $docker::repo_gpgcheck,
-    Array[String]
-            $prerequired_packages   = $docker::prerequired_packages,
+    String  $basearch               = $::architecture,
+    String  $releasever             = $::operatingsystemmajrelease,
 )
 {
-    $prerequired_packages.each |String $reqp| {
-        package { $reqp:
-            ensure => installed,
-        }
-    }
-
-    $baseurl = "${location}/${os}/${::operatingsystemmajrelease}/${::architecture}/${repo}"
+    # https://docs.docker.com/install/linux/docker-ce/fedora/#set-up-the-repository
+    # https://docs.docker.com/install/linux/docker-ce/centos/#set-up-the-repository
+    $baseurl = "${location}/${os}/${releasever}/${basearch}/${repo}"
     $gpgkey = "${location}/${os}/gpg"
 
-    if ($manage_package) {
+    if $manage_package {
         yumrepo { 'docker':
             descr    => 'Docker',
             baseurl  => $baseurl,
