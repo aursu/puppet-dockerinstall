@@ -16,7 +16,7 @@ docker::service_name: 'docker'
 docker::service_enable: true
 docker::service_hasstatus: true
 docker::service_hasrestart: true
-docker::service_ovverides_config: '/etc/systemd/system/docker.service.d/service-overrides.conf'
+docker::service_overrides_config: '/etc/systemd/system/docker.service.d/service-overrides.conf'
 docker::service_overrides_template: 'docker/etc/systemd/system/docker.service.d/service-overrides.conf.erb'
 docker::service_config: '/etc/sysconfig/docker'
 docker::service_config_template: 'docker/etc/sysconfig/docker.systemd.erb'
