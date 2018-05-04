@@ -113,10 +113,10 @@ class docker (
     Boolean $overlay2_override_kernel_check,
 )
 {
-  contain 'docker::repos'
-  contain 'docker::install'
-  contain 'docker::config'
-  contain 'docker::service'
+  include 'docker::repos'
+  include 'docker::install'
+  include 'docker::config'
+  include 'docker::service'
 
   Class['docker::repos'] -> Class['docker::install'] -> Class['docker::config'] ~> Class['docker::service']
 }
