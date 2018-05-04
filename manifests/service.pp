@@ -1,11 +1,9 @@
 # == Class: docker::service
 #
-# Class to manage the docker service daemon
-#
 class docker::service (
-    Boolean $manage_service                 = $docker::manage_service,
     Docker::Ensure
             $service_ensure                 = $docker::service_ensure,
+    Boolean $manage_service                 = $docker::manage_service,
     String  $service_name                   = $docker::service_name,
     Boolean $service_enable                 = $docker::service_enable,
     Boolean $service_hasstatus              = $docker::service_hasstatus,
@@ -15,7 +13,7 @@ class docker::service (
     Optional[String]
             $service_config_template        = $docker::service_config_template,
     Optional[String]
-            $service_overrides_config       = $docker::service_overrides_config,    
+            $service_overrides_config       = $docker::service_overrides_config,
     Optional[String]
             $service_overrides_template     = $docker::service_overrides_template,
     Optional[String]
@@ -76,7 +74,7 @@ class docker::service (
             $storage_driver                 = $docker::storage_driver,
     Optional[String]
             $dm_basesize                    = $docker::dm_basesize,
-    Optional[Docker::DmFS] 
+    Optional[Docker::DmFS]
             $dm_fs                          = $docker::dm_fs,
     Optional[String]
             $dm_mkfsarg                     = $docker::dm_mkfsarg,
@@ -98,18 +96,18 @@ class docker::service (
     Boolean $dm_use_deferred_deletion       = $docker::dm_use_deferred_deletion,
     Boolean $dm_blkdiscard                  = $docker::dm_blkdiscard,
     Boolean $dm_override_udev_sync_check    = $docker::dm_override_udev_sync_check,
-    Boolean $overlay2_override_kernel_check = $docker::overlay2_override_kernel_check, 
+    Boolean $overlay2_override_kernel_check = $docker::overlay2_override_kernel_check,
 )
 {
-    include system::systemd
+    include lsys::systemd
 
     if $manage_service {
-        service { 'docker':
+        service { $service_name:
             ensure     => $service_esure,
-            name       => $service_name,
             enable     => $service_enable,
             hasstatus  => $service_hasstatus,
             hasrestart => $service_hasrestart,
+            alias      => 'docker',
         }
 
         file { '/etc/systemd/system/docker.service.d':
@@ -120,7 +118,7 @@ class docker::service (
             file { $service_overrides_config:
                 ensure  => present,
                 content => template($service_overrides_template),
-                notify  => Exec['reload-systemd'],
+                notify  => Exec['systemd-reload'],
                 before  => Service['docker'],
             }
         }
