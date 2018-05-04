@@ -25,6 +25,5 @@ class docker::repos (
             gpgkey   => $gpgkey,
             gpgcheck => $gpgcheck,
         }
-        Yumrepo['docker'] -> Package <| name == 'docker' |>
     }
 }

@@ -12,6 +12,7 @@ class docker::config (
             ensure     => 'present',
             groups     => [ $group ],
             membership => 'minimum',
+            tag        => 'docker',
         }
     }
 }

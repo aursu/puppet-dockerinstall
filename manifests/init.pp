@@ -24,7 +24,7 @@ class docker (
     Boolean $service_hasstatus,
     Boolean $service_hasrestart,
     Optional[String]
-            $service_ovverides_config,
+            $service_overrides_config,
     Optional[String]
             $service_overrides_template,
     Optional[String]
@@ -114,10 +114,6 @@ class docker (
     Boolean $overlay2_override_kernel_check,
 )
 {
-  include 'docker::repos'
-  include 'docker::install'
-  include 'docker::config'
-  include 'docker::service'
-
-  Class['docker::repos'] -> Class['docker::install'] -> Class['docker::config'] ~> Class['docker::service']
+    # to install Docker CE - use: include 'docker::install'
+    # to install and run Docker CE - use: include 'docker::service'
 }

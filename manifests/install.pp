@@ -12,6 +12,8 @@ class docker::install (
             $prerequired_packages   = $docker::prerequired_packages,
 )
 {
+    include docker::repos
+
     $prerequired_packages.each |String $reqp| {
         package { $reqp:
             ensure => installed,
@@ -24,5 +26,6 @@ class docker::install (
             name   => $package_name,
             alias  => 'docker',
         }
+        Yumrepo <| title == 'docker' |> -> Package[$package_name]
     }
 }

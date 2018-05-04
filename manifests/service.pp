@@ -97,9 +97,13 @@ class docker::service (
     Boolean $dm_blkdiscard                  = $docker::dm_blkdiscard,
     Boolean $dm_override_udev_sync_check    = $docker::dm_override_udev_sync_check,
     Boolean $overlay2_override_kernel_check = $docker::overlay2_override_kernel_check,
+    Boolean $manage_users                   = $docker::manage_os_users,
+    Boolean $manage_package                 = $docker::manage_package,
 )
 {
     include lsys::systemd
+    include docker::config
+    include docker::install
 
     if $manage_service {
         service { $service_name:
@@ -108,6 +112,14 @@ class docker::service (
             hasstatus  => $service_hasstatus,
             hasrestart => $service_hasrestart,
             alias      => 'docker',
+        }
+
+        if $manage_users {
+            User <| tag == 'docker' |> -> Service[$service_name]
+        }
+
+        if $manage_package {
+            Package <| title == 'docker' |> -> Service[$service_name]
         }
 
         file { '/etc/systemd/system/docker.service.d':
