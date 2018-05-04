@@ -5,18 +5,10 @@
   "summary": "Docker CE  installation and start",
   "license": "Apache-2.0",
   "source": "https://github.com/aursu/puppet-docker",
-  "dependencies": [
-
-  ],
+  "dependencies": [],
   "operatingsystem_support": [
     {
       "operatingsystem": "CentOS",
-      "operatingsystemrelease": [
-        "7"
-      ]
-    },
-    {
-      "operatingsystem": "OracleLinux",
       "operatingsystemrelease": [
         "7"
       ]
@@ -28,15 +20,9 @@
       ]
     },
     {
-      "operatingsystem": "Scientific",
-      "operatingsystemrelease": [
-        "7"
-      ]
-    },
-    {
       "operatingsystem": "Fedora",
       "operatingsystemrelease": [
-        "25"
+        "26", "27", "28"
       ]
     }
   ],

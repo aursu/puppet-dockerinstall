@@ -4,7 +4,7 @@ docker::repo: 'stable'
 docker::repo_location: 'https://download.docker.com/linux'
 docker::repo_os: ~
 docker::repo_gpgcheck: true
-docker::prerequired_packages: {}
+docker::prerequired_packages: []
 docker::manage_package: true
 docker::package_name: 'docker-ce'
 docker::manage_os_users: true
@@ -13,6 +13,7 @@ docker::docker_group: 'docker'
 docker::manage_service: true
 docker::service_ensure: 'running'
 docker::service_name: 'docker'
+docker::service_enable: true
 docker::service_hasstatus: true
 docker::service_hasrestart: true
 docker::service_ovverides_config: '/etc/systemd/system/docker.service.d/service-overrides.conf'
@@ -34,6 +35,7 @@ docker::iptables: true
 docker::ip_masq: true
 docker::icc: true
 docker::registry_mirror: ~
+docker::fixed_cidr: ~
 docker::default_gateway: ~
 docker::bridge: ~
 docker::bip: ~
@@ -42,6 +44,8 @@ docker::log_driver: ~
 docker::log_opt: ~
 docker::selinux_enabled: false
 docker::socket_group: ~
+docker::dns: ~
+docker::dns_search: ~
 docker::mtu: ~
 docker::labels: ~
 docker::extra_parameters: ~

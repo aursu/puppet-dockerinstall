@@ -20,6 +20,7 @@ class docker (
     Docker::Ensure
             $service_ensure,
     String  $service_name,
+    Boolean $service_enable,
     Boolean $service_hasstatus,
     Boolean $service_hasrestart,
     Optional[String]
