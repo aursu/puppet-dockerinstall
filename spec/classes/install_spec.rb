@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe 'docker::install' do
-  let(:pre_condition) { 'include docker' }
+describe 'dockerinstall::install' do
+  let(:pre_condition) { 'include dockerinstall' }
 
   on_supported_os.each do |os, os_facts|
     context "on #{os}" do

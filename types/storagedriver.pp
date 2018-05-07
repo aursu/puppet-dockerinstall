@@ -1,2 +1,2 @@
-type Docker::StorageDriver = Enum['aufs', 'devicemapper', 'btrfs', 'zfs',
+type Dockerinstall::StorageDriver = Enum['aufs', 'devicemapper', 'btrfs', 'zfs',
     'overlay', 'overlay2']

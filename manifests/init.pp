@@ -1,23 +1,23 @@
-class docker (
-    Docker::PackageName
+class dockerinstall (
+    Dockerinstall::PackageName
             $package_name,
-    Docker::Version
+    Dockerinstall::Version
             $version,
     Boolean $manage_package,
-    Docker::Repo
+    Dockerinstall::Repo
             $repo,
     String  $repo_location,
-    Docker::RepoOS
+    Dockerinstall::RepoOS
             $repo_os,
     Boolean $repo_gpgcheck,
     Array[String]
             $prerequired_packages,
     Boolean $manage_os_users,
-    Docker::UserList
+    Dockerinstall::UserList
             $docker_users,
     String  $docker_group,
     Boolean $manage_service,
-    Docker::Ensure
+    Dockerinstall::Ensure
             $service_ensure,
     String  $service_name,
     Boolean $service_enable,
@@ -37,14 +37,14 @@ class docker (
             $storage_config_template,
     Optional[String]
             $root_dir,
-    Optional[Docker::Multiple]
+    Optional[Dockerinstall::Multiple]
             $tcp_bind,
     Boolean $tls_enable,
     Boolean $tls_verify,
     String  $tls_cacert,
     String  $tls_cert,
     String  $tls_key,
-    Optional[Docker::Multiple]
+    Optional[Dockerinstall::Multiple]
             $socket_bind,
     Boolean $ip_forward,
     Boolean $iptables,
@@ -60,24 +60,24 @@ class docker (
             $bridge,
     Optional[String]
             $bip,
-    Optional[Docker::LogLevel]
+    Optional[Dockerinstall::LogLevel]
             $log_level,
-    Optional[Docker::LogDriver]
+    Optional[Dockerinstall::LogDriver]
             $log_driver,
-    Optional[Docker::Multiple]
+    Optional[Dockerinstall::Multiple]
             $log_opt,
     Boolean $selinux_enabled,
     Optional[String]
             $socket_group,
-    Optional[Docker::Multiple]
+    Optional[Dockerinstall::Multiple]
             $dns,
-    Optional[Docker::Multiple]
+    Optional[Dockerinstall::Multiple]
             $dns_search,
     Optional[Integer]
             $mtu,
-    Optional[Docker::Multiple]
+    Optional[Dockerinstall::Multiple]
             $labels,
-    Optional[Docker::Multiple]
+    Optional[Dockerinstall::Multiple]
             $extra_parameters,
     Optional[String]
             $proxy,
@@ -85,11 +85,11 @@ class docker (
             $no_proxy,
     Optional[String]
             $tmp_dir,
-    Optional[Docker::StorageDriver]
+    Optional[Dockerinstall::StorageDriver]
             $storage_driver,
     Optional[String]
             $dm_basesize,
-    Optional[Docker::DmFS]
+    Optional[Dockerinstall::DmFS]
             $dm_fs,
     Optional[String]
             $dm_mkfsarg,
@@ -114,6 +114,6 @@ class docker (
     Boolean $overlay2_override_kernel_check,
 )
 {
-    # to install Docker CE - use: include 'docker::install'
-    # to install and run Docker CE - use: include 'docker::service'
+    # to install Docker CE - use: include 'dockerinstall::install'
+    # to install and run Docker CE - use: include 'dockerinstall::service'
 }

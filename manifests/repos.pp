@@ -1,14 +1,14 @@
-# == Class: docker::repos
+# == Class: dockerinstall::repos
 #
 #
-class docker::repos (
-    Boolean $manage_package         = $docker::manage_package,
-    Docker::Repo
-            $repo                   = $docker::repo,
-    String  $location               = $docker::repo_location,
-    Docker::RepoOS
-            $os                     = $docker::repo_os,
-    Boolean $gpgcheck               = $docker::repo_gpgcheck,
+class dockerinstall::repos (
+    Boolean $manage_package         = $dockerinstall::manage_package,
+    Dockerinstall::Repo
+            $repo                   = $dockerinstall::repo,
+    String  $location               = $dockerinstall::repo_location,
+    Dockerinstall::RepoOS
+            $os                     = $dockerinstall::repo_os,
+    Boolean $gpgcheck               = $dockerinstall::repo_gpgcheck,
     String  $basearch               = $::architecture,
     String  $releasever             = $::operatingsystemmajrelease,
 )

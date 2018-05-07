@@ -1,1 +1,1 @@
-type Docker::Ensure = Enum['stopped', 'running']
+type Dockerinstall::Ensure = Enum['stopped', 'running']

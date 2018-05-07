@@ -5,4 +5,4 @@ fixtures:
   repositories:
     "lsys": "https://github.com/aursu/puppet-lsys"
   symlinks:
-    "docker": "#{source_dir}"
+    "dockerinstall": "#{source_dir}"

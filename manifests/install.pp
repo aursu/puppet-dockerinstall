@@ -1,18 +1,18 @@
-# == Class: docker::install
+# == Class: dockerinstall::install
 #
 # Module to install an up-to-date version of Docker from a package repository.
 #
-class docker::install (
-    Docker::PackageName
-            $package_name   = $docker::package_name,
-    Docker::Version
-            $version        = $docker::version,
-    Boolean $manage_package = $docker::manage_package,
+class dockerinstall::install (
+    Dockerinstall::PackageName
+            $package_name   = $dockerinstall::package_name,
+    Dockerinstall::Version
+            $version        = $dockerinstall::version,
+    Boolean $manage_package = $dockerinstall::manage_package,
     Array[String]
-            $prerequired_packages   = $docker::prerequired_packages,
+            $prerequired_packages   = $dockerinstall::prerequired_packages,
 )
 {
-    include docker::repos
+    include dockerinstall::repos
 
     $prerequired_packages.each |String $reqp| {
         package { $reqp:

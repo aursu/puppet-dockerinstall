@@ -1,1 +1,1 @@
-type Docker::DmFS = Enum['ext4', 'xfs']
+type Dockerinstall::DmFS = Enum['ext4', 'xfs']

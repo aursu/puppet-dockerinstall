@@ -1,1 +1,1 @@
-type Docker::Repo = Enum['stable', 'test', 'edge']
+type Dockerinstall::Repo = Enum['stable', 'test', 'edge']

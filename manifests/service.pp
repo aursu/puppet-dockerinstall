@@ -1,109 +1,109 @@
-# == Class: docker::service
+# == Class: dockerinstall::service
 #
-class docker::service (
-    Docker::Ensure
-            $service_ensure                 = $docker::service_ensure,
-    Boolean $manage_service                 = $docker::manage_service,
-    String  $service_name                   = $docker::service_name,
-    Boolean $service_enable                 = $docker::service_enable,
-    Boolean $service_hasstatus              = $docker::service_hasstatus,
-    Boolean $service_hasrestart             = $docker::service_hasrestart,
+class dockerinstall::service (
+    Dockerinstall::Ensure
+            $service_ensure                 = $dockerinstall::service_ensure,
+    Boolean $manage_service                 = $dockerinstall::manage_service,
+    String  $service_name                   = $dockerinstall::service_name,
+    Boolean $service_enable                 = $dockerinstall::service_enable,
+    Boolean $service_hasstatus              = $dockerinstall::service_hasstatus,
+    Boolean $service_hasrestart             = $dockerinstall::service_hasrestart,
     Optional[String]
-            $service_config                 = $docker::service_config,
+            $service_config                 = $dockerinstall::service_config,
     Optional[String]
-            $service_config_template        = $docker::service_config_template,
+            $service_config_template        = $dockerinstall::service_config_template,
     Optional[String]
-            $service_overrides_config       = $docker::service_overrides_config,
+            $service_overrides_config       = $dockerinstall::service_overrides_config,
     Optional[String]
-            $service_overrides_template     = $docker::service_overrides_template,
+            $service_overrides_template     = $dockerinstall::service_overrides_template,
     Optional[String]
-            $storage_config                 = $docker::storage_config,
+            $storage_config                 = $dockerinstall::storage_config,
     Optional[String]
-            $storage_config_template        = $docker::storage_config_template,
+            $storage_config_template        = $dockerinstall::storage_config_template,
     Optional[String]
-            $root_dir                       = $docker::root_dir,
-    Optional[Docker::Multiple]
-            $tcp_bind                       = $docker::tcp_bind,
-    Boolean $tls_enable                     = $docker::tls_enable,
-    Boolean $tls_verify                     = $docker::tls_verify,
-    String  $tls_cacert                     = $docker::tls_cacert,
-    String  $tls_cert                       = $docker::tls_cert,
-    String  $tls_key                        = $docker::tls_key,
-    Optional[Docker::Multiple]
-            $socket_bind                    = $docker::socket_bind,
-    Boolean $ip_forward                     = $docker::ip_forward,
-    Boolean $iptables                       = $docker::iptables,
-    Boolean $ip_masq                        = $docker::ip_masq,
-    Boolean $icc                            = $docker::icc,
+            $root_dir                       = $dockerinstall::root_dir,
+    Optional[Dockerinstall::Multiple]
+            $tcp_bind                       = $dockerinstall::tcp_bind,
+    Boolean $tls_enable                     = $dockerinstall::tls_enable,
+    Boolean $tls_verify                     = $dockerinstall::tls_verify,
+    String  $tls_cacert                     = $dockerinstall::tls_cacert,
+    String  $tls_cert                       = $dockerinstall::tls_cert,
+    String  $tls_key                        = $dockerinstall::tls_key,
+    Optional[Dockerinstall::Multiple]
+            $socket_bind                    = $dockerinstall::socket_bind,
+    Boolean $ip_forward                     = $dockerinstall::ip_forward,
+    Boolean $iptables                       = $dockerinstall::iptables,
+    Boolean $ip_masq                        = $dockerinstall::ip_masq,
+    Boolean $icc                            = $dockerinstall::icc,
     Optional[String]
-            $registry_mirror                = $docker::registry_mirror,
+            $registry_mirror                = $dockerinstall::registry_mirror,
     Optional[String]
-            $fixed_cidr                     = $docker::fixed_cidr,
+            $fixed_cidr                     = $dockerinstall::fixed_cidr,
     Optional[String]
-            $default_gateway                = $docker::default_gateway,
+            $default_gateway                = $dockerinstall::default_gateway,
     Optional[String]
-            $bridge                         = $docker::bridge,
+            $bridge                         = $dockerinstall::bridge,
     Optional[String]
-            $bip                            = $docker::bip,
-    Optional[Docker::LogLevel]
-            $log_level                      = $docker::log_level,
-    Optional[Docker::LogDriver]
-            $log_driver                     = $docker::log_driver,
-    Optional[Docker::Multiple]
-            $log_opt                        = $docker::log_opt,
-    Boolean $selinux_enabled                = $docker::selinux_enabled,
+            $bip                            = $dockerinstall::bip,
+    Optional[Dockerinstall::LogLevel]
+            $log_level                      = $dockerinstall::log_level,
+    Optional[Dockerinstall::LogDriver]
+            $log_driver                     = $dockerinstall::log_driver,
+    Optional[Dockerinstall::Multiple]
+            $log_opt                        = $dockerinstall::log_opt,
+    Boolean $selinux_enabled                = $dockerinstall::selinux_enabled,
     Optional[String]
-            $socket_group                   = $docker::socket_group,
-    Optional[Docker::Multiple]
-            $dns                            = $docker::dns,
-    Optional[Docker::Multiple]
-            $dns_search                     = $docker::dns_search,
+            $socket_group                   = $dockerinstall::socket_group,
+    Optional[Dockerinstall::Multiple]
+            $dns                            = $dockerinstall::dns,
+    Optional[Dockerinstall::Multiple]
+            $dns_search                     = $dockerinstall::dns_search,
     Optional[Integer]
-            $mtu                            = $docker::mtu,
-    Optional[Docker::Multiple]
-            $labels                         = $docker::labels,
-    Optional[Docker::Multiple]
-            $extra_parameters               = $docker::extra_parameters,
+            $mtu                            = $dockerinstall::mtu,
+    Optional[Dockerinstall::Multiple]
+            $labels                         = $dockerinstall::labels,
+    Optional[Dockerinstall::Multiple]
+            $extra_parameters               = $dockerinstall::extra_parameters,
     Optional[String]
-            $proxy                          = $docker::proxy,
+            $proxy                          = $dockerinstall::proxy,
     Optional[String]
-            $no_proxy                       = $docker::no_proxy,
+            $no_proxy                       = $dockerinstall::no_proxy,
     Optional[String]
-            $tmp_dir                        = $docker::tmp_dir,
-    Optional[Docker::StorageDriver]
-            $storage_driver                 = $docker::storage_driver,
+            $tmp_dir                        = $dockerinstall::tmp_dir,
+    Optional[Dockerinstall::StorageDriver]
+            $storage_driver                 = $dockerinstall::storage_driver,
     Optional[String]
-            $dm_basesize                    = $docker::dm_basesize,
-    Optional[Docker::DmFS]
-            $dm_fs                          = $docker::dm_fs,
+            $dm_basesize                    = $dockerinstall::dm_basesize,
+    Optional[Dockerinstall::DmFS]
+            $dm_fs                          = $dockerinstall::dm_fs,
     Optional[String]
-            $dm_mkfsarg                     = $docker::dm_mkfsarg,
+            $dm_mkfsarg                     = $dockerinstall::dm_mkfsarg,
     Optional[String]
-            $dm_mountopt                    = $docker::dm_mountopt,
+            $dm_mountopt                    = $dockerinstall::dm_mountopt,
     Optional[String]
-            $dm_blocksize                   = $docker::dm_blocksize,
+            $dm_blocksize                   = $dockerinstall::dm_blocksize,
     Optional[String]
-            $dm_loopdatasize                = $docker::dm_loopdatasize,
+            $dm_loopdatasize                = $dockerinstall::dm_loopdatasize,
     Optional[String]
-            $dm_loopmetadatasize            = $docker::dm_loopmetadatasize,
+            $dm_loopmetadatasize            = $dockerinstall::dm_loopmetadatasize,
     Optional[String]
-            $dm_datadev                     = $docker::dm_datadev,
+            $dm_datadev                     = $dockerinstall::dm_datadev,
     Optional[String]
-            $dm_metadatadev                 = $docker::dm_metadatadev,
+            $dm_metadatadev                 = $dockerinstall::dm_metadatadev,
     Optional[String]
-            $dm_thinpooldev                 = $docker::dm_thinpooldev,
-    Boolean $dm_use_deferred_removal        = $docker::dm_use_deferred_removal,
-    Boolean $dm_use_deferred_deletion       = $docker::dm_use_deferred_deletion,
-    Boolean $dm_blkdiscard                  = $docker::dm_blkdiscard,
-    Boolean $dm_override_udev_sync_check    = $docker::dm_override_udev_sync_check,
-    Boolean $overlay2_override_kernel_check = $docker::overlay2_override_kernel_check,
-    Boolean $manage_users                   = $docker::manage_os_users,
-    Boolean $manage_package                 = $docker::manage_package,
+            $dm_thinpooldev                 = $dockerinstall::dm_thinpooldev,
+    Boolean $dm_use_deferred_removal        = $dockerinstall::dm_use_deferred_removal,
+    Boolean $dm_use_deferred_deletion       = $dockerinstall::dm_use_deferred_deletion,
+    Boolean $dm_blkdiscard                  = $dockerinstall::dm_blkdiscard,
+    Boolean $dm_override_udev_sync_check    = $dockerinstall::dm_override_udev_sync_check,
+    Boolean $overlay2_override_kernel_check = $dockerinstall::overlay2_override_kernel_check,
+    Boolean $manage_users                   = $dockerinstall::manage_os_users,
+    Boolean $manage_package                 = $dockerinstall::manage_package,
 )
 {
     include lsys::systemd
-    include docker::config
-    include docker::install
+    include dockerinstall::config
+    include dockerinstall::install
 
     if $manage_service {
         service { $service_name:

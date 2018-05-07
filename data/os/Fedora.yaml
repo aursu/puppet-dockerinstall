@@ -1,2 +1,2 @@
 ---
-docker::repo_os: 'fedora'
+dockerinstall::repo_os: 'fedora'

@@ -1,10 +1,10 @@
-# == Class: docker::config
+# == Class: dockerinstall::config
 #
-class docker::config (
-    Boolean $manage_users   = $docker::manage_os_users,
-    Docker::UserList
-            $docker_users   = $docker::docker_users,
-    String  $group          = $docker::docker_group,
+class dockerinstall::config (
+    Boolean $manage_users   = $dockerinstall::manage_os_users,
+    Dockerinstall::UserList
+            $docker_users   = $dockerinstall::docker_users,
+    String  $group          = $dockerinstall::docker_group,
 )
 {
     if $manage_users {

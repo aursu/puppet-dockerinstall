@@ -1,5 +1,5 @@
 ---
-docker::prerequired_packages:
+dockerinstall::prerequired_packages:
     - lvm2
     - device-mapper-persistent-data
-docker::repo_os: 'centos'
+dockerinstall::repo_os: 'centos'
