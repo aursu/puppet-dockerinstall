@@ -112,8 +112,6 @@ class dockerinstall (
     Boolean $dm_blkdiscard,
     Boolean $dm_override_udev_sync_check,
     Boolean $overlay2_override_kernel_check,
-)
-{
-    # to install Docker CE - use: include 'dockerinstall::install'
-    # to install and run Docker CE - use: include 'dockerinstall::service'
-}
+    Optional[String]
+            $compose_version,
+){}

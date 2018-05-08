@@ -68,3 +68,4 @@ dockerinstall::dm_use_deferred_deletion: false
 dockerinstall::dm_blkdiscard: true
 dockerinstall::dm_override_udev_sync_check: false
 dockerinstall::overlay2_override_kernel_check: false
+dockerinstall::compose_version: ~
