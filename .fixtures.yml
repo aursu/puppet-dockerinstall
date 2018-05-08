@@ -2,6 +2,8 @@
 # See https://github.com/puppetlabs/puppetlabs_spec_helper#using-fixtures for details
 ---
 fixtures:
+  forge_modules:
+     stdlib: "puppetlabs/stdlib"
   repositories:
     "lsys": "https://github.com/aursu/puppet-lsys"
   symlinks:

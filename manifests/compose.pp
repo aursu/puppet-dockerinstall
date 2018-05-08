@@ -11,8 +11,10 @@ class dockerinstall::compose (
     String  $download_name    = $dockerinstall::params::compose_download_name,
     String  $checksum_name    = $dockerinstall::params::compose_checksum_name,
     String  $checksum_command = $dockerinstall::params::compose_checksum_command,
-    String  $tmpdir           = $dockerinstall::params::download_tmpdir,
-    String  $binary_path      = $dockerinstall::params::compose_binary_path,
+    Stdlib::Absolutepath
+            $tmpdir           = $dockerinstall::params::download_tmpdir,
+    Stdlib::Absolutepath
+            $binary_path      = $dockerinstall::params::compose_binary_path,
 ) inherits dockerinstall::params
 {
     Exec {
