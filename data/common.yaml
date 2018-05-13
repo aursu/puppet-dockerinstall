@@ -17,11 +17,11 @@ dockerinstall::service_enable: true
 dockerinstall::service_hasstatus: true
 dockerinstall::service_hasrestart: true
 dockerinstall::service_overrides_config: '/etc/systemd/system/docker.service.d/service-overrides.conf'
-dockerinstall::service_overrides_template: 'docker/etc/systemd/system/docker.service.d/service-overrides.conf.erb'
+dockerinstall::service_overrides_template: 'dockerinstall/etc/systemd/system/docker.service.d/service-overrides.conf.erb'
 dockerinstall::service_config: '/etc/sysconfig/docker'
-dockerinstall::service_config_template: 'docker/etc/sysconfig/docker.systemd.erb'
+dockerinstall::service_config_template: 'dockerinstall/etc/sysconfig/docker.systemd.erb'
 dockerinstall::storage_config: '/etc/default/docker-storage'
-dockerinstall::storage_config_template: 'docker/etc/sysconfig/docker-storage.erb'
+dockerinstall::storage_config_template: 'dockerinstall/etc/sysconfig/docker-storage.erb'
 dockerinstall::root_dir: ~
 dockerinstall::tcp_bind: ~
 dockerinstall::tls_enable: false
