@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe 'dockerinstall::compose' do
+  let(:pre_condition) { 'include dockerinstall' }
+
   on_supported_os.each do |os, os_facts|
     context "on #{os}" do
       let(:facts) { os_facts }
