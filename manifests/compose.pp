@@ -19,6 +19,7 @@ class dockerinstall::compose (
 {
     Exec {
         path => '/bin:/usr/bin',
+        cwd  => $tmpdir,
     }
 
     # we allow user to not care about compose version and keep it default
@@ -28,7 +29,7 @@ class dockerinstall::compose (
         $download_version = $version
     }
     else {
-        $download_version = $dockerinstall::params::compose_version,
+        $download_version = $dockerinstall::params::compose_version
     }
 
     # in URL base folder lcated Docker Compose binary and checksum
@@ -40,16 +41,14 @@ class dockerinstall::compose (
     $checksum_download_path = "${tmpdir}/${checksum_version_name}"
 
     # download checksm file into temporary directory
-    exec { "curl -L ${download_url_base}/${checksum_name} -o ${checksum_download_path}":
+    exec { "curl -L ${download_url_base}/${checksum_name} -o ${checksum_version_name}":
         creates => $checksum_download_path,
         alias   => 'docker-compose-checksum',
     }
 
     # download binary if checksum not match
-    $binary_download_path = "${tmpdir}/${download_name}"
-    exec { "curl -L ${download_url_base}/${download_name} -o ${binary_download_path}":
+    exec { "curl -L ${download_url_base}/${download_name} -o ${download_name}":
         unless  => "${checksum_command} -c ${checksum_version_name}",
-        cwd     => $tmpdir,
         require => Exec['docker-compose-checksum'],
         alias   => 'docker-compose-download',
     }
@@ -58,7 +57,7 @@ class dockerinstall::compose (
     # /usr/local/bin/docker-compose)
     file { $binary_path:
         ensure    => file,
-        source    => "file://${binary_download_path}",
+        source    => "file://${tmpdir}/${download_name}",
         mode      => '0755',
         owner     => 'root',
         group     => 'root',
