@@ -1,0 +1,2 @@
+---
+dockerinstall::repo_os: 'debian'
