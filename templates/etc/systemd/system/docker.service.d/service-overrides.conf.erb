@@ -1,5 +1,9 @@
 [Service]
-EnvironmentFile=-/etc/sysconfig/docker
-EnvironmentFile=-/etc/sysconfig/docker-storage
+<% if @service_config -%>
+EnvironmentFile=-<%= @service_config %>
+<% end -%>
+<% if @storage_config -%>
+EnvironmentFile=-<%= @storage_config %>
+<% end -%>
 ExecStart=/usr/bin/dockerd $OPTIONS \
       $DOCKER_STORAGE_OPTIONS

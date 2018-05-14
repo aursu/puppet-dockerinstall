@@ -134,6 +134,9 @@ class dockerinstall::service (
                     notify  => Exec['systemd-reload'],
                     before  => Service['docker'],
                 }
+                if $service_config {
+                    File[$service_config] -> File[$service_overrides_config]
+                }
             }
 
             # for Upstart it is integrated into $service_config
