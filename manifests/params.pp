@@ -5,6 +5,12 @@
 # @example
 #   include dockerinstall::params
 class dockerinstall::params {
+    if $::is_init_systemd {
+        $service_config_template = 'dockerinstall/docker.systemd.erb'
+    }
+    else {
+        $service_config_template = 'dockerinstall/docker.upstart.erb'
+    }
     $compose_version          = '1.21.2'
     $compose_download_source  = 'https://github.com/docker/compose/releases/download'
 

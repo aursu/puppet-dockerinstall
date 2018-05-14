@@ -1,2 +1,4 @@
 ---
 dockerinstall::repo_os: 'debian'
+dockerinstall::service_config: '/etc/default/docker'
+dockerinstall::storage_config: '/etc/default/docker-storage'

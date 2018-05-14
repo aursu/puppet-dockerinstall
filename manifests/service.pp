@@ -122,31 +122,43 @@ class dockerinstall::service (
             Package <| title == 'docker' |> -> Service[$service_name]
         }
 
-        file { '/etc/systemd/system/docker.service.d':
-            ensure => directory,
-        }
+        if $::is_init_systemd {
+            file { '/etc/systemd/system/docker.service.d':
+                ensure => directory,
+            }
 
-        if $service_overrides_config and $service_overrides_template {
-            file { $service_overrides_config:
-                ensure  => present,
-                content => template($service_overrides_template),
-                notify  => Exec['systemd-reload'],
-                before  => Service['docker'],
+            if $service_overrides_config and $service_overrides_template {
+                file { $service_overrides_config:
+                    ensure  => present,
+                    content => template($service_overrides_template),
+                    notify  => Exec['systemd-reload'],
+                    before  => Service['docker'],
+                }
+            }
+
+            # for Upstart it is integrated into $service_config
+            if $storage_config and $storage_config_template {
+                file { $storage_config:
+                    ensure  => present,
+                    content => template($storage_config_template),
+                    notify  => Service['docker'],
+                }
             }
         }
 
-        if $service_config and  $service_config_template {
+        if $service_config_template {
+            # provided by user
+            $config_template = $service_config_template
+        }
+        else {
+            # predefined (systemd or upstart)
+            $config_template = $dockerinstall::params::service_config_template
+        }
+
+        if $service_config {
             file { $service_config:
                 ensure  => present,
-                content => template($service_config_template),
-                notify  => Service['docker'],
-            }
-        }
-
-        if $storage_config and $storage_config_template {
-            file { $storage_config:
-                ensure  => present,
-                content => template($storage_config_template),
+                content => template($config_template),
                 notify  => Service['docker'],
             }
         }

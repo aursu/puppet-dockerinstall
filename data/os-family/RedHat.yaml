@@ -3,3 +3,5 @@ dockerinstall::prerequired_packages:
     - lvm2
     - device-mapper-persistent-data
 dockerinstall::repo_os: 'centos'
+dockerinstall::service_config: '/etc/sysconfig/docker'
+dockerinstall::storage_config: '/etc/sysconfig/docker-storage'

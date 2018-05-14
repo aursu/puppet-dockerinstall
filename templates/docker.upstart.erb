@@ -1,0 +1,120 @@
+<%-
+def flag2config(flag, option, defval=true)
+    case flag
+    when true
+        if defval
+            ''
+        else
+            " #{option}=true"
+        end
+    when false
+        if defval
+            " #{option}=false"
+        else
+            ''
+        end
+    else
+        ''
+    end
+end
+-%>
+# This file is managed by Puppet and local changes
+# may be overwritten
+
+OPTIONS="<% if @root_dir -%> -g <%= @root_dir -%><% end -%>
+<% if @tcp_bind.is_a?(Array) -%>
+<%-      @tcp_bind.each do |param| -%>
+ -H <%= param -%>
+<%-      end -%>
+<% elsif @tcp_bind %> -H <%= @tcp_bind %><% end -%>
+<% if @tls_enable -%>
+ --tls<%= flag2config(@tls_verify, '--tlsverify', false) -%>
+ --tlscacert=<%= @tls_cacert -%>
+ --tlscert=<%= @tls_cert -%>
+ --tlskey=<%= @tls_key -%>
+<% end -%>
+<% if @socket_bind %> -H <%= @socket_bind %><% end -%>
+<% if @socket_bind.is_a?(Array) -%>
+<%-      @socket_bind.each do |param| -%>
+ -H <%= param -%>
+<%-      end -%>
+<% elsif @socket_bind %> -H <%= @socket_bind %><% end -%>
+<%= flag2config(@ip_forward, '--ip-forward') -%>
+<%= flag2config(@iptables, '--iptables') -%>
+<%= flag2config(@ip_masq, '--ip-masq') -%>
+<%= flag2config(@icc, '--icc') -%>
+<% if @registry_mirror %> --registry-mirror=<%= @registry_mirror %><% end -%>
+<% if @fixed_cidr %> --fixed-cidr <%= @fixed_cidr %><% end -%>
+<% if @default_gateway %> --default-gateway <%= @default_gateway %><% end -%>
+<% if @bridge %> --bridge <%= @bridge -%>
+<% elsif @bip %> --bip=<%= @bip -%>
+<% end -%>
+<% if @log_level %> -l <%= @log_level %><% end -%>
+<% if @log_driver %> --log-driver <%= @log_driver -%>
+<%-    if @log_opt -%>
+<%-        @log_opt.each do |param| -%>
+ --log-opt <%= param -%>
+<%-        end -%>
+<%-    end -%>
+<% end -%>
+<%= flag2config(@selinux_enabled, '--selinux-enabled', false) -%>
+<% if @socket_group %> -G <%= @socket_group %><% end -%>
+<% if @dns.is_a?(Array) -%>
+<%-      @dns.each do |address| -%>
+ --dns <%= address -%>
+<%-      end -%>
+<% elsif @dns -%> --dns <%= @dns -%><% end -%>
+<% if @dns_search.is_a?(Array) -%>
+<%-      @dns_search.each do |domain| -%>
+ --dns-search <%= domain -%>
+<%-      end -%>
+<% elsif @dns_search %> --dns-search <%= @dns_search %><% end -%>
+<% if @mtu %> --mtu=<%= @mtu %> <% end -%>
+<% if @labels.is_a?(Array) -%>
+<%-      @labels.each do |label| -%>
+ --label <%= label -%>
+<%-      end -%>
+<% elsif @labels %> --label <%= @labels %><% end -%>
+<%- if @extra_parameters -%>
+<%-    @extra_parameters.each do |param| -%>
+ <%= param -%>
+<%-        end -%>
+<%-    end -%>"
+
+DOCKER_STORAGE_OPTIONS="<% -%>
+<% if @storage_driver -%>
+ --storage-driver=<%= @storage_driver %>
+<%-     if @storage_driver == 'devicemapper' -%>
+<%-         if @dm_basesize %> --storage-opt dm.basesize=<%= @dm_basesize %><% end -%>
+<%-         if @dm_fs %> --storage-opt dm.fs=<%= @dm_fs %><% end -%>
+<%-         if @dm_mkfsarg %> --storage-opt "dm.mkfsarg=<%= @dm_mkfsarg %>"<% end -%>
+<%-         if @dm_mountopt %> --storage-opt dm.mountopt=<%= @dm_mountopt %><% end -%>
+<%-         if @dm_blocksize %> --storage-opt dm.blocksize=<%= @dm_blocksize %><% end -%>
+<%-         if @dm_loopdatasize %> --storage-opt dm.loopdatasize=<%= @dm_loopdatasize %><% end -%>
+<%-         if @dm_loopmetadatasize %> --storage-opt dm.loopmetadatasize=<%= @dm_loopmetadatasize %><% end -%>
+<%-         if @dm_thinpooldev %> --storage-opt dm.thinpooldev=<%= @dm_thinpooldev -%>
+<%-         else -%>
+<%-             if @dm_datadev %> --storage-opt dm.datadev=<%= @dm_datadev %><% end -%>
+<%-             if @dm_metadatadev %> --storage-opt dm.metadatadev=<%= @dm_metadatadev %><% end -%>
+<%-         end -%>
+<%= flag2config(@dm_use_deferred_removal, '--storage-opt dm.use_deferred_removal', false) -%>
+<%= flag2config(@dm_use_deferred_deletion, '--storage-opt dm.use_deferred_deletion', false) -%>
+<%= flag2config(@dm_blkdiscard, '--storage-opt dm.blkdiscard') -%>
+<%= flag2config(@dm_override_udev_sync_check, '--storage-opt dm.override_udev_sync_check', false) -%>
+<%      elsif @storage_driver == 'overlay2' -%>
+<%= flag2config(@overlay2_override_kernel_check, '--storage-opt overlay2.override_kernel_check', false) -%>
+<%-     end -%>
+<% end -%>"
+
+DOCKER_OPTS="${OPTIONS} ${DOCKER_STORAGE_OPTIONS}"
+
+<% if @proxy -%>
+HTTP_PROXY="<%= @proxy %>"
+HTTPS_PROXY="<%= @proxy %>"
+<% end -%>
+<% if @no_proxy -%>
+NO_PROXY="<%= @no_proxy %>"
+<% end -%>
+<% if @tmp_dir -%>
+DOCKER_TMPDIR="<%= @tmp_dir %>"
+<% end -%>
