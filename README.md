@@ -3,7 +3,7 @@ Based on puppetlabs/docker - only installation and service startup for Fedora, C
 
 ### Usage in profile
 
-Profile `profile::docker` will install Docker daemon and Docker compose and start daemon. It is possible to define `class {'dockerinstall::config': ... }` in order to ovveride predefined startup options.
+Profile `profile::docker` will install Docker daemon and Docker compose and start daemon. It is possible to define `class {'dockerinstall::config': ... }` in order to override predefined startup options.
 
 ```
 class profile::docker {
