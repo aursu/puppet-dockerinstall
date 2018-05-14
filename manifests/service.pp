@@ -99,7 +99,7 @@ class dockerinstall::service (
     Boolean $overlay2_override_kernel_check = $dockerinstall::overlay2_override_kernel_check,
     Boolean $manage_users                   = $dockerinstall::manage_os_users,
     Boolean $manage_package                 = $dockerinstall::manage_package,
-)
+)  inherits dockerinstall::params
 {
     include lsys::systemd
     include dockerinstall::config
