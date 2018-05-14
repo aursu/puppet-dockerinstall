@@ -11,6 +11,7 @@ end
 include RspecPuppetFacts
 
 # TODO: http://unethicalblogger.com/2014/03/01/testing-custom-facts-with-rspec.html
+#       https://github.com/puppetlabs/puppetlabs-firewall/blob/master/spec/unit/facter/iptables_persistent_version_spec.rb
 
 # https://github.com/mcanevet/rspec-puppet-facts/blob/master/README.md#create-dynamic-facts
 # register is_init_systemd fact from module lsys
