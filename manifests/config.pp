@@ -5,14 +5,27 @@ class dockerinstall::config (
     Dockerinstall::UserList
             $docker_users   = $dockerinstall::docker_users,
     String  $group          = $dockerinstall::docker_group,
+    Boolean $manage_package = $dockerinstall::manage_package,
 )
 {
+    include dockerinstall::install
+
     if $manage_users {
+        group { $group:
+            ensure => 'present',
+        }
+
         user{ $docker_users:
             ensure     => 'present',
             groups     => [ $group ],
             membership => 'minimum',
-            tag        => 'docker',
+            require    => Group[$group],
+            alias      => 'docker',
+        }
+
+        if $manage_package {
+            Package['docker'] -> Group[$group]
+            Package['docker'] -> User[$docker_users]
         }
     }
 }

@@ -14,18 +14,19 @@ class dockerinstall::install (
 {
     include dockerinstall::repos
 
-    $prerequired_packages.each |String $reqp| {
-        package { $reqp:
-            ensure => installed,
-        }
-    }
-
     if $manage_package {
-        package { $package_name:
-            ensure => $version,
-            name   => $package_name,
-            alias  => 'docker',
+        $prerequired_packages.each |String $reqp| {
+            package { $reqp:
+                ensure => installed,
+                before => Package['docker'],
+            }
         }
-        Yumrepo <| title == 'docker' |> -> Package[$package_name]
+
+        package { $package_name:
+            ensure  => $version,
+            name    => $package_name,
+            require => Yumrepo['docker'],
+            alias   => 'docker',
+        }
     }
 }

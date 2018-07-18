@@ -99,11 +99,12 @@ class dockerinstall::service (
     Boolean $overlay2_override_kernel_check = $dockerinstall::overlay2_override_kernel_check,
     Boolean $manage_users                   = $dockerinstall::manage_os_users,
     Boolean $manage_package                 = $dockerinstall::manage_package,
-)  inherits dockerinstall::params
+)
 {
     include lsys::systemd
     include dockerinstall::config
     include dockerinstall::install
+    include dockerinstall::params
 
     if $manage_service {
         service { $service_name:
@@ -115,11 +116,11 @@ class dockerinstall::service (
         }
 
         if $manage_users {
-            User <| tag == 'docker' |> -> Service[$service_name]
+            User['docker'] -> Service[$service_name]
         }
 
         if $manage_package {
-            Package <| title == 'docker' |> -> Service[$service_name]
+            Package['docker'] -> Service[$service_name]
         }
 
         if $::is_init_systemd {
