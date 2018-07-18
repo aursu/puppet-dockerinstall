@@ -5,5 +5,8 @@ EnvironmentFile=-<%= @service_config %>
 <% if @storage_config -%>
 EnvironmentFile=-<%= @storage_config %>
 <% end -%>
+# reset the list of commands to start, prior assignments of this option will
+# have no effect
+ExecStart=
 ExecStart=/usr/bin/dockerd $OPTIONS \
       $DOCKER_STORAGE_OPTIONS
