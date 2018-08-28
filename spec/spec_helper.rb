@@ -1,4 +1,3 @@
-
 require 'puppetlabs_spec_helper/module_spec_helper'
 require 'rspec-puppet-facts'
 
@@ -16,11 +15,7 @@ include RspecPuppetFacts
 # https://github.com/mcanevet/rspec-puppet-facts/blob/master/README.md#create-dynamic-facts
 # register is_init_systemd fact from module lsys
 add_custom_fact :is_init_systemd, ->(os, _facts) do
-  if os == 'ubuntu-14.04-x86_64'
-    false
-  else
-    true
-  end
+  os != 'ubuntu-14.04-x86_64'
 end
 
 default_facts = {
@@ -47,3 +42,12 @@ RSpec.configure do |c|
     Puppet.settings[:strict] = :warning
   end
 end
+
+def ensure_module_defined(module_name)
+  module_name.split('::').reduce(Object) do |last_module, next_module|
+    last_module.const_set(next_module, Module.new) unless last_module.const_defined?(next_module)
+    last_module.const_get(next_module)
+  end
+end
+
+# 'spec_overrides' from sync.yml will appear below this line
