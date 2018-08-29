@@ -24,6 +24,11 @@ Puppet::Type.newtype(:dockerimage) do
     ]
   end
 
+  newparam(:name) do
+    desc "Resource name"
+    defaultto(self[:name] + ":" + self[:tag])
+  end
+
   newparam(:path, namevar: true) do
     desc "Path is username/repository part of image name"
   end
