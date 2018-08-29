@@ -85,7 +85,7 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
       hash[:domain] = path[0]
       hash[:path] = path[1] + '/' + path[2]
     else
-      hash[:path] = meta['repository']
+      hash[:path] = meta[:repository]
     end
 
     hash[:provider] = self.name
