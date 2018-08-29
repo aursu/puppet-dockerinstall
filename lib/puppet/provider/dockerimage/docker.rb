@@ -78,9 +78,9 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
     hash = {}
     meta = self::GO_FIELDS.zip(line.split)
 
-    [:id, :tag].each { |f| hash[f] = meta[f] }
+    meta.each { |f, v| hash[f] = v if [:id, :tag].include?(f)}
 
-    path = meta['repository'].split('/')
+    path = meta[:repository].split('/')
     if path.count == 3
       hash[:domain] = path[0]
       hash[:path] = path[1] + '/' + path[2]
