@@ -26,7 +26,7 @@ Puppet::Type.newtype(:dockerimage) do
 
   newparam(:name) do
     desc "Resource name"
-    defaultto(self[:name] + ":" + self[:tag])
+    defaultto { @resource[:path] + ":" + @resource[:tag] }
   end
 
   newparam(:path, namevar: true) do
