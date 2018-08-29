@@ -15,7 +15,7 @@ Puppet::Type.newtype(:dockerimage) do
   def self.title_patterns
     [
       [
-        /^(.*):([\w][\w.-]{0,127})$/,
+        %r{^(.*):([\w][\w.-]{0,127})$},
         [
           [:path ],
           [:tag ]
