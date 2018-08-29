@@ -1,6 +1,13 @@
 Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Package) do
   desc "Docker image provider"
 
+  # Note: self:: is required here to keep these constants in the context of what will
+  # eventually become this Puppet::Type::Package::ProviderDocker class.
+  # The query format by which we identify installed images
+  self::GO_FORMAT = %Q[{{.ID}} {{.Repository}} {{.Tag}}\\n]
+  self::GO_FIELDS = [:id, :repository, :tag]
+
+
   commands :docker => "docker"
 
   if command('docker')
@@ -18,8 +25,7 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
 
     # list out all of the packages
     begin
-      # docker image ls --format "{{.ID}}: {{.Repository}} {{.Tag}}"
-      execpipe("#{command(:rpm)} -qa #{nosignature} #{nodigest} --qf '#{self::NEVRA_FORMAT}'") { |process|
+      execpipe("#{command(:docker)} image ls --format '#{self::GO_FORMAT}'") { |process|
         # now turn each returned line into a package object
         process.each_line { |line|
           hash = command_to_hash(line)
@@ -41,15 +47,20 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
   def self.command_to_hash(line)
     line.strip!
     hash = {}
+    meta = self::GO_FIELDS.zip(line.split)
 
-    if match = self::NEVRA_REGEX.match(line)
-      self::NEVRA_FIELDS.zip(match.captures) { |f, v| hash[f] = v }
-      hash[:provider] = self.name
-      hash[:ensure] = "#{hash[:version]}-#{hash[:release]}"
-      hash[:ensure].prepend("#{hash[:epoch]}:") if hash[:epoch] != '0'
+    [:id, :tag].each { |f| hash[f] = meta[f] }
+
+    path = meta['repository'].split('/')
+    if path.count == 3
+      hash[:domain] = path[0]
+      hash[:path] = path[1] + '/' + path[2]
     else
-      Puppet.debug("Failed to match rpm line #{line}")
+      hash[:path] = meta['repository']
     end
+
+    hash[:provider] = self.name
+    hash[:ensure] = :present
 
     return hash
   end
