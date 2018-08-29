@@ -12,13 +12,27 @@ Puppet::Type.newtype(:dockerimage) do
     defaultto :present
   end
 
-  newparam(:tag) do
-    desc "Tag is the mechanism that registries use to give Docker images a
-    version"
+  def self.title_patterns
+    [
+      [
+        /^(.*):([\w][\w.-]{0,127})$/,
+        [
+          [:path ],
+          [:tag ]
+        ]
+      ]
+    ]
   end
 
   newparam(:path) do
     desc "Path is username/repository part of image name"
+    isnamevar
+  end
+
+  newparam(:tag) do
+    desc "Tag is the mechanism that registries use to give Docker images a
+    version"
+    isnamevar
   end
 
   newparam(:domain) do
@@ -28,5 +42,4 @@ Puppet::Type.newtype(:dockerimage) do
   newparam(:id) do
     desc "ID is image id"
   end
-
 end

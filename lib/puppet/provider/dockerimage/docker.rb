@@ -44,7 +44,8 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
       image += ':' + @resource[:tag]
     end
     if @resource[:domain]
-      image = @resource[:domain] + '/' + image
+      prefix = @resource[:domain] + '/'
+      image = prefix + image if !image.include?(prefix)
     end
     image
   end
