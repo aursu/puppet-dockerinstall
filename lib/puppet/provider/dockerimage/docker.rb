@@ -1,12 +1,11 @@
 Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Package) do
-  desc "Docker image provider"
+  @doc = "Docker image provider"
 
   # Note: self:: is required here to keep these constants in the context of what will
   # eventually become this Puppet::Type::Package::ProviderDocker class.
   # The query format by which we identify installed images
   self::GO_FORMAT = %Q[{{.ID}} {{.Repository}} {{.Tag}}\\n]
   self::GO_FIELDS = [:id, :repository, :tag]
-
 
   commands :docker => "docker"
 
@@ -25,9 +24,9 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
 
     # list out all of the packages
     begin
-      execpipe("#{command(:docker)} image ls --format '#{self::GO_FORMAT}'") { |process|
+      execpipe("#{command(:docker)} image ls --format '#{self::GO_FORMAT}'") { |pipe|
         # now turn each returned line into a package object
-        process.each_line { |line|
+        pipe.each_line { |line|
           hash = command_to_hash(line)
           images << new(hash) unless hash.empty?
         }
@@ -37,6 +36,35 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
     end
 
     images
+  end
+
+  def imagename
+    image = @resource[:path]
+    if @resource[:tag]
+      image += ':' + @resource[:tag]
+    end
+    if @resource[:domain]
+      image = @resource[:domain] + '/' + image
+    end
+    image
+  end
+
+  def pull
+    image = imagename
+    begin
+      output = docker('pull', image)
+    rescue
+      raise Puppet::Error, "Could not pull #{image}: #{output}", $!.backtrace
+    end
+  end
+
+  def rmi
+    image = imagename
+    begin
+      output = docker('rmi', image)
+    rescue
+      raise Puppet::Error, "Could not remove image #{image}: #{output}", $!.backtrace
+    end
   end
 
   private
@@ -64,6 +92,4 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
 
     return hash
   end
-
-
 end
