@@ -24,15 +24,13 @@ Puppet::Type.newtype(:dockerimage) do
     ]
   end
 
-  newparam(:path) do
+  newparam(:path, namevar: true) do
     desc "Path is username/repository part of image name"
-    isnamevar
   end
 
-  newparam(:tag) do
+  newparam(:tag, namevar: true) do
     desc "Tag is the mechanism that registries use to give Docker images a
     version"
-    isnamevar
   end
 
   newparam(:domain) do
