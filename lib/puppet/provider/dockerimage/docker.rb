@@ -84,6 +84,7 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
       hash[:path] = pp[1] + '/' + pp[2]
     end
 
+    hash[:name] = hash[:path] + ':' + hash[:tag]
     hash[:provider] = self.name
     hash[:ensure] = :present
 
