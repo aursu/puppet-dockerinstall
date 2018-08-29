@@ -5,7 +5,7 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
   # eventually become this Puppet::Type::Package::ProviderDocker class.
   # The query format by which we identify installed images
   self::GO_FORMAT = %Q[{{.ID}} {{.Repository}} {{.Tag}}]
-  self::GO_FIELDS = [:id, :repository, :tag]
+  self::GO_FIELDS = [:id, :path, :tag]
 
   commands :docker => "docker"
 
@@ -76,16 +76,12 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
   def self.command_to_hash(line)
     line.strip!
     hash = {}
-    meta = self::GO_FIELDS.zip(line.split)
+    self::GO_FIELDS.zip(line.split) { |f, v| hash[f] = v }
 
-    meta.each { |f, v| hash[f] = v if [:id, :tag].include?(f)}
-
-    path = meta[:repository].split('/')
-    if path.count == 3
-      hash[:domain] = path[0]
-      hash[:path] = path[1] + '/' + path[2]
-    else
-      hash[:path] = meta[:repository]
+    pp = hash[:path].split('/')
+    if pp.count == 3
+      hash[:domain] = pp[0]
+      hash[:path] = pp[1] + '/' + pp[2]
     end
 
     hash[:provider] = self.name
