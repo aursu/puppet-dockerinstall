@@ -26,7 +26,7 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
 
     # list out all of the packages
     begin
-      ls { |pipe|
+      execpipe(lscmd) { |pipe|
         # now turn each returned line into a package object
         pipe.each_line { |line|
           Puppet.info _("Got line: %{line}") % { line: line }
@@ -74,17 +74,16 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
     end
   end
 
-  def self.ls(*args, &block)
-    cmd = [command(:docker), 'image', 'ls', '--format', "'#{self::GO_FORMAT}'"] + args
-    execpipe(cmd, &block)
+  def self.lscmd(*args)
+    ([command(:docker), 'image', 'ls', '--format', "'#{self::GO_FORMAT}'"] + args).join(' ')
   end
 
-  def ls(*args, &block)
-    self.class.ls(*args, &block)
+  def lscmd(*args)
+    self.class.lscmd(*args)
   end
 
   def exists?
-    output = ls(image)
+    output = execute(lscmd(image))
     Puppet.info _("Got output from ls(%{image}): %{output}") % { image: image, output: output }
     @property_hash[:ensure] == :present
   end
