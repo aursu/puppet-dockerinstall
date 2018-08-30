@@ -83,9 +83,8 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
   end
 
   def exists?
-    output = execute(lscmd(image))
-    Puppet.info _("Got output from ls(%{image}): %{output}") % { image: image, output: output }
-    @property_hash[:ensure] == :present
+    !execute(lscmd(image)).empty?
+#    @property_hash[:ensure] == :present
   end
 
   private
