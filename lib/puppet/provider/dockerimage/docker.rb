@@ -40,7 +40,7 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
     images
   end
 
-  def imagename
+  def name
     image = @resource[:path]
     if @resource[:tag]
       image += ':' + @resource[:tag]
@@ -52,21 +52,23 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
     image
   end
 
+  def imagename
+    @imagename ||= name
+  end
+
   def pull
-    image = imagename
     begin
-      output = docker('pull', image)
+      output = docker('pull', imagename)
     rescue
-      raise Puppet::Error, "Could not pull #{image}: #{output}", $!.backtrace
+      raise Puppet::Error, "Could not pull #{imagename}: #{output}", $!.backtrace
     end
   end
 
   def rmi
-    image = imagename
     begin
-      output = docker('rmi', image)
+      output = docker('rmi', imagename)
     rescue
-      raise Puppet::Error, "Could not remove image #{image}: #{output}", $!.backtrace
+      raise Puppet::Error, "Could not remove image #{imagename}: #{output}", $!.backtrace
     end
   end
 
@@ -90,7 +92,7 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
       hash[:path] = pp[1] + '/' + pp[2]
     end
 
-    hash[:name] = hash[:path] + ':' + hash[:tag]
+#    hash[:name] = hash[:path] + ':' + hash[:tag]
     hash[:provider] = self.name
     hash[:ensure] = :present
 
