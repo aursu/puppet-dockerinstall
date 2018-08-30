@@ -74,9 +74,7 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
   end
 
   def self.ls(*args, &block)
-    command_str = ([command(:docker), 'image', 'ls', '--format', self::GO_FORMAT] + args).join(' ')
-    Puppet.info _("Compiled command: %{command}") % { command: command_str }
-    execpipe(command_str, &block)
+    execpipe([command(:docker), 'image', 'ls', '--format', "'#{self::GO_FORMAT}'"] + args, &block)
   end
 
   def ls(*args, &block)
