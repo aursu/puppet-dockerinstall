@@ -27,6 +27,7 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
     # list out all of the packages
     begin
       ls { |pipe|
+        Puppet.info _("Got piped content: %{pipe}") % { pipe: pipe }
         # now turn each returned line into a package object
         pipe.each_line { |line|
           hash = command_to_hash(line)
