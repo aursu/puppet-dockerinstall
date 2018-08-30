@@ -29,7 +29,6 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
       execpipe(lscmd) { |pipe|
         # now turn each returned line into a package object
         pipe.each_line { |line|
-          Puppet.info _("Got line: %{line}") % { line: line }
           hash = command_to_hash(line)
           images << new(hash) unless hash.empty?
         }
@@ -42,7 +41,6 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
   end
 
   def imagename
-    Puppet.info _("Got domain: %{domain}") % { domain: @resource[:domain] }
     name = @resource[:path]
     if @resource[:tag]
       name += ':' + @resource[:tag]
@@ -83,8 +81,8 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
   end
 
   def exists?
-    !execute(lscmd(image)).empty?
-#    @property_hash[:ensure] == :present
+    return !execute(lscmd(image)).empty? if @resource[:domain]
+    @property_hash[:ensure] != :absent
   end
 
   private
@@ -97,11 +95,6 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
     hash = {}
 
     self::GO_FIELDS.zip(line.split) { |f, v| hash[f] = v }
-
-    pp = hash[:path].split('/')
-    if pp.count == 3 || pp[0].match?(%r{:\d+$})
-      hash[:domain] = pp[0]
-    end
 
     hash[:name] = hash[:path] + ':' + hash[:tag]
     hash[:provider] = self.name
