@@ -41,15 +41,15 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
   end
 
   def imagename
-    name = @resource[:path]
+    image = @resource[:path]
     if @resource[:tag]
-      name += ':' + @resource[:tag]
+      image += ':' + @resource[:tag]
     end
     if @resource[:domain]
       prefix = @resource[:domain] + '/'
-      name = prefix + name if name.index(prefix) != 0
+      image = prefix + image unless image.index(prefix) == 0
     end
-    name
+    image
   end
 
   def image
@@ -81,8 +81,9 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
   end
 
   def exists?
+    Puppet.info _("Check if exists with domain=%{domain}") % { domain: @resource[:domain]}
     return !execute(lscmd(image)).empty? if @resource[:domain]
-    @property_hash[:ensure] != :absent
+    @property_hash[:ensure] == :present
   end
 
   private
