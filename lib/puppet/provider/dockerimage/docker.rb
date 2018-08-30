@@ -12,13 +12,13 @@ Puppet::Type.type(:dockerimage).provide(:docker, parent: Puppet::Provider::Packa
   commands docker: 'docker'
 
   if command('docker')
-    confine true => begin
-                      docker('--version')
-                    rescue Puppet::ExecutionFailure
-                      false
-                    else
-                      true
-                    end
+    confine true: begin
+                    docker('--version')
+                  rescue Puppet::ExecutionFailure
+                    false
+                  else
+                    true
+                  end
   end
 
   def self.instances
