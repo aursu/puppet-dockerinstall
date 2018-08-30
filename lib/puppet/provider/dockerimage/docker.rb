@@ -81,7 +81,9 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
   end
 
   def exists?
+
     return !execute(lscmd(image)).empty? if @resource[:domain]
+    Puppet.info _("Check if exists with @property_hash=%{props}") % { props: @property_hash}
     @property_hash[:ensure] == :present
   end
 
