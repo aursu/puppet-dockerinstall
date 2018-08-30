@@ -26,7 +26,7 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
 
     # list out all of the packages
     begin
-      execpipe("#{command(:docker)} image ls --format '#{self::GO_FORMAT}'") { |pipe|
+      ls { |pipe|
         # now turn each returned line into a package object
         pipe.each_line { |line|
           hash = command_to_hash(line)
@@ -41,15 +41,15 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
   end
 
   def imagename
-    image = @resource[:path]
+    name = @resource[:path]
     if @resource[:tag]
-      image += ':' + @resource[:tag]
+      name += ':' + @resource[:tag]
     end
     if @resource[:domain]
       prefix = @resource[:domain] + '/'
-      image = prefix + image if !image.include?(prefix)
+      name = prefix + name if name.index(prefix) != 0
     end
-    image
+    name
   end
 
   def image
@@ -72,8 +72,12 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
     end
   end
 
+  def ls(*args, &block)
+    execpipe([command(:docker), 'image', 'ls', '--format', self::GO_FORMAT] + args, &block)
+  end
+
   def exists?
-    @property_hash[:ensure] == :present
+    !ls(image).empty?
   end
 
   private
