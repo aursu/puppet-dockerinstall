@@ -1,6 +1,8 @@
 Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Package) do
   @doc = "Docker image provider"
 
+  mk_resource_methods
+
   # Note: self:: is required here to keep these constants in the context of what will
   # eventually become this Puppet::Type::Package::ProviderDocker class.
   # The query format by which we identify installed images
@@ -66,6 +68,10 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
     rescue
       raise Puppet::Error, "Could not remove image #{image}: #{output}", $!.backtrace
     end
+  end
+
+  def exists?
+    @property_hash[:ensure] == :present
   end
 
   private
