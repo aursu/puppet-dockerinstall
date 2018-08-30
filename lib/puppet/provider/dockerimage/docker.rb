@@ -84,6 +84,7 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
   def self.command_to_hash(line)
     line.strip!
     hash = {}
+
     self::GO_FIELDS.zip(line.split) { |f, v| hash[f] = v }
 
     pp = hash[:path].split('/')
