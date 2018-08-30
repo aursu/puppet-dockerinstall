@@ -42,6 +42,7 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
   end
 
   def imagename
+    Puppet.info _("Got domain: %{domain}") % { domain: @resource[:domain] }
     name = @resource[:path]
     if @resource[:tag]
       name += ':' + @resource[:tag]
