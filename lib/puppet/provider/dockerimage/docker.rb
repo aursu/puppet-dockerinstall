@@ -75,16 +75,18 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
   end
 
   def self.ls(*args, &block)
-    execpipe([command(:docker), 'image', 'ls', '--format', "'#{self::GO_FORMAT}'"] + args, &block)
+    cmd = [command(:docker), 'image', 'ls', '--format', "'#{self::GO_FORMAT}'"] + args
+    execpipe(cmd, &block)
   end
 
   def ls(*args, &block)
-    execpipe([command(:docker), 'image', 'ls', '--format', "'#{self::GO_FORMAT}'"] + args, &block)
+    self.class.ls(*args, &block)
   end
 
   def exists?
-    true
-  #  !ls(image).empty?
+    output = ls(image)
+    Puppet.info _("Got output from ls(%{image}): %{output}") % { image: image, output: output }
+    @property_hash[:ensure] == :present
   end
 
   private
