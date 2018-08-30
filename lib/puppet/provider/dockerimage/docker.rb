@@ -83,7 +83,8 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
   end
 
   def exists?
-    !ls(image).empty?
+    true
+  #  !ls(image).empty?
   end
 
   private
