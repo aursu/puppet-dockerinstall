@@ -87,7 +87,7 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
     self::GO_FIELDS.zip(line.split) { |f, v| hash[f] = v }
 
     pp = hash[:path].split('/')
-    if pp.count == 3
+    if pp.count == 3 || pp[0].match?(%r{:\d+$})
       hash[:domain] = pp[0]
     end
 
