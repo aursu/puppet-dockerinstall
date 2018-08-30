@@ -72,8 +72,12 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
     end
   end
 
-  def ls(*args, &block)
+  def self.ls(*args, &block)
     execpipe([command(:docker), 'image', 'ls', '--format', self::GO_FORMAT] + args, &block)
+  end
+
+  def ls(*args, &block)
+    self.ls(*args, &block)
   end
 
   def exists?
