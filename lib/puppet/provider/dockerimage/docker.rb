@@ -58,14 +58,14 @@ Puppet::Type.type(:dockerimage).provide(:docker, parent: Puppet::Provider::Packa
 
   def pull
     output = docker('pull', image)
-  rescue Puppet::ExecutionFailure => e
-    raise Puppet::Error, "Could not pull #{image}: #{output} (#{e.message})", $ERROR_INFO.backtrace
+  rescue Puppet::ExecutionFailure
+    raise Puppet::Error, "Could not pull #{image}: #{output}", $ERROR_INFO.backtrace
   end
 
   def rmi
     output = docker('rmi', image)
-  rescue Puppet::ExecutionFailure => e
-    raise Puppet::Error, "Could not remove image #{image}: #{output} (#{e.message})", $ERROR_INFO.backtrace
+  rescue Puppet::ExecutionFailure
+    raise Puppet::Error, "Could not remove image #{image}: #{output}", $ERROR_INFO.backtrace
   end
 
   def self.lscmd(*args)
