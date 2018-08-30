@@ -89,7 +89,6 @@ Puppet::Type.type(:dockerimage).provide(:docker, :parent => Puppet::Provider::Pa
     pp = hash[:path].split('/')
     if pp.count == 3
       hash[:domain] = pp[0]
-      hash[:path] = pp[1] + '/' + pp[2]
     end
 
     hash[:name] = hash[:path] + ':' + hash[:tag]
