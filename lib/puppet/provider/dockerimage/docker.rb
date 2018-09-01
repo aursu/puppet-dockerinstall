@@ -6,6 +6,7 @@ Puppet::Type.type(:dockerimage).provide(:docker, parent: Puppet::Provider::Packa
   # Note: self:: is required here to keep these constants in the context of what will
   # eventually become this Puppet::Type::Package::ProviderDocker class.
   # The query format by which we identify installed images
+  # https://docs.docker.com/engine/reference/commandline/images/#format-the-output
   self::GO_FORMAT = %({{.ID}} {{.Repository}} {{.Tag}}).freeze
   self::GO_FIELDS = [:id, :path, :tag].freeze
 
