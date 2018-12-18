@@ -42,7 +42,7 @@ Puppet::Type.newtype(:dockerservice) do
     validate do |value|
       fail Puppet::Error, 'Path must be a string' unless value.is_a?(String)
       fail Puppet::Error, 'Path must be a non-empty string' if value.empty?
-      if value.include('/')
+      if value.include?('/')
         fail Puppet::Error, 'Path must be absolute' unless Puppet::Util.absolute_path?(value)
       end
     end
@@ -187,7 +187,7 @@ Puppet::Type.newtype(:dockerservice) do
   end
 
   def fixpath(value)
-    path =  if value.include('/')
+    path =  if value.include?('/')
               File.join(File.split(value))
             else
               value
