@@ -6,5 +6,3 @@ fixtures:
      stdlib: "puppetlabs/stdlib"
   repositories:
     "lsys": "https://github.com/aursu/puppet-lsys"
-  symlinks:
-    "dockerinstall": "#{source_dir}"

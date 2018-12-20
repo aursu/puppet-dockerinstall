@@ -3,6 +3,19 @@ require 'yaml'
 Puppet::Type.newtype(:dockerservice) do
   @doc = 'Docker Compose service'
 
+  class DockerserviceParam < Puppet::Parameter
+    attr_reader :should
+
+    munge do |value|
+      @should = value
+    end
+
+    validate do |value|
+      fail Puppet::Error, '%{name} must be a string' % {name: self.name.capitalize} unless value.is_a?(String)
+      fail Puppet::Error, '%{name} must be a non-empty string' % {name: self.name.capitalize} if value.empty?
+    end
+  end
+
   # Handle whether the service should actually be running right now.
   newproperty(:ensure) do
     desc 'Whether a service should be running.'
@@ -21,6 +34,14 @@ Puppet::Type.newtype(:dockerservice) do
     def retrieve
       provider.status
     end
+
+    def sync
+      if property = @resource.property(:configuration)
+        val = property.retrieve
+        property.sync unless property.safe_insync?(val)
+      end
+      super()
+    end
   end
 
   def self.title_patterns
@@ -35,19 +56,21 @@ Puppet::Type.newtype(:dockerservice) do
     ]
   end
 
-  newparam(:project, namevar: true) do
+  newparam(:project, namevar: true, :parent => DockerserviceParam) do
     desc 'Docker Compose project name. It could be absolute path to a project
       directory or just alternate project name'
 
+    attr_reader :should
+
     validate do |value|
-      fail Puppet::Error, 'Path must be a string' unless value.is_a?(String)
-      fail Puppet::Error, 'Path must be a non-empty string' if value.empty?
+      super(value)
       if value.include?('/')
         fail Puppet::Error, 'Path must be absolute' unless Puppet::Util.absolute_path?(value)
       end
     end
 
     munge do |value|
+      super(value)
       if Puppet::Util.absolute_path?(value)
         # project directory could override basedir
         resource[:basedir] = File.dirname(value)
@@ -62,7 +85,7 @@ Puppet::Type.newtype(:dockerservice) do
     desc 'Docker compose service name'
 
     validate do |value|
-      fail Puppet::Error, _('name must not contain whitespace: %{value}') % { value: value } if value.match?(%r{\s})
+      fail Puppet::Error, _('name must not contain whitespaces: %{name}') % {name: value} if value.match(%r{\s})
     end
   end
 
@@ -83,20 +106,19 @@ Puppet::Type.newtype(:dockerservice) do
     end
   end
 
-  newparam(:path) do
+  newparam(:path, :parent => DockerserviceParam) do
     desc 'Path to Docker Compose configuration file. Path should be
       absolute or relative to Project directory'
 
     defaultto 'docker-compose.yml'
 
     validate do |value|
-      fail Puppet::Error, 'Path must be a string' unless value.is_a?(String)
-      fail Puppet::Error, 'Path must be a non-empty string' if value.empty?
+      super(value)
       # both project and path could not be absolute
-      project = @resource.should(:project)
+      project = @resource.parameter(:project).should
       if Puppet::Util.absolute_path?(value) && Puppet::Util.absolute_path?(project)
-        fail  Puppet::Error,
-              "Path should be relative to project directory #{project} - not absolute"
+        fail Puppet::Error,
+              "Path should be relative to project directory (#{project}) - not absolute"
       end
     end
 
@@ -119,13 +141,12 @@ Puppet::Type.newtype(:dockerservice) do
 
     def retrieve
       path = @resource[:path]
-      return :absent unless (s = stat(path))
+      return nil unless (s = stat(path) && s.ftype == 'file')
 
-      ftype = s.ftype
       begin
         '{sha256}' + sha256_file(path).to_s
       rescue => detail
-        raise Puppet::Error, "Could not read #{ftype} #{resource.title}: #{detail}", detail.backtrace
+        raise Puppet::Error, "Could not read file #{resource.title}: #{detail}", detail.backtrace
       end
     end
 
@@ -182,8 +203,8 @@ Puppet::Type.newtype(:dockerservice) do
   end
 
   validate do
-    data = YAML.safe_load(self[:configuration])
-    fail 'Service %{name} does not exist in configuration file' unless data['services'].include?(self[:name])
+    data = YAML.safe_load(@parameters[:configuration].actual_content)
+    fail 'Service %{name} does not exist in configuration file' % {name: self[:name]} unless data['services'] and data['services'].include?(self[:name])
   end
 
   def fixpath(value)
