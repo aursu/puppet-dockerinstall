@@ -118,3 +118,7 @@ Style/MixinUsage:
   Enabled: false
 Style/SignalException:
   EnforcedStyle: semantic
+Lint/ScriptPermission:
+  Enabled: false
+RSpec/InstanceVariable:
+  Enabled: false

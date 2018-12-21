@@ -2,7 +2,7 @@ require 'yaml'
 
 Puppet::Type.newtype(:dockerservice) do
   @doc = 'Docker Compose service'
-
+  #
   class DockerserviceParam < Puppet::Parameter
     attr_reader :should
 
@@ -11,8 +11,8 @@ Puppet::Type.newtype(:dockerservice) do
     end
 
     validate do |value|
-      fail Puppet::Error, '%{name} must be a string' % {name: self.name.capitalize} unless value.is_a?(String)
-      fail Puppet::Error, '%{name} must be a non-empty string' % {name: self.name.capitalize} if value.empty?
+      fail Puppet::Error, '%{name} must be a string' % { name: name.capitalize } unless value.is_a?(String)
+      fail Puppet::Error, '%{name} must be a non-empty string' % { name: name.capitalize } if value.empty?
     end
   end
 
@@ -42,12 +42,12 @@ Puppet::Type.newtype(:dockerservice) do
     end
 
     def config_sync
-      if property = @resource.property(:configuration)
-        val = property.retrieve
-        property.sync unless property.safe_insync?(val)
-      end
-    end
+      property = @resource.property(:configuration)
+      return unless property
 
+      val = property.retrieve
+      property.sync unless property.safe_insync?(val)
+    end
   end
 
   def self.title_patterns
@@ -62,7 +62,7 @@ Puppet::Type.newtype(:dockerservice) do
     ]
   end
 
-  newparam(:project, namevar: true, :parent => DockerserviceParam) do
+  newparam(:project, namevar: true, :parent => DockerserviceParam) do # rubocop:disable Style/HashSyntax
     desc 'Docker Compose project name. It could be absolute path to a project
       directory or just alternate project name'
 
@@ -91,7 +91,7 @@ Puppet::Type.newtype(:dockerservice) do
     desc 'Docker compose service name'
 
     validate do |value|
-      fail Puppet::Error, _('name must not contain whitespaces: %{name}') % {name: value} if value.match(%r{\s})
+      fail Puppet::Error, _('name must not contain whitespaces: %{name}') % { name: value } if value.index(%r{\s})
     end
   end
 
@@ -112,7 +112,7 @@ Puppet::Type.newtype(:dockerservice) do
     end
   end
 
-  newparam(:path, :parent => DockerserviceParam) do
+  newparam(:path, :parent => DockerserviceParam) do # rubocop:disable Style/HashSyntax
     desc 'Path to Docker Compose configuration file. Path should be
       absolute or relative to Project directory'
 
@@ -124,7 +124,7 @@ Puppet::Type.newtype(:dockerservice) do
       project = @resource.parameter(:project).should
       if Puppet::Util.absolute_path?(value) && Puppet::Util.absolute_path?(project)
         fail Puppet::Error,
-              "Path should be relative to project directory (#{project}) - not absolute"
+             "Path should be relative to project directory (#{project}) - not absolute"
       end
     end
 
@@ -147,7 +147,8 @@ Puppet::Type.newtype(:dockerservice) do
 
     def retrieve
       path = @resource[:path]
-      return nil unless (s = stat(path) && s.ftype == 'file')
+      s = stat(path)
+      return nil unless s && s.ftype == 'file'
 
       begin
         '{sha256}' + sha256_file(path).to_s
@@ -215,7 +216,7 @@ Puppet::Type.newtype(:dockerservice) do
 
   validate do
     data = YAML.safe_load(@parameters[:configuration].actual_content)
-    fail 'Service %{name} does not exist in configuration file' % {name: self[:name]} unless data['services'] and data['services'].include?(self[:name])
+    fail 'Service %{name} does not exist in configuration file' % { name: self[:name] } unless data['services'] && data['services'].include?(self[:name])
   end
 
   def fixpath(value)
