@@ -24,4 +24,20 @@ Puppet::Type.type(:dockerservice).provide(
                     true
                   end
   end
+
+  def statuscmd
+    [command(:compose), '-f', @resource[:path], '-p', @resource[:project], 'ps', @resource[:name]]
+  end
+
+  def status
+    # Don't fail when the exit status is not 0.
+    output = ucommand(:status, false)
+
+    services = output.split(/\n/).select {|l| l.start_with?("#{@resource[:project]}_#{@resource[:name]}_") }
+    services.each do |l|
+      %r{\s+(Paused|Restarting|Ghost|Up( \(.+\))?|Exit [-0-9]+)\s+}.match(l)
+      return :running if Regexp.last_match(1) =~ %r{Up( \(.+\))?}
+    end
+    :stopped
+  end
 end

@@ -32,16 +32,22 @@ Puppet::Type.newtype(:dockerservice) do
     aliasvalue(:true, :running)
 
     def retrieve
+      config_sync
       provider.status
     end
 
     def sync
+      config_sync
+      super
+    end
+
+    def config_sync
       if property = @resource.property(:configuration)
         val = property.retrieve
         property.sync unless property.safe_insync?(val)
       end
-      super()
     end
+
   end
 
   def self.title_patterns
@@ -196,6 +202,11 @@ Puppet::Type.newtype(:dockerservice) do
       warning _('Could not stat; permission denied')
       nil
     end
+  end
+
+  newparam(:status) do
+    desc "Specify a *status* command manually. This command must
+      return 0 if the service is running and a nonzero value otherwise."
   end
 
   autorequire(:file) do
