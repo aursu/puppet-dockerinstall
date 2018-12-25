@@ -36,11 +36,6 @@ Puppet::Type.newtype(:dockerservice) do
       provider.status
     end
 
-    def sync
-      config_sync
-      super
-    end
-
     def config_sync
       property = @resource.property(:configuration)
       return unless property
@@ -66,12 +61,10 @@ Puppet::Type.newtype(:dockerservice) do
     desc 'Docker Compose project name. It could be absolute path to a project
       directory or just alternate project name'
 
-    attr_reader :should
-
     validate do |value|
       super(value)
       if value.include?('/')
-        fail Puppet::Error, 'Path must be absolute' unless Puppet::Util.absolute_path?(value)
+        fail Puppet::Error, 'Project path must be absolute' unless Puppet::Util.absolute_path?(value)
       end
     end
 
@@ -95,20 +88,25 @@ Puppet::Type.newtype(:dockerservice) do
     end
   end
 
-  newparam(:basedir, :parent => Puppet::Parameter::Path) do # rubocop:disable Style/HashSyntax
+  newparam(:basedir, :parent => DockerserviceParam) do # rubocop:disable Style/HashSyntax
     desc 'The directory where to store Docker Compose projects (it could be
       runtime or temporary directory). By default /var/run/compose'
-
-    # parent is  Puppet::Parameter::Path which accepts String or Array
-    # we do not need Array here.
-    accept_arrays(false)
 
     # provider has a check for /run directory
     defaultto { provider.class.basedir if provider.class.respond_to?(:basedir) }
 
+    validate do |value|
+      super(value)
+      path = resource.fixpath(value)
+      fail Puppet::Error, 'Basedir must be absolute' unless Puppet::Util.absolute_path?(path)
+
+      # fail if base directory is not in catalog
+      fail 'File resource for base directory %{path} not found' % { path: path } unless @resource.catalog.resource(:file, path)
+    end
+
     munge do |value|
       # normalize path
-      File.join(File.split(File.expand_path(value)))
+      resource.fixpath(value)
     end
   end
 
@@ -118,13 +116,20 @@ Puppet::Type.newtype(:dockerservice) do
 
     defaultto 'docker-compose.yml'
 
+    attr_reader :dirname
+
     validate do |value|
       super(value)
       # both project and path could not be absolute
-      project = @resource.parameter(:project).should
-      if Puppet::Util.absolute_path?(value) && Puppet::Util.absolute_path?(project)
-        fail Puppet::Error,
-             "Path should be relative to project directory (#{project}) - not absolute"
+
+      if Puppet::Util.absolute_path?(value)
+        project = @resource.parameter(:project).should
+        if Puppet::Util.absolute_path?(project)
+          fail Puppet::Error, "Path should be relative to project directory (#{project}) - not absolute"
+        end
+
+        @dirname = resource.fixpath(File.dirname(value))
+        fail 'File resource for configuration base path %{path} not found' % { path: dirname } unless @resource.catalog.resource(:file, dirname)
       end
     end
 
@@ -211,7 +216,12 @@ Puppet::Type.newtype(:dockerservice) do
   end
 
   autorequire(:file) do
-    self[:basedir] if self[:basedir]
+    req = []
+    req << self[:basedir] if self[:basedir]
+
+    confbase = @parameters[:path].dirname
+    req << confbase if confbase
+    req
   end
 
   validate do
