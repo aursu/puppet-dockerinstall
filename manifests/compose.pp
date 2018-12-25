@@ -15,6 +15,8 @@ class dockerinstall::compose (
             $tmpdir           = $dockerinstall::params::download_tmpdir,
     Stdlib::Absolutepath
             $binary_path      = $dockerinstall::params::compose_binary_path,
+    Stdlib::Absolutepath
+            $rundir           = $dockerinstall::params::compose_rundir,
 ) inherits dockerinstall::params
 {
     Exec {
@@ -63,5 +65,11 @@ class dockerinstall::compose (
         group     => 'root',
         subscribe => Exec['docker-compose-download'],
         alias     => 'docker-compose',
+    }
+
+    file { $rundir:
+        ensure => directory,
+        mode   => '0755',
+        force  => true,
     }
 }
