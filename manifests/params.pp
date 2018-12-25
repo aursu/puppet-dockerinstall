@@ -11,7 +11,7 @@ class dockerinstall::params {
     else {
         $service_config_template = 'dockerinstall/docker.upstart.erb'
     }
-    $compose_version          = '1.22.0'
+    $compose_version          = '1.23.2'
     $compose_download_source  = 'https://github.com/docker/compose/releases/download'
 
     # docker compose project provides binaries only for x86_64 architecture
@@ -22,4 +22,13 @@ class dockerinstall::params {
     $compose_checksum_command = 'sha256sum'
     $download_tmpdir          = '/tmp'
     $compose_binary_path      = '/usr/local/bin/docker-compose'
+
+    if  $facts['os']['name'] in ['RedHat', 'CentOS'] and
+        $facts['os']['release']['major'] in ['7', '8'] {
+        $compose_rundir = '/run/compose'
+    }
+    else {
+        $compose_rundir = '/var/run/compose'
+    }
+    $compose_libdir = '/var/lib/compose'
 }
