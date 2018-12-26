@@ -40,4 +40,16 @@ Puppet::Type.type(:dockerservice).provide(
     end
     :stopped
   end
+
+  def startcmd
+    [command(:compose), '-f', @resource[:path], '-p', @resource[:project], 'up', '-d', '--no-build', @resource[:name]]
+  end
+
+  def stopcmd
+    [command(:compose), '-f', @resource[:path], '-p', @resource[:project], 'stop', @resource[:name]]
+  end
+
+  def restartcmd
+    [command(:compose), '-f', @resource[:path], '-p', @resource[:project], 'restart', @resource[:name]]
+  end
 end
