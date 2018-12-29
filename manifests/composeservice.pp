@@ -57,18 +57,20 @@ define dockerinstall::composeservice (
     }
 
     unless $basedir in ['/run', '/var/run', '/lib', '/var/lib', $rundir] {
-      unless defined(File[$basedir]) {
-        file { $basedir:
-            ensure => 'directory',
-            force  => true,
+        unless defined(File[$basedir]) {
+            file { $basedir:
+                ensure => 'directory',
+                force  => true,
+            }
         }
-      }
     }
 
     unless $path in ['/run', '/var/run', '/lib', '/var/lib', $rundir, $basedir] {
-        file { $path:
-            ensure => 'directory',
-            force  => true,
+        unless defined(File[$path]) {
+            file { $path:
+                ensure => 'directory',
+                force  => true,
+            }
         }
     }
 
