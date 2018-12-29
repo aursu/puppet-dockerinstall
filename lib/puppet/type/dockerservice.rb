@@ -211,20 +211,20 @@ Puppet::Type.newtype(:dockerservice) do
   end
 
   newparam(:status) do
-    desc "Specify a *status* command manually. This command must
-      return 0 if the service is running and a nonzero value otherwise."
+    desc 'Specify a *status* command manually. This command must
+      return 0 if the service is running and a nonzero value otherwise.'
   end
 
   newparam(:restart) do
-    desc "Specify a *restart* command manually."
+    desc 'Specify a *restart* command manually.'
   end
 
   newparam(:start) do
-    desc "Specify a *start* command manually."
+    desc 'Specify a *start* command manually.'
   end
 
   newparam(:stop) do
-    desc "Specify a *stop* command manually."
+    desc 'Specify a *stop* command manually.'
   end
 
   autorequire(:file) do
