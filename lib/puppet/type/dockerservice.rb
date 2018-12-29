@@ -215,6 +215,18 @@ Puppet::Type.newtype(:dockerservice) do
       return 0 if the service is running and a nonzero value otherwise."
   end
 
+  newparam(:restart) do
+    desc "Specify a *restart* command manually."
+  end
+
+  newparam(:start) do
+    desc "Specify a *start* command manually."
+  end
+
+  newparam(:stop) do
+    desc "Specify a *stop* command manually."
+  end
+
   autorequire(:file) do
     req = []
     req << self[:basedir] if self[:basedir]
