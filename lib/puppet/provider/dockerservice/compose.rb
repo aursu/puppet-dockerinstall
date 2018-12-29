@@ -29,6 +29,14 @@ Puppet::Type.type(:dockerservice).provide(
     [command(:compose), '-f', @resource[:path], '-p', @resource[:project], 'ps', @resource[:name]]
   end
 
+  def texecute(type, command, fof = true, squelch = false, combine = true)
+    begin
+      execute(command, :failonfail => fof, :override_locale => false, :squelch => squelch, :combine => combine)
+    rescue Puppet::ExecutionFailure => detail
+      @resource.fail Puppet::Error, "Could not #{type} #{@resource.ref}: #{detail}", detail
+    end
+  end
+
   def status
     # Don't fail when the exit status is not 0.
     output = ucommand(:status, false)
