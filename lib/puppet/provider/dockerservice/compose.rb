@@ -25,10 +25,6 @@ Puppet::Type.type(:dockerservice).provide(
                   end
   end
 
-  def statuscmd
-    [command(:compose), '-f', @resource[:path], '-p', @resource[:project], 'ps', @resource[:name]]
-  end
-
   def texecute(type, command, fof = true, squelch = false, combine = true)
     begin
       execute(command, :failonfail => fof, :override_locale => false, :squelch => squelch, :combine => combine)
@@ -40,7 +36,6 @@ Puppet::Type.type(:dockerservice).provide(
   def status
     # Don't fail when the exit status is not 0.
     output = ucommand(:status, false)
-    warning _("Status command output: \"#{output}\"")
     if output
       services = output.split(%r{\n}).select { |l| l.start_with?("#{@resource[:project]}_#{@resource[:name]}_") }
       services.each do |l|
@@ -49,6 +44,10 @@ Puppet::Type.type(:dockerservice).provide(
       end
     end
     :stopped
+  end
+
+  def statuscmd
+    [command(:compose), '-f', @resource[:path], '-p', @resource[:project], 'ps', @resource[:name]]
   end
 
   def startcmd
