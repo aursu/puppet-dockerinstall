@@ -68,12 +68,12 @@ Puppet::Type.type(:dockerservice).provide(
   end
 
   def start
-    super
     @property_flush = false
+    super
   end
 
   def flush
-    return unless property_flush
+    return unless @property_flush
     warning _('Restarted by flush')
     restart
   end
