@@ -76,7 +76,7 @@ Puppet::Type.type(:dockerservice).provide(
   end
 
   def flush
-    warning _("Access flush with #{property_flush[:ensure]}")
+    warning _("Access flush with #{@property_flush[:ensure]}")
     if @property_flush[:ensure].nil?
       warning _('Restarted by flush')
       restart unless resource[:ensure] == :stopped
