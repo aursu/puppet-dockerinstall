@@ -27,6 +27,11 @@ Puppet::Type.type(:dockerservice).provide(
                   end
   end
 
+  def initialize(value={})
+    super(value)
+    @property_flush = false
+  end
+
   def texecute(type, command, fof = true, squelch = false, combine = true)
     execute(command, failonfail: fof, override_locale: false, squelch: squelch, combine: combine)
   rescue Puppet::ExecutionFailure => detail
@@ -62,13 +67,17 @@ Puppet::Type.type(:dockerservice).provide(
     [command(:compose), '-f', @resource[:path], '-p', @resource[:project], 'restart', @resource[:name]]
   end
 
+  def config_sync
+    @property_flush = true
+  end
+
   def start
-    @property_hash[:flush] = false
+    @property_flush = false
     super
   end
 
   def flush
-    return unless @property_hash[:flush]
+    return unless @property_flush
     warning _('Restarted by flush')
     restart
   end
