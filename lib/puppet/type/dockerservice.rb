@@ -191,7 +191,6 @@ Puppet::Type.newtype(:dockerservice) do
     end
 
     def sync
-      provider.config_sync
       mode_int = 0o0644
       File.open(@resource[:path], 'wb', mode_int) { |f| write(f) }
     end

@@ -29,7 +29,7 @@ Puppet::Type.type(:dockerservice).provide(
 
   def initialize(value={})
     super(value)
-    @property_flush = false
+    @property_flush = true
   end
 
   def texecute(type, command, fof = true, squelch = false, combine = true)
@@ -67,13 +67,9 @@ Puppet::Type.type(:dockerservice).provide(
     [command(:compose), '-f', @resource[:path], '-p', @resource[:project], 'restart', @resource[:name]]
   end
 
-  def config_sync
-    @property_flush = true
-  end
-
   def start
-    @property_flush = false
     super
+    @property_flush = false
   end
 
   def flush
