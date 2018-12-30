@@ -38,10 +38,9 @@ Puppet::Type.newtype(:dockerservice) do
 
     def config_sync
       property = @resource.property(:configuration)
-      return unless property
-
-      val = property.retrieve
-      property.sync unless property.safe_insync?(val)
+      config = property.retrieve
+      return property.sync unless property.safe_insync?(config)
+      nil
     end
   end
 
@@ -185,6 +184,12 @@ Puppet::Type.newtype(:dockerservice) do
       "configuration changed '#{is}' to '#{want}'"
     end
 
+    def insync?(is)
+      return false if is.nil?
+      return true unless resource.replace?
+      super(is)
+    end
+
     def sync
       mode_int = 0o0644
       File.open(@resource[:path], 'wb', mode_int) { |f| write(f) }
@@ -225,6 +230,11 @@ Puppet::Type.newtype(:dockerservice) do
 
   newparam(:stop) do
     desc 'Specify a *stop* command manually.'
+  end
+
+  newparam(:replace, boolean: true, parent: Puppet::Parameter::Boolean) do
+    desc 'Whether to replace a configuration file or not'
+    defaultto :true
   end
 
   autorequire(:file) do
