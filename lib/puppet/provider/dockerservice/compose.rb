@@ -5,8 +5,6 @@ Puppet::Type.type(:dockerservice).provide(
 ) do
   @doc = 'Docker service provider'
 
-  attr_accessor :property_hash
-
   def self.basedir
     if File.directory?('/run')
       '/run/compose'
@@ -27,9 +25,9 @@ Puppet::Type.type(:dockerservice).provide(
                   end
   end
 
-  def initialize(value={})
+  def initialize(value = {})
     super(value)
-    @property_flush = true
+    @property_flush = {}
   end
 
   def texecute(type, command, fof = true, squelch = false, combine = true)
@@ -69,12 +67,18 @@ Puppet::Type.type(:dockerservice).provide(
 
   def start
     super
-    @property_flush = false
+    @property_flush[:ensure] = :running
+  end
+
+  def stop
+    super
+    @property_flush[:ensure] = :stopped
   end
 
   def flush
-    return unless @property_flush
-    warning _('Restarted by flush')
-    restart
+    if @property_flush[:ensure].nil?
+      warning _('Restarted by flush')
+      restart unless resource[:ensure] == :stopped
+    end
   end
 end
