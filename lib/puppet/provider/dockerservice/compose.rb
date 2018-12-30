@@ -5,6 +5,8 @@ Puppet::Type.type(:dockerservice).provide(
 ) do
   @doc = 'Docker service provider'
 
+  attr_accessor :property_hash
+
   def self.basedir
     if File.directory?('/run')
       '/run/compose'
