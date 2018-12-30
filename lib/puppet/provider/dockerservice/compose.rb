@@ -29,7 +29,7 @@ Puppet::Type.type(:dockerservice).provide(
 
   def initialize(*args)
     super
-    property_flush = false
+    @property_flush = false
   end
 
   def texecute(type, command, fof = true, squelch = false, combine = true)
@@ -69,13 +69,12 @@ Puppet::Type.type(:dockerservice).provide(
 
   def start
     super
-    property_flush = false
+    @property_flush = false
   end
 
   def flush
-    if property_flush
-      warning _('Restarted by flush')
-      restart
-    end
+    return unless property_flush
+    warning _('Restarted by flush')
+    restart
   end
 end
