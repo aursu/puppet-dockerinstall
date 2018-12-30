@@ -25,13 +25,6 @@ Puppet::Type.type(:dockerservice).provide(
                   end
   end
 
-  attr_accessor :property_flush
-
-  def initialize(*args)
-    super
-    @property_flush = false
-  end
-
   def texecute(type, command, fof = true, squelch = false, combine = true)
     execute(command, failonfail: fof, override_locale: false, squelch: squelch, combine: combine)
   rescue Puppet::ExecutionFailure => detail
@@ -68,12 +61,12 @@ Puppet::Type.type(:dockerservice).provide(
   end
 
   def start
-    @property_flush = false
+    @property_hash[:flush] = false
     super
   end
 
   def flush
-    return unless @property_flush
+    return unless @property_hash[:flush]
     warning _('Restarted by flush')
     restart
   end

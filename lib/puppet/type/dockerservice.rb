@@ -191,7 +191,7 @@ Puppet::Type.newtype(:dockerservice) do
     end
 
     def sync
-      provider.property_flush = true
+      provider.property_hash[:flush] = true
       mode_int = 0o0644
       File.open(@resource[:path], 'wb', mode_int) { |f| write(f) }
     end
