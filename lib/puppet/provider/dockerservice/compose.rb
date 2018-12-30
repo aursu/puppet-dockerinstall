@@ -26,11 +26,9 @@ Puppet::Type.type(:dockerservice).provide(
   end
 
   def texecute(type, command, fof = true, squelch = false, combine = true)
-    begin
-      execute(command, :failonfail => fof, :override_locale => false, :squelch => squelch, :combine => combine)
-    rescue Puppet::ExecutionFailure => detail
-      @resource.fail Puppet::Error, "Could not #{type} #{@resource.ref}: #{detail}", detail
-    end
+    execute(command, failonfail: fof, override_locale: false, squelch: squelch, combine: combine)
+  rescue Puppet::ExecutionFailure => detail
+    @resource.fail Puppet::Error, "Could not #{type} #{@resource.ref}: #{detail}", detail
   end
 
   def status
@@ -60,5 +58,10 @@ Puppet::Type.type(:dockerservice).provide(
 
   def restartcmd
     [command(:compose), '-f', @resource[:path], '-p', @resource[:project], 'restart', @resource[:name]]
+  end
+
+  def flush
+    warning _('Restarted by flush')
+    restart
   end
 end
