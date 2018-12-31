@@ -36,7 +36,16 @@ Puppet::Type.type(:dockerservice).provide(
     @resource.fail Puppet::Error, "Could not #{type} #{@resource.ref}: #{detail}", detail
   end
 
+  def configuration_sync
+    @property_flush[:configuration]
+  end
+
+  def configuration_sync=(value)
+    @property_flush[:configuration] = value
+  end
+
   def status
+    return :stopped if configuration_sync
     # Don't fail when the exit status is not 0.
     output = ucommand(:status, false)
     if output
@@ -66,20 +75,27 @@ Puppet::Type.type(:dockerservice).provide(
   end
 
   def start
-    super
+    return super unless configuration_sync
     @property_flush[:ensure] = :running
   end
 
   def stop
-    super
+    return super unless configuration_sync
     @property_flush[:ensure] = :stopped
   end
 
   def flush
-    warning _("Access flush with #{@property_flush[:ensure]}")
-    if @property_flush[:ensure].nil?
-      warning _('Restarted by flush')
-      restart unless resource[:ensure] == :stopped
+    return if configuration_sync.nil?
+    case status
+    when :running
+      case @property_flush[:ensure]
+      when :running
+        restart
+      else
+        stop
+      end
+    else
+      start if @property_flush[:ensure] == :running
     end
   end
 end

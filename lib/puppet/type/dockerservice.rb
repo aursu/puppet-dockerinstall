@@ -38,9 +38,8 @@ Puppet::Type.newtype(:dockerservice) do
 
     def config_sync
       property = @resource.property(:configuration)
-      config = property.retrieve
-      return property.sync unless property.safe_insync?(config)
-      nil
+      current = property.retrieve
+      provider.configuration_sync = true unless property.safe_insync?(current)
     end
   end
 
@@ -192,7 +191,9 @@ Puppet::Type.newtype(:dockerservice) do
 
     def sync
       mode_int = 0o0644
-      File.open(@resource[:path], 'wb', mode_int) { |f| write(f) }
+      content = File.open(@resource[:path], 'wb', mode_int) { |f| write(f) }
+      provider.configuration_sync = false
+      content
     end
 
     def write(file)
