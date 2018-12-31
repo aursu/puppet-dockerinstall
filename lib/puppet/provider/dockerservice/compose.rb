@@ -88,6 +88,7 @@ Puppet::Type.type(:dockerservice).provide(
   def flush
     warning _("Enter flush with  configuration_sync = \"#{configuration_sync.to_s}\"")
     return if configuration_sync.nil?
+    @resource.property(:configuration).sync if configuration_sync
     case status
     when :running
       case @property_flush[:ensure]
