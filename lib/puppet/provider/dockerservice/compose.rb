@@ -41,7 +41,6 @@ Puppet::Type.type(:dockerservice).provide(
   end
 
   def configuration_sync=(value)
-    warning _("set @property_flush[:configuration] to #{value}")
     @property_flush[:configuration] = value
   end
 
@@ -86,9 +85,11 @@ Puppet::Type.type(:dockerservice).provide(
   end
 
   def flush
-    warning _("Enter flush with  configuration_sync = \"#{configuration_sync.to_s}\"")
+    # nothing to flush if configuration is in sync
     return if configuration_sync.nil?
-    @resource.property(:configuration).sync if configuration_sync
+    # sync configuration here (transaction skip any property sync while ensure
+    # is not synced)
+    # @resource.property(:configuration).sync if configuration_sync
     case status
     when :running
       case @property_flush[:ensure]
