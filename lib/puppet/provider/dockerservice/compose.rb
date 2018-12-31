@@ -77,9 +77,6 @@ Puppet::Type.type(:dockerservice).provide(
   def flush
     # nothing to flush if configuration is in sync
     return if configuration_sync.nil?
-    # sync configuration here (transaction skip any property sync while ensure
-    # is not synced)
-    # @resource.property(:configuration).sync if configuration_sync
     case status
     when :running
       case @resource[:ensure]
