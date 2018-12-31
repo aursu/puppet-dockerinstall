@@ -151,6 +151,7 @@ Puppet::Type.newtype(:dockerservice) do
     desc 'Docker Compose configuration file content (YAML)'
 
     def retrieve
+      warning _('Enter configuration retrieve')
       path = @resource[:path]
       s = stat(path)
       return nil unless s && s.ftype == 'file'
@@ -186,14 +187,19 @@ Puppet::Type.newtype(:dockerservice) do
     end
 
     def insync?(is)
+      warning _("Enter configuration insync?")
       return false if is.nil?
+      warning _("Enter configuration insync? with is = \"#{is}\"")
       return true unless resource.replace?
+      warning _("Enter configuration insync? with resource.replace? = #{resource.replace?}")
       super(is)
     end
 
     def sync
+      warning _("Enter configuration sync")
       mode_int = 0o0644
       content = File.open(@resource[:path], 'wb', mode_int) { |f| write(f) }
+      warning _("sync configuration with new content = \"#{content}\"")
       provider.configuration_sync = false
       content
     end
