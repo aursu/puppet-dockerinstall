@@ -37,7 +37,7 @@ Puppet::Type.newtype(:dockerservice) do
     end
 
     def insync?(current)
-      # skip resource ensure if configuration is not in sync
+      # skip resource ensure property sync if configuration is not in sync
       return true if provider.configuration_sync
       super(current)
     end
@@ -45,9 +45,8 @@ Puppet::Type.newtype(:dockerservice) do
     def config_sync
       property = @resource.property(:configuration)
       current = property.retrieve
-      unless property.safe_insync?(current)
-        provider.configuration_sync = true
-      end
+      # set provider to sync configuration
+      provider.configuration_sync = true unless property.safe_insync?(current)
     end
   end
 

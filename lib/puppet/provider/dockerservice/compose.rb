@@ -74,16 +74,6 @@ Puppet::Type.type(:dockerservice).provide(
     [command(:compose), '-f', @resource[:path], '-p', @resource[:project], 'restart', @resource[:name]]
   end
 
-  def start
-    return super unless configuration_sync
-    @property_flush[:ensure] = :running
-  end
-
-  def stop
-    return super unless configuration_sync
-    @property_flush[:ensure] = :stopped
-  end
-
   def flush
     # nothing to flush if configuration is in sync
     return if configuration_sync.nil?
@@ -92,14 +82,14 @@ Puppet::Type.type(:dockerservice).provide(
     # @resource.property(:configuration).sync if configuration_sync
     case status
     when :running
-      case @property_flush[:ensure]
+      case @resource[:ensure]
       when :running
         restart
       else
         stop
       end
     else
-      start if @property_flush[:ensure] == :running
+      start if @resource[:ensure] == :running
     end
   end
 end
