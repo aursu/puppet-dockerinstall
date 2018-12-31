@@ -192,7 +192,9 @@ Puppet::Type.newtype(:dockerservice) do
       warning _("Enter configuration insync? with is = \"#{is}\"")
       return true unless resource.replace?
       warning _("Enter configuration insync? with resource.replace? = #{resource.replace?}")
-      super(is)
+      insync = super(is)
+      warning _("return insync? #{insync}")
+      insync
     end
 
     def sync
