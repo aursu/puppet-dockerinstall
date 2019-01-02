@@ -197,11 +197,12 @@ Puppet::Type.newtype(:dockerservice) do
     end
 
     def sync
+      return_event = stat ? :configuration_changed : :configuration_created
       mode_int = 0o0644
-      content = File.open(@resource[:path], 'wb', mode_int) { |f| write(f) }
+      File.open(@resource[:path], 'wb', mode_int) { |f| write(f) }
       # configuration synced here - no need to sync it elsewhere
       provider.configuration_sync = false
-      content
+      return_event
     end
 
     def write(file)
@@ -212,7 +213,8 @@ Puppet::Type.newtype(:dockerservice) do
       "{sha256}#{checksum}"
     end
 
-    def stat(path)
+    def stat(path = nil)
+      path = @resource[:path] if path.nil?
       Puppet::FileSystem.stat(path)
     rescue Errno::ENOENT
       nil
