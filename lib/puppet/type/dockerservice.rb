@@ -1,6 +1,6 @@
 require 'yaml'
 
-Puppet::Type.newtype(:dockerservice) do
+Puppet::Type.newtype(:dockerservice, :self_refresh => true) do
   @doc = 'Docker Compose service'
   #
   class DockerserviceParam < Puppet::Parameter
@@ -197,12 +197,12 @@ Puppet::Type.newtype(:dockerservice) do
     end
 
     def sync
-      return_event = stat ? :configuration_changed : :configuration_created
+      event = stat ? :configuration_changed : :configuration_created
       mode_int = 0o0644
       File.open(@resource[:path], 'wb', mode_int) { |f| write(f) }
       # configuration synced here - no need to sync it elsewhere
       provider.configuration_sync = false
-      return_event
+      event
     end
 
     def write(file)
@@ -270,5 +270,16 @@ Puppet::Type.newtype(:dockerservice) do
             end
     return File.expand_path(path) if Puppet::Util.absolute_path?(path)
     path
+  end
+
+    # Basically just a synonym for restarting.  Used to respond
+    # to events.
+  def refresh
+    # Only restart if we're actually running
+    if (@parameters[:ensure] || newattr(:ensure)).retrieve == :running
+      provider.restart
+    else
+      debug "Skipping restart; service is not running"
+    end
   end
 end
