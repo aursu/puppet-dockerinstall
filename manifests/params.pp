@@ -31,4 +31,12 @@ class dockerinstall::params {
         $compose_rundir = '/var/run/compose'
     }
     $compose_libdir = '/var/lib/compose'
+
+    # Client authentication
+    $certdir       = $::puppet_sslpaths['certdir']['path']
+    $privatekeydir = $::puppet_sslpaths['privatekeydir']['path']
+    $localcacert   = "${certdir}/ca.pem"
+    # https://puppet.com/docs/puppet/5.3/lang_facts_and_builtin_vars.html#puppet-agent-facts
+    $hostcert      = "${certdir}/${::clientcert}.pem"
+    $hostprivkey   = "${privatekeydir}/${::clientcert}.pem"
 }
