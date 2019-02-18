@@ -1,6 +1,6 @@
 {
   "name": "aursu-dockerinstall",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "aursu",
   "summary": "Docker CE  installation and start",
   "license": "Apache-2.0",
@@ -8,7 +8,7 @@
   "dependencies": [
     {
       "name": "puppetlabs/stdlib",
-      "version_requirement": ">= 3.2.0 < 5.0.0"
+      "version_requirement": ">= 3.2.0 < 6.0.0"
     }
   ],
   "operatingsystem_support": [
@@ -43,10 +43,10 @@
   "requirements": [
     {
       "name": "puppet",
-      "version_requirement": ">= 4.7.0 < 6.0.0"
+      "version_requirement": ">= 4.7.0 < 7.0.0"
     }
   ],
-  "pdk-version": "1.7.0",
+  "pdk-version": "1.7.1",
   "template-url": "https://github.com/puppetlabs/pdk-templates",
-  "template-ref": "tags/1.7.0-0-g57412ed"
+  "template-ref": "heads/master-0-g615413e"
 }

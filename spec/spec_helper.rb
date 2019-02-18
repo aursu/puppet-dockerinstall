@@ -1,16 +1,9 @@
 require 'puppetlabs_spec_helper/module_spec_helper'
 require 'rspec-puppet-facts'
 
-begin
-  require 'spec_helper_local' if File.file?(File.join(File.dirname(__FILE__), 'spec_helper_local.rb'))
-rescue LoadError => loaderror
-  warn "Could not require spec_helper_local: #{loaderror.message}"
-end
+require 'spec_helper_local' if File.file?(File.join(File.dirname(__FILE__), 'spec_helper_local.rb'))
 
 include RspecPuppetFacts
-
-# TODO: http://unethicalblogger.com/2014/03/01/testing-custom-facts-with-rspec.html
-#       https://github.com/puppetlabs/puppetlabs-firewall/blob/master/spec/unit/facter/iptables_persistent_version_spec.rb
 
 # https://github.com/mcanevet/rspec-puppet-facts/blob/master/README.md#create-dynamic-facts
 # register is_init_systemd fact from module lsys
@@ -20,18 +13,22 @@ end
 
 default_facts = {
   puppetversion: Puppet.version,
-  facterversion: Facter.version
+  facterversion: Facter.version,
 }
 
-default_facts_path = File.expand_path(File.join(File.dirname(__FILE__), 'default_facts.yml'))
-default_module_facts_path = File.expand_path(File.join(File.dirname(__FILE__), 'default_module_facts.yml'))
+default_fact_files = [
+  File.expand_path(File.join(File.dirname(__FILE__), 'default_facts.yml')),
+  File.expand_path(File.join(File.dirname(__FILE__), 'default_module_facts.yml')),
+]
 
-if File.exist?(default_facts_path) && File.readable?(default_facts_path)
-  default_facts.merge!(YAML.safe_load(File.read(default_facts_path)))
-end
+default_fact_files.each do |f|
+  next unless File.exist?(f) && File.readable?(f) && File.size?(f)
 
-if File.exist?(default_module_facts_path) && File.readable?(default_module_facts_path)
-  default_facts.merge!(YAML.safe_load(File.read(default_module_facts_path)))
+  begin
+    default_facts.merge!(YAML.safe_load(File.read(f)))
+  rescue => e
+    RSpec.configuration.reporter.message "WARNING: Unable to load #{f}: #{e}"
+  end
 end
 
 RSpec.configure do |c|
@@ -41,12 +38,15 @@ RSpec.configure do |c|
     # by default Puppet runs at warning level
     Puppet.settings[:strict] = :warning
   end
+  c.filter_run_excluding(bolt: true) unless ENV['GEM_BOLT']
+  c.after(:suite) do
+  end
 end
 
 def ensure_module_defined(module_name)
   module_name.split('::').reduce(Object) do |last_module, next_module|
-    last_module.const_set(next_module, Module.new) unless last_module.const_defined?(next_module)
-    last_module.const_get(next_module)
+    last_module.const_set(next_module, Module.new) unless last_module.const_defined?(next_module, false)
+    last_module.const_get(next_module, false)
   end
 end
 
