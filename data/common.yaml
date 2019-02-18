@@ -69,3 +69,4 @@ dockerinstall::dm_blkdiscard: true
 dockerinstall::dm_override_udev_sync_check: false
 dockerinstall::overlay2_override_kernel_check: false
 dockerinstall::compose_version: ~
+dockerinstall::manage_docker_certdir: true

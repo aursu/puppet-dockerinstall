@@ -114,4 +114,5 @@ class dockerinstall (
     Boolean $overlay2_override_kernel_check,
     Optional[String]
             $compose_version,
+    Boolean $manage_docker_certdir,
 ){}
