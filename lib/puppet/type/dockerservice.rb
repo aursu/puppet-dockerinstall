@@ -1,6 +1,6 @@
 require 'yaml'
 
-Puppet::Type.newtype(:dockerservice, :self_refresh => true) do
+Puppet::Type.newtype(:dockerservice, self_refresh: true) do
   @doc = 'Docker Compose service'
   #
   class DockerserviceParam < Puppet::Parameter
@@ -272,14 +272,14 @@ Puppet::Type.newtype(:dockerservice, :self_refresh => true) do
     path
   end
 
-    # Basically just a synonym for restarting.  Used to respond
-    # to events.
+  # Basically just a synonym for restarting.  Used to respond
+  # to events.
   def refresh
     # Only restart if we're actually running
     if (@parameters[:ensure] || newattr(:ensure)).retrieve == :running
       provider.restart
     else
-      debug "Skipping restart; service is not running"
+      debug 'Skipping restart; service is not running'
     end
   end
 end
