@@ -50,7 +50,7 @@ function dockerinstall::option(String $name, Data $value) >> Hash {
     'userland-proxy-path' => String,
     'ip'     => String,
     'bridge' => String,
-    'bip'    => String,
+    'bip'    => Stdlib::IP::Address::V4::CIDR,
     'fixed-cidr'    => String,
     'fixed-cidr-v6' => String,
     'default-gateway'    => String,
