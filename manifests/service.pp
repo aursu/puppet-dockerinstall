@@ -112,6 +112,7 @@ class dockerinstall::service (
             enable     => $service_enable,
             hasstatus  => $service_hasstatus,
             hasrestart => $service_hasrestart,
+            subscribe  => File['/etc/docker/daemon.json'],
             alias      => 'docker',
         }
 

@@ -8,7 +8,7 @@ class dockerinstall::config (
     Boolean $manage_package    = $dockerinstall::manage_package,
     # https://github.com/puppetlabs/puppetlabs-stdlib#stdlibipaddressv4cidr
     Optional[Stdlib::IP::Address::V4::CIDR]
-            $bip               = $dockerinstall::bip,
+            $bip               = undef,
 )
 {
     include dockerinstall::install
@@ -30,5 +30,12 @@ class dockerinstall::config (
             Package['docker'] -> Group[$group]
             Package['docker'] -> User[$docker_users]
         }
+    }
+
+    $daemon_config = {} +
+      dockerinstall::option('bip', $bip)
+
+    file { '/etc/docker/daemon.json':
+      content => template('dockerinstall/daemon.json.erb'),
     }
 }
