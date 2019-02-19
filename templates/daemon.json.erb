@@ -1,0 +1,6 @@
+<%-
+require 'json'
+-%>
+<% if @daemon_config.is_a?(Hash) -%>
+<%= @daemon_config.to_json -%>
+<% end -%>

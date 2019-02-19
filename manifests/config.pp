@@ -1,11 +1,14 @@
 # == Class: dockerinstall::config
 #
 class dockerinstall::config (
-    Boolean $manage_users   = $dockerinstall::manage_os_users,
+    Boolean $manage_users      = $dockerinstall::manage_os_users,
     Dockerinstall::UserList
-            $docker_users   = $dockerinstall::docker_users,
-    String  $group          = $dockerinstall::docker_group,
-    Boolean $manage_package = $dockerinstall::manage_package,
+            $docker_users      = $dockerinstall::docker_users,
+    String  $group             = $dockerinstall::docker_group,
+    Boolean $manage_package    = $dockerinstall::manage_package,
+    # https://github.com/puppetlabs/puppetlabs-stdlib#stdlibipaddressv4cidr
+    Optional[Stdlib::IP::Address::V4::CIDR]
+            $bip               = $dockerinstall::bip,
 )
 {
     include dockerinstall::install
