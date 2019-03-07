@@ -31,6 +31,10 @@ class dockerinstall::install (
         }
     }
 
+    file { '/etc/docker':
+        ensure => directory,
+    }
+
     if $manage_docker_certdir {
         file { '/etc/docker/certs.d':
             ensure => directory,
