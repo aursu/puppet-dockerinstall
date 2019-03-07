@@ -31,8 +31,8 @@ Facter.add(:dockerinstall_swarm) do
         swarm_join_token_manager = `/usr/bin/docker swarm join-token -q manager`
 
         swarm['JoinTokens'] = {
-          'Worker' => swarm_join_token_worker,
-          'Manager' => swarm_join_token_manager
+          'Worker' => swarm_join_token_worker.strip,
+          'Manager' => swarm_join_token_manager.strip
         }
       else
         swarm['JoinTokens'] = {}
