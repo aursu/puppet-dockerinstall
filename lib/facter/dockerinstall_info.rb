@@ -18,3 +18,28 @@ Facter.add(:dockerinstall_info) do
     dockerinstall_info
   end
 end
+
+Facter.add(:dockerinstall_swarm) do
+  setcode do
+    info = Facter.value(:dockerinstall_info)
+
+    if info
+      swarm = info['Swarm']
+
+      if swarm['ControlAvailable']
+        swarm_join_token_worker = `/usr/bin/docker swarm join-token -q worker`
+        swarm_join_token_manager = `/usr/bin/docker swarm join-token -q manager`
+
+        swarm['JoinTokens'] = {
+          'Worker' => swarm_join_token_worker,
+          'Manager' => swarm_join_token_manager
+        }
+      else
+        swarm['JoinTokens'] = {}
+      end
+    else
+      swarm = nil
+    end
+    swarm
+  end
+end
