@@ -39,4 +39,23 @@ class dockerinstall::params {
     # https://puppet.com/docs/puppet/5.3/lang_facts_and_builtin_vars.html#puppet-agent-facts
     $hostcert      = "${certdir}/${::clientcert}.pem"
     $hostprivkey   = "${privatekeydir}/${::clientcert}.pem"
+
+    # Swarm data
+    $swarm = $::dockerinstall_swarm
+    $swarm_enabled = ($swarm['LocalNodeState'] == 'active')
+    if $swarm_enabled {
+        $is_swarm_manager = $swarm['ControlAvailable']
+        if $is_swarm_manager {
+            $swarm_managers_count = $swarm['Managers']
+        }
+        else {
+            $swarm_managers_count = undef
+        }
+        $swarm_node_id = $swarm['NodeID']
+    }
+    else {
+        $is_swarm_manager = undef
+        $swarm_managers_count = undef
+        $swarm_node_id = undef
+    }
 }
