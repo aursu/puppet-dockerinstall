@@ -76,7 +76,7 @@ class dockerinstall::swarm::manager (
   }
   # need to disable manager role
   else {
-    if $is_manager and $swarm['Managers'] > 2 {}
+    if $is_manager and $swarm['Managers'] > 2 {
       # can leave swarm if quorum remains available
       # demote manager https://docs.docker.com/engine/reference/commandline/node_demote/
       exec { "docker node demote ${nodeid}":
