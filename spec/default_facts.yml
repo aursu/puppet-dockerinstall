@@ -24,3 +24,19 @@ puppet_sslpaths:
   hostcrl:
     path: /etc/puppetlabs/puppet/ssl/crl.pem
     path_exists: true
+
+dockerinstall_info:
+  Swarm:
+    NodeID: "qoe8gpifamlvps90y7zhykz66"
+    LocalNodeState: "active"
+    ControlAvailable: true
+    Managers: 3
+
+dockerinstall_swarm:
+  NodeID: "qoe8gpifamlvps90y7zhykz66"
+  LocalNodeState: "active"
+  ControlAvailable: true
+  Managers: 3
+  JoinTokens:
+    Worker: "SWMTKN-1-2pt66je5c3fejw4adu8kcsoeid4rkk9fdy1s1bibm9plzuq8d0-ebcr22sn5z7cf9f76098v3gef"
+    Manager: "SWMTKN-1-2pt66je5c3fejw4adu8kcsoeid4rkk9fdy1s1bibm9plzuq8d0-ch26mhdxkas5eci9ai80yb67m"

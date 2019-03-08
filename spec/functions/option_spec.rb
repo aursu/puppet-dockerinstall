@@ -3,7 +3,7 @@ require 'spec_helper'
 describe 'dockerinstall::option' do
   context 'with parameter bip' do
     it {
-      is_expected.to run.with_params('bip', '172.30.0.1/16').and_return({'bip' => '172.30.0.1/16'})
+      is_expected.to run.with_params('bip', '172.30.0.1/16').and_return('bip' => '172.30.0.1/16')
     }
   end
 

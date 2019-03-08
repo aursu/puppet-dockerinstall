@@ -46,7 +46,7 @@ class dockerinstall::swarm::worker (
     # or if node is worker
     if ($is_manager and $swarm['Managers'] > 2) or $is_worker {
       # check if it is allowed to leave swarm
-      exec { "docker swarm leave --force":
+      exec { 'docker swarm leave --force':
         path => '/bin:/usr/bin',
       }
     }

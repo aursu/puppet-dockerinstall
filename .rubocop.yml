@@ -126,3 +126,5 @@ Lint/ScriptPermission:
   Enabled: false
 RSpec/InstanceVariable:
   Enabled: false
+Style/SpecialGlobalVars:
+  Enabled: false
