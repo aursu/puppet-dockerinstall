@@ -62,15 +62,15 @@ class dockerinstall::swarm::manager (
       }
     }
     else {
-      if $manager_node {
-        # apply exported resource to join swarm as manager
-        Dockerinstall::Swarm::Node <<| title == "manager/${manager_node}" |>>
-      }
-      elsif $advertise_addr {
+      if $advertise_addr {
         # init swarm manager
         exec { "docker swarm init --advertise-addr ${advertise_addr}":
           path => '/bin:/usr/bin',
         }
+      }
+      elsif $manager_node {
+        # apply exported resource to join swarm as manager
+        Dockerinstall::Swarm::Node <<| title == "manager/${manager_node}" |>>
       }
     }
   }
