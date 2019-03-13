@@ -9,6 +9,8 @@ class dockerinstall::config (
     # https://github.com/puppetlabs/puppetlabs-stdlib#stdlibipaddressv4cidr
     Optional[Stdlib::IP::Address::V4::CIDR]
             $bip               = undef,
+    Optional[Integer]
+            $mtu               = undef,
 )
 {
     include dockerinstall::install
@@ -33,7 +35,8 @@ class dockerinstall::config (
     }
 
     $daemon_config = {} +
-      dockerinstall::option('bip', $bip)
+      dockerinstall::option('bip', $bip) +
+      dockerinstall::option('mtu', $mtu) +
 
     file { '/etc/docker/daemon.json':
       content => template('dockerinstall/daemon.json.erb'),
