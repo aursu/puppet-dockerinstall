@@ -36,7 +36,7 @@ class dockerinstall::config (
 
     $daemon_config = {} +
       dockerinstall::option('bip', $bip) +
-      dockerinstall::option('mtu', $mtu) +
+      dockerinstall::option('mtu', $mtu)
 
     file { '/etc/docker/daemon.json':
       content => template('dockerinstall/daemon.json.erb'),
