@@ -22,7 +22,9 @@ Facter.add(:docker_swarm) do
   setcode do
     info = Facter.value(:docker_info)
 
-    if info
+    if info.empty?
+      {}
+    else
       swarm = info['Swarm']
 
       if swarm['ControlAvailable']
@@ -38,8 +40,6 @@ Facter.add(:docker_swarm) do
       end
 
       swarm
-    else
-      {}
     end
   end
 end
