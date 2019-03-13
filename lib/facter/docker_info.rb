@@ -1,5 +1,5 @@
 require 'json'
-Facter.add(:dockerinstall_info) do
+Facter.add(:docker_info) do
   setcode do
     docker_info_json =  if File.executable?('/usr/bin/docker')
                           `/usr/bin/docker info -f '{{json .}}'`
@@ -10,17 +10,17 @@ Facter.add(:dockerinstall_info) do
       begin
         JSON.parse(docker_info_json)
       rescue JSON::ParserError
-        nil
+        {}
       end
     else
-      nil
+      {}
     end
   end
 end
 
-Facter.add(:dockerinstall_swarm) do
+Facter.add(:docker_swarm) do
   setcode do
-    info = Facter.value(:dockerinstall_info)
+    info = Facter.value(:docker_info)
 
     if info
       swarm = info['Swarm']
@@ -36,9 +36,10 @@ Facter.add(:dockerinstall_swarm) do
       else
         swarm['JoinTokens'] = {}
       end
+
+      swarm
     else
-      swarm = nil
+      {}
     end
-    swarm
   end
 end

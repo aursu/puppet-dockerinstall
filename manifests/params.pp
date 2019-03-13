@@ -41,7 +41,7 @@ class dockerinstall::params {
     $hostprivkey   = "${privatekeydir}/${::clientcert}.pem"
 
     # Swarm data
-    $swarm = $::dockerinstall_swarm
+    $swarm = $::docker_swarm
     $swarm_enabled = ($swarm['LocalNodeState'] == 'active')
     if $swarm_enabled {
         $is_swarm_manager = $swarm['ControlAvailable']
