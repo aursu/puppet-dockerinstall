@@ -53,7 +53,7 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
   def self.title_patterns
     [
       [
-        %r{^([-\w]+)/([\w]+)$},
+        %r{^([-\w]+)/([-\w]+)$},
         [
           [:project],
           [:name]
