@@ -259,7 +259,7 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
 
   validate do
     data = YAML.safe_load(@parameters[:configuration].actual_content)
-    fail 'Service %{name} does not exist in configuration file' % { name: self[:name] } unless data['services'] && data['services'].include?(self[:name])
+    fail 'Service %{name} does not exist in configuration file (content: %{content})' % { name: self[:name], content: data } unless data['services'] && data['services'].include?(self[:name])
   end
 
   def fixpath(value)
