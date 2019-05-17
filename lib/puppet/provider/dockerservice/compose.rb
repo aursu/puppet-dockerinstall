@@ -58,6 +58,14 @@ Puppet::Type.type(:dockerservice).provide(
     :stopped
   end
 
+    # Don't support them specifying runlevels; always use the runlevels
+  # in the init scripts.
+  def reload
+    compose('-f', @resource[:path], '-p', @resource[:project], 'up', '-d', '--no-build', @resource[:name])
+  rescue Puppet::ExecutionFailure => detail
+    raise Puppet::Error, "Could not reload service: #{detail}", detail.backtrace
+  end
+
   def statuscmd
     [command(:compose), '-f', @resource[:path], '-p', @resource[:project], 'ps', @resource[:name]]
   end
@@ -70,8 +78,13 @@ Puppet::Type.type(:dockerservice).provide(
     [command(:compose), '-f', @resource[:path], '-p', @resource[:project], 'stop', @resource[:name]]
   end
 
+  # If there are existing containers for a service, and the service’s
+  # configuration or image was changed after the container’s creation, docker-
+  # compose up picks up the changes by stopping and recreating the containers
+  # (preserving mounted volumes). To prevent Compose from picking up changes,
+  # use the --no-recreate flag.
   def restartcmd
-    [command(:compose), '-f', @resource[:path], '-p', @resource[:project], 'restart', @resource[:name]]
+    startcmd
   end
 
   def flush
