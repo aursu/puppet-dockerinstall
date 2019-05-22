@@ -58,7 +58,7 @@ Puppet::Type.type(:dockerservice).provide(
     :stopped
   end
 
-    # Don't support them specifying runlevels; always use the runlevels
+  # Don't support them specifying runlevels; always use the runlevels
   # in the init scripts.
   def reload
     compose('-f', @resource[:path], '-p', @resource[:project], 'up', '-d', '--no-build', @resource[:name])
