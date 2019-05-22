@@ -37,40 +37,48 @@ define dockerinstall::composeservice (
         $basedir = $rundir
     }
 
-    if $configuration_path {
+    if $project_directory {
         $project = $project_directory
+    }
+    elsif $project_name {
+        $project = $project_name
+    }
+    else {
+        $titledata = split($title, '/')
+        $project = $titledata[0]
+    }
+
+    if $configuration_path {
         $path = dirname($configuration_path)
     }
     elsif $project_directory {
-        $project = $project_directory
         $path = $project_directory
     }
     else {
-        if $project_name {
-            $project = $project_name
-        }
-        else {
-            $titledata = split($title, '/')
-            $project = $titledata[0]
-        }
         $path = "${basedir}/${project}"
     }
 
-    unless $basedir in ['/run', '/var/run', '/lib', '/var/lib', $rundir] {
-        unless defined(File[$basedir]) {
-            file { $basedir:
+    unless $basedir in ['/run', '/var/run', '/lib', '/var/lib', $rundir] or defined(File[$basedir]) {
+        file { $basedir:
+            ensure => 'directory',
+            force  => true,
+        }
+    }
+
+    if $project_basedir {
+        unless $project_basedir in ['/run', '/var/run', '/lib', '/var/lib', $rundir, $basedir] or
+               defined(File[$project_basedir]) {
+            file { $project_basedir:
                 ensure => 'directory',
                 force  => true,
             }
         }
     }
 
-    unless $path in ['/run', '/var/run', '/lib', '/var/lib', $rundir, $basedir] {
-        unless defined(File[$path]) {
-            file { $path:
-                ensure => 'directory',
-                force  => true,
-            }
+    unless $path in ['/run', '/var/run', '/lib', '/var/lib', $rundir, $basedir] or defined(File[$path]) {
+        file { $path:
+            ensure => 'directory',
+            force  => true,
         }
     }
 

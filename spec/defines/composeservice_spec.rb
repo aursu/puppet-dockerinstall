@@ -117,6 +117,7 @@ describe 'dockerinstall::composeservice' do
         end
 
         it { is_expected.to contain_file('/var/lib/build') }
+        it { is_expected.to contain_file('/var/run/build') }
         it { is_expected.to contain_file('/var/lib/build/rpmbuild-curl-gitlab') }
         it {
           is_expected.to contain_dockerservice('curl/centos7curlbuild')

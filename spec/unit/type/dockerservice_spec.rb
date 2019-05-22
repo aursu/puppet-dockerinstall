@@ -59,6 +59,34 @@ describe Puppet::Type.type(:dockerservice) do
       )
       expect(service[:path]).to eq('/var/run/compose/curl/docker-compose.yml')
     end
+
+    it 'when project path specified' do
+      catalog.add_resource Puppet::Type.type(:file).new(name: '/root/compose')
+      service = described_class.new(
+        title: 'curl/centos6curlbuild',
+        configuration: { 'services' => { 'centos6curlbuild' => {} } }.to_yaml,
+        project: '/root/compose/apollo11',
+        catalog: catalog,
+      )
+      expect(service[:basedir]).to eq('/root/compose')
+      expect(service[:project]).to eq('apollo11')
+      expect(service[:path]).to eq('/root/compose/apollo11/docker-compose.yml')
+    end
+
+    it 'when both project path and basedir specified' do
+      catalog.add_resource Puppet::Type.type(:file).new(name: '/root/compose')
+      catalog.add_resource Puppet::Type.type(:file).new(name: '/root/moon/missions')
+      service = described_class.new(
+        title: 'curl/centos6curlbuild',
+        configuration: { 'services' => { 'centos6curlbuild' => {} } }.to_yaml,
+        project: '/root/compose/apollo11',
+        basedir: '/root/moon/missions',
+        catalog: catalog,
+      )
+      expect(service[:basedir]).to eq('/root/moon/missions')
+      expect(service[:project]).to eq('apollo11')
+      expect(service[:path]).to eq('/root/moon/missions/apollo11/docker-compose.yml')
+    end
   end
 
   context 'check project' do
