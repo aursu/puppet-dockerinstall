@@ -8,7 +8,6 @@ define dockerinstall::registry::clientauth (
   Stdlib::Fqdn $server_name = $name,
 )
 {
-  include dockerinstall::install
   include dockerinstall::params
 
   $localcacert = $dockerinstall::params::localcacert
