@@ -22,16 +22,11 @@ Facter.add(:docker_swarm) do
   setcode do
     info = Facter.value(:docker_info)
 
-    Facter.warn("docker_info: #{info}")
-    if info.empty?
+    if info.nil? || info.empty?
       {}
     else
-      swarm = info['Swarm']
-
-      Facter.warn("swarm: #{swarm}")
-
-      # it could be nil on this point when Docker daemon is not running
-      return {} if swarm.nil?
+      swarm = {}
+      swarm = info['Swarm'] if info['Swarm']
 
       if swarm['ControlAvailable']
         swarm_join_token_worker = `/usr/bin/docker swarm join-token -q worker`
