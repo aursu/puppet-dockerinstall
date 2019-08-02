@@ -22,10 +22,13 @@ Facter.add(:docker_swarm) do
   setcode do
     info = Facter.value(:docker_info)
 
+    warning _("docker_info: #{info}")
     if info.empty?
       {}
     else
       swarm = info['Swarm']
+
+      warning _("swarm: #{swarm}")
 
       # it could be nil on this point when Docker daemon is not running
       return {} if swarm.nil?
