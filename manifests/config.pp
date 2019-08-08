@@ -34,6 +34,9 @@ class dockerinstall::config (
         }
     }
 
+    # TLS
+    # https://docs.docker.com/engine/security/https/
+
     $daemon_config = {} +
       dockerinstall::option('bip', $bip) +
       dockerinstall::option('mtu', $mtu)
