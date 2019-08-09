@@ -115,4 +115,7 @@ class dockerinstall (
     Optional[String]
             $compose_version,
     Boolean $manage_docker_certdir,
+    Boolean $manage_docker_tlsdir,
+    Stdlib::Unixpath
+            $docker_tlsdir,
 ){}

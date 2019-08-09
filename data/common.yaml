@@ -24,6 +24,7 @@ dockerinstall::storage_config: ~
 dockerinstall::storage_config_template: 'dockerinstall/docker-storage.erb'
 dockerinstall::root_dir: ~
 dockerinstall::tcp_bind: ~
+dockerinstall::manage_docker_tlsdir: true
 dockerinstall::tls_enable: false
 dockerinstall::tls_verify: true
 dockerinstall::tls_cacert: '/etc/docker/tls/ca.pem'
@@ -70,3 +71,4 @@ dockerinstall::dm_override_udev_sync_check: false
 dockerinstall::overlay2_override_kernel_check: false
 dockerinstall::compose_version: ~
 dockerinstall::manage_docker_certdir: true
+dockerinstall::docker_tlsdir: '/etc/docker/tls'

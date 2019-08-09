@@ -11,6 +11,9 @@ class dockerinstall::install (
     Array[String]
             $prerequired_packages  = $dockerinstall::prerequired_packages,
     Boolean $manage_docker_certdir = $dockerinstall::manage_docker_certdir,
+    Boolean $manage_docker_tlsdir  = $dockerinstall::manage_docker_tlsdir,
+    Stdlib::Unixpath
+            $docker_tlsdir         = $dockerinstall::docker_tlsdir,
 )
 {
     include dockerinstall::repos
@@ -38,6 +41,16 @@ class dockerinstall::install (
     if $manage_docker_certdir {
         file { '/etc/docker/certs.d':
             ensure => directory,
+            owner  => 'root',
+            mode   => '0700',
+        }
+    }
+
+    if $manage_docker_tlsdir {
+        file { $docker_tlsdir:
+            ensure => directory,
+            owner  => 'root',
+            mode   => '0700',
         }
     }
 }
