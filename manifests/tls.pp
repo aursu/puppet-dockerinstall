@@ -5,8 +5,8 @@
 # @example
 #   include dockerinstall::tls
 class dockerinstall::tls (
-    Stdlib::Unixpath
-            $docker_tlsdir = $dockerinstall::docker_tlsdir,
+  Stdlib::Unixpath
+          $docker_tlsdir = $dockerinstall::docker_tlsdir,
 )
 {
   include dockerinstall::params
