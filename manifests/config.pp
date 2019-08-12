@@ -11,6 +11,8 @@ class dockerinstall::config (
             $bip               = undef,
     Optional[Integer]
             $mtu               = undef,
+    Optional[Dockerinstall::StorageDriver]
+            $storage_driver    = undef,
 )
 {
     include dockerinstall::install
@@ -39,7 +41,8 @@ class dockerinstall::config (
 
     $daemon_config = {} +
       dockerinstall::option('bip', $bip) +
-      dockerinstall::option('mtu', $mtu)
+      dockerinstall::option('mtu', $mtu) +
+      dockerinstall::option('storage-driver', $storage_driver)
 
     file { '/etc/docker/daemon.json':
       content => template('dockerinstall/daemon.json.erb'),
