@@ -5,7 +5,10 @@
 # @example
 #   dockerinstall::registry::clientauth { 'namevar': }
 define dockerinstall::registry::clientauth (
-  Stdlib::Fqdn $server_name = $name,
+  Stdlib::Fqdn
+          $server_name = $name,
+  Optional[Stdlib::Port]
+          $server_port = undef,
 )
 {
   include dockerinstall::params
@@ -20,7 +23,13 @@ define dockerinstall::registry::clientauth (
   #    ├── client.cert
   #    ├── client.key
   #    └── ca.crt
-  $auth_certdir = "/etc/docker/certs.d/${server_name}"
+  if $server_port {
+    $auth_certdir = "/etc/docker/certs.d/${server_name}:${server_port}"
+  }
+  else {
+    $auth_certdir = "/etc/docker/certs.d/${server_name}"
+  }
+
   file { $auth_certdir:
     ensure => directory,
   }
