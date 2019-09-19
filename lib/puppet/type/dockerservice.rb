@@ -171,7 +171,6 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
       fail Puppet::Error, 'Configuration must be a string' unless value.is_a?(String)
       fail Puppet::Error, 'Configuration must be a non-empty string' if value.empty?
       begin
-        warning _(value)
         data = YAML.safe_load(value)
         fail Puppet::Error, _('%{path}: file does not contain a valid yaml hash') % { path: @resource[:path] } unless data.is_a?(Hash)
       rescue YAML::SyntaxError => ex
