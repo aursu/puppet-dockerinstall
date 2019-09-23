@@ -1,3 +1,5 @@
+require 'puppet/provider/package'
+
 Puppet::Type.type(:dockerimage).provide(:docker, parent: Puppet::Provider::Package) do
   @doc = 'Docker image provider'
 
