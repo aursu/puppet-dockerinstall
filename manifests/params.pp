@@ -11,7 +11,7 @@ class dockerinstall::params {
     else {
         $service_config_template = 'dockerinstall/docker.upstart.erb'
     }
-    $compose_version          = '1.23.2'
+    $compose_version          = '1.24.1'
     $compose_download_source  = 'https://github.com/docker/compose/releases/download'
 
     # docker compose project provides binaries only for x86_64 architecture
