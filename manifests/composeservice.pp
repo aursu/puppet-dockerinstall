@@ -21,7 +21,7 @@ define dockerinstall::composeservice (
 )
 {
   include dockerinstall::params
-  $rundir = $dockerinstall::params::compose_rundir
+  $libdir = $dockerinstall::params::compose_libdir
 
   unless '/' in $title {
     fail('Composeservice title must be in format <project name>/<service name>')
@@ -34,7 +34,7 @@ define dockerinstall::composeservice (
     $basedir = $project_basedir
   }
   else {
-    $basedir = $rundir
+    $basedir = $libdir
   }
 
   if $project_directory {
@@ -58,7 +58,7 @@ define dockerinstall::composeservice (
     $path = "${basedir}/${project}"
   }
 
-  unless $basedir in ['/run', '/var/run', '/lib', '/var/lib', $rundir] or defined(File[$basedir]) {
+  unless $basedir in ['/run', '/var/run', '/lib', '/var/lib', $libdir] or defined(File[$basedir]) {
     file { $basedir:
       ensure => 'directory',
       force  => true,
@@ -66,7 +66,7 @@ define dockerinstall::composeservice (
   }
 
   if $project_basedir {
-    unless  $project_basedir in ['/run', '/var/run', '/lib', '/var/lib', $rundir, $basedir] or
+    unless  $project_basedir in ['/run', '/var/run', '/lib', '/var/lib', $libdir, $basedir] or
             defined(File[$project_basedir]) {
       file { $project_basedir:
         ensure => 'directory',
@@ -75,7 +75,7 @@ define dockerinstall::composeservice (
     }
   }
 
-  unless $path in ['/run', '/var/run', '/lib', '/var/lib', $rundir, $basedir] or defined(File[$path]) {
+  unless $path in ['/run', '/var/run', '/lib', '/var/lib', $libdir, $basedir] or defined(File[$path]) {
     file { $path:
       ensure => 'directory',
       force  => true,

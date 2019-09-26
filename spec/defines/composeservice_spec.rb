@@ -4,6 +4,7 @@ require 'yaml'
 describe 'dockerinstall::composeservice' do
   let(:configuration) { { 'services' => { 'centos7curlbuild' => {} } }.to_yaml }
   let(:rundir) { '/var/run/compose' }
+  let(:libdir) { '/var/lib/compose' }
   let(:pre_condition) do
     <<-PRECOND
     class {'dockerinstall': }
@@ -46,7 +47,7 @@ describe 'dockerinstall::composeservice' do
       context 'when valid title (curl/centos7curlbuild) and configuration parameters' do
         let(:title) { 'rpmbuild-curl/centos7curlbuild' }
 
-        it { is_expected.to contain_file(rundir + '/rpmbuild-curl') }
+        it { is_expected.to contain_file(libdir + '/rpmbuild-curl') }
         it {
           is_expected.to contain_dockerservice('rpmbuild-curl/centos7curlbuild')
             .with(
@@ -64,7 +65,7 @@ describe 'dockerinstall::composeservice' do
           )
         end
 
-        it { is_expected.to contain_file(rundir + '/rpmbuild-curl-gitlab') }
+        it { is_expected.to contain_file(libdir + '/rpmbuild-curl-gitlab') }
         it {
           is_expected.to contain_dockerservice('curl/centos7curlbuild')
             .with(
