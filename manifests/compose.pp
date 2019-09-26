@@ -17,6 +17,8 @@ class dockerinstall::compose (
             $binary_path      = $dockerinstall::params::compose_binary_path,
     Stdlib::Absolutepath
             $rundir           = $dockerinstall::params::compose_rundir,
+    Stdlib::Absolutepath
+            $libdir           = $dockerinstall::params::compose_libdir,
 ) inherits dockerinstall::params
 {
     Exec {
@@ -67,7 +69,7 @@ class dockerinstall::compose (
         alias     => 'docker-compose',
     }
 
-    file { $rundir:
+    file { [$rundir, $libdir]:
         ensure => directory,
         mode   => '0755',
         force  => true,
