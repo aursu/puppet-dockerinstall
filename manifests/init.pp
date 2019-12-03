@@ -10,6 +10,7 @@ class dockerinstall (
     Dockerinstall::RepoOS
             $repo_os,
     Boolean $repo_gpgcheck,
+    Boolean $repo_management_software,
     Array[String]
             $prerequired_packages,
     Boolean $manage_os_users,
