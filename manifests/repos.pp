@@ -21,29 +21,15 @@ class dockerinstall::repos (
   $gpgkey = "${distrourl}/gpg"
 
   if $manage_package {
-    if $::operatingsystem == 'Ubuntu' {
-      if $repo_mgmt_software {
-        package {
-          [
-            'apt-transport-https',
-            'software-properties-common',
-          ]:
-          ensure => installed,
-        }
-      }
-
+    if $facts['os']['family'] == 'Debian' {
       # https://docs.docker.com/install/linux/docker-ce/ubuntu/
-      $aptrepo = "deb [arch=${basearch}] ${distrourl} ${::lsbdistcodename} ${repo}"
-      exec { 'aptrepo-docker':
-        command => "add-apt-repository \"${aptrepo}\"",
-        unless  => "grep ${distrourl} /etc/apt/sources.list",
-        path    => '/bin:/usr/bin',
-      }
-      if $gpgcheck {
-        exec { 'aptrepo-docker-gpgkey':
-          command => "curl -fsSL ${gpgkey} | apt-key add -",
-          unless  => 'apt-key fingerprint 0EBFCD88 | grep Docker',
-          path    => '/bin:/usr/bin',
+      apt::source { 'docker':
+        architecture => $basearch,
+        location     => $distrourl,
+        repos        => $repo,
+        key          => {
+          id     => '0EBFCD88',
+          source => $gpgkey,
         }
       }
     }

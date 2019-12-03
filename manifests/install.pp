@@ -27,10 +27,19 @@ class dockerinstall::install (
         }
 
         package { $package_name:
-            ensure  => $version,
-            name    => $package_name,
-            require => Yumrepo['docker'],
-            alias   => 'docker',
+            ensure => $version,
+            name   => $package_name,
+            alias  => 'docker',
+        }
+
+        case $facts['os']['family'] {
+            'Debian': {
+                Apt::Source['docker'] -> Package[$package_name]
+            }
+            'RedHat': {
+                Yumrepo['docker'] -> Package[$package_name]
+            }
+            default: { }
         }
     }
 
