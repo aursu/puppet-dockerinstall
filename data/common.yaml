@@ -4,7 +4,6 @@ dockerinstall::repo: 'stable'
 dockerinstall::repo_location: 'https://download.docker.com/linux'
 dockerinstall::repo_os: ~
 dockerinstall::repo_gpgcheck: true
-dockerinstall::repo_management_software: false
 dockerinstall::prerequired_packages: []
 dockerinstall::manage_package: true
 dockerinstall::package_name: 'docker-ce'

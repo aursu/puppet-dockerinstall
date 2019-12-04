@@ -11,7 +11,6 @@ class dockerinstall::repos (
     Boolean $gpgcheck               = $dockerinstall::repo_gpgcheck,
     String  $basearch               = $::architecture,
     String  $releasever             = $::operatingsystemmajrelease,
-    Boolean $repo_mgmt_software     = $dockerinstall::repo_management_software,
 )
 {
   # https://docs.docker.com/install/linux/docker-ce/fedora/#set-up-the-repository
