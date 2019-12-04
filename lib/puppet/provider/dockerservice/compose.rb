@@ -31,7 +31,8 @@ Puppet::Type.type(:dockerservice).provide(
   end
 
   def texecute(type, command, fof = true, squelch = false, combine = true)
-    execute(command, failonfail: fof, override_locale: false, squelch: squelch, combine: combine)
+    execute(command,  failonfail: fof, override_locale: false, squelch: squelch, combine: combine,
+                      custom_environment: { 'COLUMNS' => 512 })
   rescue Puppet::ExecutionFailure => detail
     @resource.fail Puppet::Error, "Could not #{type} #{@resource.ref}: #{detail}", detail
   end
