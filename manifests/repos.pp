@@ -28,7 +28,7 @@ class dockerinstall::repos (
         location     => $distrourl,
         repos        => $repo,
         key          => {
-          id     => '0EBFCD88',
+          id     => '9DC858229FC7DD38854AE2D88D81803C0EBFCD88',
           source => $gpgkey,
         }
       }
