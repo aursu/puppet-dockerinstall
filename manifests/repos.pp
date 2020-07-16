@@ -10,13 +10,12 @@ class dockerinstall::repos (
             $os                     = $dockerinstall::repo_os,
     Boolean $gpgcheck               = $dockerinstall::repo_gpgcheck,
     String  $basearch               = $::architecture,
-    String  $releasever             = $::operatingsystemmajrelease,
 )
 {
   # https://docs.docker.com/install/linux/docker-ce/fedora/#set-up-the-repository
   # https://docs.docker.com/install/linux/docker-ce/centos/#set-up-the-repository
   $distrourl = "${location}/${os}"
-  $rpmurl = "${distrourl}/${releasever}/${basearch}/${repo}"
+  $rpmurl = "${distrourl}/7/${basearch}/${repo}"
   $gpgkey = "${distrourl}/gpg"
 
   if $manage_package {
