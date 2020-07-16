@@ -11,6 +11,7 @@ class dockerinstall::params {
     else {
         $service_config_template = 'dockerinstall/docker.upstart.erb'
     }
+    # predefined Docker Compose version - could  be overriden with dockerinstall::compose_version
     $compose_version          = '1.26.2'
     $compose_download_source  = 'https://github.com/docker/compose/releases/download'
 
