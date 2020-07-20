@@ -20,7 +20,6 @@ dockerinstall::dm_use_deferred_removal: false
 dockerinstall::dns: ~
 dockerinstall::dns_search: ~
 dockerinstall::docker_group: 'docker'
-dockerinstall::docker_tlsdir: '/etc/docker/tls'
 dockerinstall::docker_users: 'docker'
 dockerinstall::extra_parameters: ~
 dockerinstall::fixed_cidr: ~

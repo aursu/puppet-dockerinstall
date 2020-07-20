@@ -50,4 +50,5 @@ class dockerinstall::params {
     else {
         $is_swarm_manager = undef
     }
+    $docker_tlsdir = '/etc/docker/tls'
 }

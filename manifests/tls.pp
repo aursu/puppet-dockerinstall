@@ -6,8 +6,8 @@
 #   include dockerinstall::tls
 class dockerinstall::tls (
   Stdlib::Unixpath
-          $docker_tlsdir = $dockerinstall::docker_tlsdir,
-)
+          $docker_tlsdir = $dockerinstall::params::docker_tlsdir,
+) inherits dockerinstall::params
 {
   include dockerinstall::params
 

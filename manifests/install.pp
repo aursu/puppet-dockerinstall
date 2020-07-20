@@ -13,8 +13,8 @@ class dockerinstall::install (
     Boolean $manage_docker_certdir = $dockerinstall::manage_docker_certdir,
     Boolean $manage_docker_tlsdir  = $dockerinstall::manage_docker_tlsdir,
     Stdlib::Unixpath
-            $docker_tlsdir         = $dockerinstall::docker_tlsdir,
-)
+            $docker_tlsdir         = $dockerinstall::params::docker_tlsdir,
+) inherits dockerinstall::params
 {
     include dockerinstall::repos
 
