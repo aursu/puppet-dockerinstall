@@ -34,9 +34,9 @@ class dockerinstall::params {
     $compose_libdir = '/var/lib/compose'
 
     # Client authentication
-    if $::puppet_sslpaths {
-        $certdir       = $::puppet_sslpaths['certdir']['path']
-        $privatekeydir = $::puppet_sslpaths['privatekeydir']['path']
+    if $facts['puppet_sslpaths'] {
+        $certdir       = $facts['puppet_sslpaths']['certdir']['path']
+        $privatekeydir = $facts['puppet_sslpaths']['privatekeydir']['path']
     }
     else {
         # fallback to predefined
