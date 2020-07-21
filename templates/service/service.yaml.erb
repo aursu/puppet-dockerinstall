@@ -1,0 +1,67 @@
+---
+version: "<%= @compose_file_version %>"
+services:
+  <%= @compose_service %>:
+    image: <%= @docker_image %>
+<% if @restart -%>
+    restart: <%= @restart %>
+<% end -%>
+<% if @expose_ports -%>
+    ports:
+<%   Array(@expose_ports).each do |port| -%>
+      - <%= port %>
+<%   end -%>
+<% end -%>
+<% if @environment -%>
+    environment:
+<%-  @environment.each do |name, value| -%>
+<%     if ['yes', 'no', 'true', 'false', true, false].include?(value) -%>
+      <%= name %>: "<%= value %>"
+<%     else -%>
+      <%= name %>: <%= value %>
+<%     end -%>
+<%-  end -%>
+<% end -%>
+<% if @env_name && @secrets -%>
+    env_file:
+      - secrets/<%= @env_name %>.env
+<% end -%>
+<% if @docker_volume -%>
+    volumes:
+<%   Array(@docker_volume).each do |vol| -%>
+      - <%= vol %>
+<%   end -%>
+<% end -%>
+<% if @docker_extra_hosts -%>
+    extra_hosts:
+<%   Array(@docker_extra_hosts).each do |host|  -%>
+      - <%= host %>
+<%   end -%>
+<% end -%>
+<% if @docker_ulimits -%>
+    ulimits:
+<%   @docker_ulimits.each do |name, limit| -%>
+<%     if limit.is_a?(Array) -%>
+      <%= name %>:
+        soft: <%= limit[0] %>
+        hard: <%= limit[1] %>
+<%     else -%>
+      <%= name %>: <%= limit %>
+<%     end -%>
+<%   end -%>
+<% end -%>
+<% if @docker_mtu -%>
+
+networks:
+  default:
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: <%= @docker_mtu %>
+<% end -%>
+<% if @project_volumes -%>
+
+volumes:
+<%   Array(@project_volumes).each do |vol| -%>
+  <%= vol %>:
+<%   end -%>
+<% end -%>
