@@ -5,6 +5,7 @@ fixtures:
   forge_modules:
      stdlib: "puppetlabs/stdlib"
      puppet_agent: "puppetlabs/puppet_agent"
+     apt: 'puppetlabs/apt'
   repositories:
     lsys: "https://github.com/aursu/puppet-lsys"
     yumrepo_core:
