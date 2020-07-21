@@ -6,4 +6,6 @@ type Dockerinstall::Log::JSONFile = Struct[{
   Optional['env'] => String,
   Optional['env-regex'] => String,
   Optional['compress'] => Enum['true', 'false'],
+  Optional['mode'] => Enum['blocking', 'non-blocking'],
+  Optional['max-buffer-size'] => Pattern[/^[0-9]+[gmk]?$/],
 }]

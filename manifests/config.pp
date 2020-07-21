@@ -13,6 +13,15 @@ class dockerinstall::config (
             $mtu               = undef,
     Optional[Dockerinstall::StorageDriver]
             $storage_driver    = undef,
+    Optional[
+      Array[Dockerinstall::StorageOptions]
+    ]       $storage_opts      = undef,
+    Optional[Dockerinstall::CgroupDriver]
+            $cgroup_driver     = undef,
+    Optional[Dockerinstall::LogDriver]
+            $log_driver        = undef,
+    Optional[Dockerinstall::Log::JSONFile]
+            $log_opts          = undef,
 )
 {
     include dockerinstall::install
@@ -51,10 +60,21 @@ class dockerinstall::config (
     # TLS
     # https://docs.docker.com/engine/security/https/
 
+    if $cgroup_driver {
+      $exec_opts = ["native.cgroupdriver=${cgroup_driver}"]
+    }
+    else {
+      $exec_opts = undef
+    }
+
     $daemon_config = {} +
       dockerinstall::option('bip', $bip) +
       dockerinstall::option('mtu', $mtu) +
-      dockerinstall::option('storage-driver', $storage_driver)
+      dockerinstall::option('storage-driver', $storage_driver) +
+      dockerinstall::option('exec-opts', $exec_opts) +
+      dockerinstall::option('log-driver', $log_driver) +
+      dockerinstall::option('log-opts', $log_opts) +
+      dockerinstall::option('storage-opts', $storage_opts)
 
     file { '/etc/docker/daemon.json':
       content => template('dockerinstall/daemon.json.erb'),

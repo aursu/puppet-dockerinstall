@@ -11,6 +11,14 @@ class dockerinstall::profile::daemon (
           $mtu               = undef,
   Optional[String]
           $storage_driver    = undef,
+  Optional[Array[String]]
+          $storage_opts      = undef,
+  Optional[String]
+          $cgroup_driver     = undef,
+  Optional[String]
+          $log_driver        = undef,
+  Optional[Hash]
+          $log_opts          = undef,
   Boolean $docker0_bind      = false,
   Boolean $tls_enable        = false,
   Stdlib::Unixpath
@@ -20,13 +28,17 @@ class dockerinstall::profile::daemon (
     include dockerinstall::profile::install
 
     class { 'dockerinstall::tls':
-        docker_tlsdir => $docker_tlsdir,
+      docker_tlsdir => $docker_tlsdir,
     }
 
     class { 'dockerinstall::config':
-        bip            => $network_bridge_ip,
-        mtu            => $mtu,
-        storage_driver => $storage_driver,
+      bip            => $network_bridge_ip,
+      mtu            => $mtu,
+      storage_driver => $storage_driver,
+      storage_opts   => $storage_opts,
+      cgroup_driver  => $cgroup_driver,
+      log_driver     => $log_driver,
+      log_opts       => $log_opts,
     }
 
     # Daemon options
