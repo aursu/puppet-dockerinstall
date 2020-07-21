@@ -50,13 +50,20 @@ class dockerinstall::params {
     $hostprivkey   = "${privatekeydir}/${::clientcert}.pem"
 
     # Swarm data
-    $swarm = $::docker_swarm
-    $swarm_enabled = ($swarm['LocalNodeState'] == 'active')
+    $swarm = $facts['docker_swarm']
+    if $swarm {
+        $swarm_enabled = ($swarm['LocalNodeState'] == 'active')
+    }
+    else {
+        $swarm_enabled = undef
+    }
+
     if $swarm_enabled {
         $is_swarm_manager = $swarm['ControlAvailable']
     }
     else {
         $is_swarm_manager = undef
     }
+
     $docker_tlsdir = '/etc/docker/tls'
 }

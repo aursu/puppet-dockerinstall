@@ -29,7 +29,7 @@ class dockerinstall::swarm::manager (
     }
   }
 
-  $node_name = $::fqdn
+  $node_name = $facts['fqdn']
   $nodeid = $swarm['NodeID']
 
   if $enable {
