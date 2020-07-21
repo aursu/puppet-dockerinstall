@@ -128,3 +128,5 @@ RSpec/InstanceVariable:
   Enabled: false
 Style/SpecialGlobalVars:
   Enabled: false
+Style/NumericLiterals:
+  Enabled: false

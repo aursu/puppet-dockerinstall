@@ -12,7 +12,7 @@ describe 'dockerinstall::config' do
       context 'check bip option' do
         let(:params) do
           {
-            bip: '192.168.0.1/24',
+            bip: '192.168.0.1/24'
           }
         end
 
@@ -25,7 +25,7 @@ describe 'dockerinstall::config' do
       context 'check mtu option' do
         let(:params) do
           {
-            mtu: 1460,
+            mtu: 1460
           }
         end
 
@@ -40,7 +40,7 @@ describe 'dockerinstall::config' do
           {
             storage_opts: [
               'dm.fs=ext4'
-            ],
+            ]
           }
         end
 
@@ -55,7 +55,7 @@ describe 'dockerinstall::config' do
           {
             storage_opts: [
               'overlay2.override_kernel_check=true'
-            ],
+            ]
           }
         end
 
@@ -70,7 +70,7 @@ describe 'dockerinstall::config' do
           {
             storage_opts: [
               'overlay2.blocksize=512K'
-            ],
+            ]
           }
         end
 
