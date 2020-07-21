@@ -5,7 +5,7 @@
 # @example
 #   include dockerinstall::params
 class dockerinstall::params {
-    if $::is_init_systemd {
+    if $facts['systemd'] {
         $service_config_template = 'dockerinstall/docker.systemd.erb'
     }
     else {

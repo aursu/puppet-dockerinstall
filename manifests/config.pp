@@ -18,21 +18,33 @@ class dockerinstall::config (
     include dockerinstall::install
 
     if $manage_users {
-        group { $group:
+        group { 'docker':
             ensure => 'present',
+            name   => $group,
         }
 
-        user{ $docker_users:
-            ensure     => 'present',
-            groups     => [ $group ],
-            membership => 'minimum',
-            require    => Group[$group],
-            alias      => 'docker',
+        $docker_users_list = $docker_users ? {
+          Array   => $docker_users,
+          default => [$docker_users]
+        }
+        $users = $docker_users_list - ['docker']
+
+        user {
+            default:
+              ensure     => 'present',
+              groups     => [ $group ],
+              membership => 'minimum',
+              require    => Group['docker'],
+            ;
+            $users:
+              tag => 'docker',
+            ;
+            'docker': ;
         }
 
         if $manage_package {
-            Package['docker'] -> Group[$group]
-            Package['docker'] -> User[$docker_users]
+            Package['docker'] -> Group['docker']
+            Package['docker'] -> User['docker']
         }
     }
 

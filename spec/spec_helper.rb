@@ -6,11 +6,6 @@ require 'spec_helper_local' if File.file?(File.join(File.dirname(__FILE__), 'spe
 include RspecPuppetFacts
 
 # https://github.com/mcanevet/rspec-puppet-facts/blob/master/README.md#create-dynamic-facts
-# register is_init_systemd fact from module lsys
-add_custom_fact :is_init_systemd, ->(os, _facts) do
-  os != 'ubuntu-14.04-x86_64'
-end
-
 default_facts = {
   puppetversion: Puppet.version,
   facterversion: Facter.version

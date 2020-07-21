@@ -101,14 +101,15 @@ class dockerinstall::service (
     Boolean $manage_package                 = $dockerinstall::manage_package,
 )
 {
-    include lsys::systemd
+    include systemd::systemctl::daemon_reload
     include dockerinstall::config
     include dockerinstall::install
     include dockerinstall::params
 
     if $manage_service {
-        service { $service_name:
+        service { 'docker':
             ensure     => $service_ensure,
+            name       => $service_name,
             enable     => $service_enable,
             hasstatus  => $service_hasstatus,
             hasrestart => $service_hasrestart,
@@ -117,14 +118,14 @@ class dockerinstall::service (
         }
 
         if $manage_users {
-            User['docker'] -> Service[$service_name]
+            User['docker'] -> Service['docker']
         }
 
         if $manage_package {
-            Package['docker'] -> Service[$service_name]
+            Package['docker'] -> Service['docker']
         }
 
-        if $::is_init_systemd {
+        if $facts['systemd'] {
             file { '/etc/systemd/system/docker.service.d':
                 ensure => directory,
             }
@@ -133,7 +134,7 @@ class dockerinstall::service (
                 file { $service_overrides_config:
                     ensure  => present,
                     content => template($service_overrides_template),
-                    notify  => Exec['systemd-reload'],
+                    notify  => Class['systemd::systemctl::daemon_reload'],
                     before  => Service['docker'],
                 }
                 if $service_config {

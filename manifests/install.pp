@@ -42,10 +42,10 @@ class dockerinstall::install (
 
         case $facts['os']['family'] {
             'Debian': {
-                Apt::Source['docker'] -> Package[$package_name]
+                Apt::Source['docker'] -> Package['docker']
             }
             'RedHat': {
-                Yumrepo['docker'] -> Package[$package_name]
+                Yumrepo['docker'] -> Package['docker']
             }
             default: { }
         }
