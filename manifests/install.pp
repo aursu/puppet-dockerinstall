@@ -4,32 +4,40 @@
 #
 class dockerinstall::install (
     Dockerinstall::PackageName
-            $package_name          = $dockerinstall::package_name,
+            $package_name            = $dockerinstall::package_name,
     Dockerinstall::Version
-            $version               = $dockerinstall::version,
-    Boolean $manage_package        = $dockerinstall::manage_package,
+            $version                 = $dockerinstall::version,
+    Boolean $manage_package          = $dockerinstall::manage_package,
     Array[String]
-            $prerequired_packages  = $dockerinstall::prerequired_packages,
-    Boolean $manage_docker_certdir = $dockerinstall::manage_docker_certdir,
-    Boolean $manage_docker_tlsdir  = $dockerinstall::manage_docker_tlsdir,
+            $prerequired_packages    = $dockerinstall::prerequired_packages,
+    Boolean $manage_docker_certdir   = $dockerinstall::manage_docker_certdir,
+    Boolean $manage_docker_tlsdir    = $dockerinstall::manage_docker_tlsdir,
     Stdlib::Unixpath
-            $docker_tlsdir         = $dockerinstall::params::docker_tlsdir,
+            $docker_tlsdir           = $dockerinstall::params::docker_tlsdir,
+    String  $containerd_package_name = $dockerinstall::containerd_package_name,
+    String  $containerd_version      = $dockerinstall::containerd_version,
 ) inherits dockerinstall::params
 {
     include dockerinstall::repos
 
     if $manage_package {
-        $prerequired_packages.each |String $reqp| {
+        # exclude docker and conteinerd.io from list of additional packages
+        $managed_packages = $prerequired_packages - [ $package_name, $containerd_package_name, 'docker', 'containerd.io']
+        $managed_packages.each |String $reqp| {
             package { $reqp:
                 ensure => installed,
                 before => Package['docker'],
             }
         }
 
-        package { $package_name:
+        package { 'docker':
             ensure => $version,
             name   => $package_name,
-            alias  => 'docker',
+        }
+
+        package { 'containerd.io':
+            ensure => $containerd_version,
+            name   => $containerd_package_name,
         }
 
         case $facts['os']['family'] {

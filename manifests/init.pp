@@ -3,6 +3,8 @@ class dockerinstall (
             $package_name,
     Dockerinstall::Version
             $version,
+    String  $containerd_package_name,
+    String  $containerd_version,
     Boolean $manage_package,
     Dockerinstall::Repo
             $repo,

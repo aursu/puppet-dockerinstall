@@ -71,3 +71,5 @@ dockerinstall::tls_key: '/etc/docker/tls/key.pem'
 dockerinstall::tls_verify: true
 dockerinstall::tmp_dir: ~
 dockerinstall::version: 'installed'
+dockerinstall::containerd_package_name: 'containerd.io'
+dockerinstall::containerd_version: 'installed'
