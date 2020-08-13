@@ -96,6 +96,7 @@ define dockerinstall::webservice (
     unless $decomission {
       dockerimage { $docker_image:
         ensure => present,
+        before => Dockerinstall::Composeservice[$project_title],
       }
     }
   }
@@ -109,21 +110,18 @@ define dockerinstall::webservice (
     $configuration_path = "${project_directory}/docker-compose.${service_hash}.yml"
   }
 
-  # docker-compose service
   if $decomission {
-    dockerinstall::composeservice { $project_title:
-      ensure             => stopped,
-      project_basedir    => $project_basedir,
-      configuration      => template('dockerinstall/service/service.yaml.erb'),
-      configuration_path => $configuration_path,
-    }
+    $service_ensure = stopped
   }
   else {
-    dockerinstall::composeservice { $project_title:
-      project_basedir    => $project_basedir,
-      configuration      => template('dockerinstall/service/service.yaml.erb'),
-      require            => Dockerimage[$docker_image],
-      configuration_path => $configuration_path,
-    }
+    $service_ensure = running
+  }
+
+  # docker-compose service
+  dockerinstall::composeservice { $project_title:
+    ensure             => $service_ensure,
+    project_basedir    => $project_basedir,
+    configuration      => template('dockerinstall/service/service.yaml.erb'),
+    configuration_path => $configuration_path,
   }
 }
