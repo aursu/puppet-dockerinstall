@@ -21,11 +21,6 @@ class dockerinstall::compose (
             $libdir           = $dockerinstall::params::compose_libdir,
 ) inherits dockerinstall::params
 {
-    Exec {
-        path => '/bin:/usr/bin',
-        cwd  => $tmpdir,
-    }
-
     # we allow user to not care about compose version and keep it default
     # (specified in params)
     # $download_version - either user specified or default
@@ -44,17 +39,22 @@ class dockerinstall::compose (
     $checksum_version_name = "${checksum_name}.${download_version}"
     $checksum_download_path = "${tmpdir}/${checksum_version_name}"
 
-    # download checksm file into temporary directory
-    exec { "curl -L ${download_url_base}/${checksum_name} -o ${checksum_version_name}":
+    exec {
+      default:
+        path => '/bin:/usr/bin',
+        cwd  => $tmpdir,
+      ;
+      # download checksm file into temporary directory
+      'docker-compose-checksum':
+        command => "curl -L ${download_url_base}/${checksum_name} -o ${checksum_version_name}",
         creates => $checksum_download_path,
-        alias   => 'docker-compose-checksum',
-    }
-
-    # download binary if checksum not match
-    exec { "curl -L ${download_url_base}/${download_name} -o ${download_name}":
+      ;
+      # download binary if checksum not match
+      'docker-compose-download':
+        command => "curl -L ${download_url_base}/${download_name} -o ${download_name}",
         unless  => "${checksum_command} -c ${checksum_version_name}",
         require => Exec['docker-compose-checksum'],
-        alias   => 'docker-compose-download',
+      ;
     }
 
     # install binary into specified location (by default is
