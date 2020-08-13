@@ -3,13 +3,32 @@
 ---
 fixtures:
   forge_modules:
-    stdlib: "puppetlabs/stdlib"
-    puppet_agent: "puppetlabs/puppet_agent"
     apt: "puppetlabs/apt"
+    concat:
+      repo: "puppetlabs/concat"
+      ref: "6.2.0"
+    puppet_agent:
+      repo: "puppetlabs/puppet_agent"
+      ref: "4.0.0"
+    selinux:
+      repo: "puppet/selinux"
+      ref: "3.2.0"
+    stdlib:
+      repo: "puppetlabs/stdlib"
+      ref: "6.3.0"
     systemd:
       repo: "camptocamp/systemd"
       ref: "2.9.0"
   repositories:
+    lsys: "https://github.com/aursu/puppet-lsys.git"
+    nginx:
+      repo: "https://github.com/aursu/puppet-nginx.git"
+      ref: "tags/v1.1.1-rc0.5"
+    puppet: "https://github.com/aursu/puppet-puppet.git"
+    selinux_core:
+      repo: https://github.com/puppetlabs/puppetlabs-selinux_core.git
+      puppet_version: ">= 6.0.0"
+    tlsinfo: "https://github.com/aursu/puppet-tlsinfo.git"
     yumrepo_core:
       repo: https://github.com/puppetlabs/puppetlabs-yumrepo_core.git
       puppet_version: ">= 6.0.0"
