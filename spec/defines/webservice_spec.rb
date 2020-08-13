@@ -36,6 +36,11 @@ describe 'dockerinstall::webservice' do
           .with_configuration(%r{^[ ]{4}image: jenkinsci/blueocean:1\.19\.0$})
       }
 
+      it {
+        is_expected.to contain_dockerinstall__composeservice('namevar/namevar')
+          .with_configuration(%r{^[ ]{4}restart: always$})
+      }
+
       context 'when docker ulimits specified' do
         let(:params) do
           super().merge(
