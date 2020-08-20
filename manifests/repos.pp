@@ -32,6 +32,10 @@ class dockerinstall::repos (
       }
     }
     else {
+      $gpgcheck_param = $gpgcheck ? {
+        true    => '1',
+        default => '0',
+      }
       yumrepo { 'docker':
         descr    => 'Docker',
         baseurl  => $rpmurl,
