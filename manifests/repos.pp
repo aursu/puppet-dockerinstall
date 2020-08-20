@@ -48,6 +48,9 @@ class dockerinstall::repos (
         gpgcheck  => $gpgcheck_param,
         sslverify => $sslverify_param,
       }
+      file { '/etc/yum.repos.d/docker.repo':
+        mode => '0644',
+      }
     }
   }
 }
