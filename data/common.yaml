@@ -45,6 +45,7 @@ dockerinstall::proxy: ~
 dockerinstall::registry_mirror: ~
 dockerinstall::repo: 'stable'
 dockerinstall::repo_gpgcheck: true
+dockerinstall::repo_sslverify: true
 dockerinstall::repo_location: 'https://download.docker.com/linux'
 dockerinstall::repo_os: ~
 dockerinstall::root_dir: ~

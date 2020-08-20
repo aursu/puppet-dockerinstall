@@ -9,6 +9,7 @@ class dockerinstall::repos (
     Dockerinstall::RepoOS
             $os                     = $dockerinstall::repo_os,
     Boolean $gpgcheck               = $dockerinstall::repo_gpgcheck,
+    Boolean $sslverify              = $dockerinstall::repo_sslverify,
     String  $basearch               = $::architecture,
 )
 {
@@ -36,11 +37,16 @@ class dockerinstall::repos (
         true    => '1',
         default => '0',
       }
+      $sslverify_param = $sslverify ? {
+        true    => '1',
+        default => '0',
+      }
       yumrepo { 'docker':
-        descr    => 'Docker',
-        baseurl  => $rpmurl,
-        gpgkey   => $gpgkey,
-        gpgcheck => $gpgcheck_param,
+        descr     => 'Docker',
+        baseurl   => $rpmurl,
+        gpgkey    => $gpgkey,
+        gpgcheck  => $gpgcheck_param,
+        sslverify => $sslverify_param,
       }
     }
   }
