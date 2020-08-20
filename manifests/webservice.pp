@@ -43,8 +43,16 @@ define dockerinstall::webservice (
         Array[Dockerinstall::RLimit, 2]
       ]
     ]
-  ] $docker_ulimits    = undef,
-  Boolean $decomission = false,
+  ]       $docker_ulimits       = undef,
+  Optional[
+    Array[
+      Variant[
+        Stdlib::IP::Address,
+        Stdlib::Fqdn
+      ]
+    ]
+  ]       $docker_dns           = undef,
+  Boolean $decomission          = false,
 )
 {
   include dockerinstall::params

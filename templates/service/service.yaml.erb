@@ -50,6 +50,12 @@ services:
 <%     end -%>
 <%   end -%>
 <% end -%>
+<% if @docker_dns -%>
+    dns:
+<%   Array(@docker_dns).each do |dns| -%>
+      - <%= dns %>
+<%   end -%>
+<% end -%>
 <% if @docker_mtu -%>
 
 networks:
