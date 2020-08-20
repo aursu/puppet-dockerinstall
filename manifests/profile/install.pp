@@ -13,7 +13,7 @@ class dockerinstall::profile::install (
           $docker_tlsdir      = $dockerinstall::params::docker_tlsdir,
 ) inherits dockerinstall::params
 {
-  class { 'dockerinstall': }
+  include dockerinstall
   class { 'dockerinstall::install':
     version              => $dockerd_version,
     containerd_version   => $containerd_version,
