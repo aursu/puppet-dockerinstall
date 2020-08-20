@@ -40,7 +40,7 @@ class dockerinstall::repos (
         descr    => 'Docker',
         baseurl  => $rpmurl,
         gpgkey   => $gpgkey,
-        gpgcheck => $gpgcheck,
+        gpgcheck => $gpgcheck_param,
       }
     }
   }
