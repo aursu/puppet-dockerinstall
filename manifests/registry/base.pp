@@ -22,6 +22,9 @@ class dockerinstall::registry::base (
     expose_ports  => [
       '5000:5000',
     ],
+    environment   => {
+      'REGISTRY_STORAGE_DELETE_ENABLED' => 'true',
+    },
     docker_volume => [
       "${data_directory}:/var/lib/registry",
     ]
