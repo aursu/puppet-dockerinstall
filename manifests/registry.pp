@@ -6,16 +6,20 @@
 #   include dockerinstall::registry
 class dockerinstall::registry (
   String  $server_name,
-  Boolean $manage_nginx_core      = true,
-  Boolean $manage_web_user        = true,
+  Optional[String]
+          $cert_identity          = $server_name,
   Boolean $ssl_client_ca_auth     = true,
   Optional[Array[Stdlib::Fqdn]]
           $ssl_client_ca_certs    = undef,
+  Boolean $manage_cert_data       = true,
   # TLS data
   Optional[String]
           $ssl_cert               = undef,
   Optional[String]
           $ssl_key                = undef,
+  # WEB service
+  Boolean $manage_nginx_core      = true,
+  Boolean $manage_web_user        = true,
   Boolean $global_ssl_redirect    = true,
 )
 {
@@ -56,21 +60,33 @@ class dockerinstall::registry (
     }
   }
 
-  # we use Hiera for certificate/private key storage
-  tlsinfo::certpair { $server_name:
-    identity => true,
-    cert     => $ssl_cert,
-    pkey     => $ssl_key,
-    # in case of self signed CA
-    strict   => false,
-  }
+  # if both SSL cert and key provided via parameters - them have more priority
+  # then certificate identity for lookup
+  if $ssl_cert and $ssl_key {
+    $cert_lookupkey = $server_name
+    $certdata       = $ssl_cert
 
-  # get certificate data from Hiera
-  if $ssl_cert {
-    $certdata = $ssl_cert
+    if $manage_cert_data {
+      # we use Hiera for certificate/private key storage
+      tlsinfo::certpair { $server_name:
+        identity => true,
+        cert     => $ssl_cert,
+        pkey     => $ssl_key,
+        # in case of self signed CA
+        strict   => false,
+      }
+    }
   }
   else {
-    $certdata = tlsinfo::lookup($server_name)
+    $cert_lookupkey = $cert_identity
+    $certdata       = tlsinfo::lookup($cert_lookupkey)
+
+    if $manage_cert_data {
+      # we use Hiera for certificate/private key storage
+      tlsinfo::certpair { $cert_identity:
+        identity => true,
+      }
+    }
   }
 
   # we use default locations for certificate and key storage - get
@@ -89,7 +105,7 @@ class dockerinstall::registry (
     global_ssl_redirect => $global_ssl_redirect,
   }
 
-  if $manage_nginx_core {
-    Tlsinfo::Certpair[$server_name] ~> Class['nginx::service']
+  if $manage_nginx_core and $manage_cert_data {
+    Tlsinfo::Certpair[$cert_lookupkey] ~> Class['nginx::service']
   }
 }
