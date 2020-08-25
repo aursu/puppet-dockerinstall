@@ -1,6 +1,6 @@
-# A description of what this defined type does
+# @summary Setup client cert auth for registry
 #
-# @summary A short summary of the purpose of this defined type.
+# Setup client cert auth for registry usung Puppet CA certificates
 #
 # @example
 #   dockerinstall::registry::clientauth { 'namevar': }

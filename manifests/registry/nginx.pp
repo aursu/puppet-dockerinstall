@@ -1,6 +1,6 @@
-# @summary A short summary of the purpose of this class
+# @summary Registry Nginx setup
 #
-# A description of what this class does
+# Registry Nginx setup
 #
 # @example
 #   include dockerinstall::registry::nginx
