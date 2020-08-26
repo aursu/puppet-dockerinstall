@@ -24,7 +24,7 @@ class dockerinstall::registry::params {
   # docker-compose.yaml configuration file
   $compose_project = 'registry'
   $compose_service = 'registry'
-  $registry_compose_service = "${compose_project}/${compose_service}"
+  $compose_service_title = "${compose_project}/${compose_service}"
 
   # data directory
   # this reflectded in docker compose file files/services/registry.yaml
