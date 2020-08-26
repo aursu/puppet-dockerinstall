@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'dockerinstall::registry' do
+describe 'dockerinstall::profile::registry' do
   let(:facts) do
     {
       'stype' => 'web'

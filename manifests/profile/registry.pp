@@ -4,7 +4,7 @@
 #
 # @example
 #   include dockerinstall::registry
-class dockerinstall::registry (
+class dockerinstall::profile::registry (
   String  $server_name,
   Optional[String]
           $cert_identity          = $server_name,
