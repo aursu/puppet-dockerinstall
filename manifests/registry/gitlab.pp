@@ -41,10 +41,11 @@ class dockerinstall::registry::gitlab (
           $registry_internal_certificate = undef,
   Optional[Stdlib::Unixpath]
           $registry_cert_path            = $dockerinstall::registry::params::auth_token_rootcertbundle,
+  Optional[Stdlib::Fqdn]
+          $gitlab_host                   = $dockerinstall::params::certname,
 ) inherits dockerinstall::registry::params
 {
   include dockerinstall::params
-  $certname = $dockerinstall::params::certname
   $hostprivkey = $dockerinstall::params::hostprivkey
 
   if $registry_internal_key {
@@ -67,7 +68,7 @@ class dockerinstall::registry::gitlab (
     @@file { 'registry_rootcertbundle':
       path    => $registry_cert_path,
       content => $registry_cert_content,
-      tag     => $certname,
+      tag     => $gitlab_host,
     }
   }
   else {

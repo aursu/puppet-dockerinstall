@@ -5,6 +5,7 @@
 # @example
 #   include dockerinstall::registry::params
 class dockerinstall::registry::params {
+  include dockerinstall::params
   include tlsinfo::params
   include lsys::params
 
