@@ -41,9 +41,7 @@ class dockerinstall::registry::auth_token (
   Optional[Stdlib::HTTPUrl]
           $realm                = undef,
   Optional[String]
-          $gitlab_certificate = undef,
-  Optional[Stdlib::Unixpath]
-          $rootcertbundle       = $dockerinstall::registry::params::auth_token_rootcertbundle,
+          $gitlab_certificate   = undef,
   String  $service              = $dockerinstall::registry::params::auth_token_service,
   String  $issuer               = $dockerinstall::registry::params::auth_token_issuer,
 ) inherits dockerinstall::registry::params
@@ -56,9 +54,12 @@ class dockerinstall::registry::auth_token (
   #     rootcertbundle: /var/opt/gitlab/registry/gitlab-registry.crt
   #     autoredirect: false
 
+  $rootcertbundle = $dockerinstall::registry::params::auth_token_rootcertbundle
+  $tokenbundle_certdir = $dockerinstall::registry::params::tokenbundle_certdir
+
   if $enable {
-    $certdir = $dockerinstall::registry::params::tokenbundle_certdir
-    file { $certdir:
+    # create certificate directory before creating certificate itself
+    file { $tokenbundle_certdir:
       ensure => directory,
     }
 
@@ -67,7 +68,6 @@ class dockerinstall::registry::auth_token (
         fail('You must supply gitlab_host parameter to dockerinstall::registry::auth_token')
       }
 
-      #
       $token_realm = "https://${gitlab_host}/jwt/auth"
 
       # export certificate from GitLab host gitlab_host

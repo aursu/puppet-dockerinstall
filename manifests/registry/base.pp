@@ -11,6 +11,7 @@ class dockerinstall::registry::base (
 ) inherits dockerinstall::registry::params
 {
   include dockerinstall::registry::auth_token
+  $tokenbundle_certdir = $dockerinstall::registry::params::tokenbundle_certdir
 
   # auth:
   #   token:
@@ -29,9 +30,14 @@ class dockerinstall::registry::base (
       'REGISTRY_AUTH_TOKEN_ROOTCERTBUNDLE' => $dockerinstall::registry::auth_token::rootcertbundle,
       'REGISTRY_AUTH_TOKEN_AUTOREDIRECT'   => 'false'
     }
+
+    $auth_token_volume = [
+      "${tokenbundle_certdir}:${tokenbundle_certdir}"
+    ]
   }
   else {
     $auth_tonken_environment = {}
+    $auth_token_volume = []
   }
 
   $compose_service = $dockerinstall::registry::params::compose_service
@@ -51,8 +57,9 @@ class dockerinstall::registry::base (
                       } +
                       $auth_tonken_environment,
     docker_volume => [
-      "${data_directory}:/var/lib/registry",
-    ]
+                        "${data_directory}:/var/lib/registry",
+                      ] +
+                      $auth_token_volume,
   }
 
   # Read only mode environment:
