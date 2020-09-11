@@ -35,8 +35,6 @@ class dockerinstall::registry::params {
   $internal_certdir = "${tlsinfo::params::certbase}/internal"
   $internal_cacert = "${internal_certdir}/ca.pem"
 
-  $gitlab_registry_key_path = '/var/opt/gitlab/gitlab-rails/etc/gitlab-registry.key'
-
   # The service being authenticated.
   $auth_token_service = 'container_registry'
 
