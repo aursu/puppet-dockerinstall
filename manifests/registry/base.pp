@@ -11,7 +11,7 @@ class dockerinstall::registry::base (
 ) inherits dockerinstall::registry::params
 {
   include dockerinstall::registry::auth_token
-  $tokenbundle_certdir = $dockerinstall::registry::params::tokenbundle_certdir
+  $rootcertbundle = $dockerinstall::registry::auth_token::rootcertbundle
 
   # auth:
   #   token:
@@ -27,12 +27,12 @@ class dockerinstall::registry::base (
       'REGISTRY_AUTH_TOKEN_REALM'          => $dockerinstall::registry::auth_token::token_realm,
       'REGISTRY_AUTH_TOKEN_SERVICE'        => $dockerinstall::registry::auth_token::service,
       'REGISTRY_AUTH_TOKEN_ISSUER'         => $dockerinstall::registry::auth_token::issuer,
-      'REGISTRY_AUTH_TOKEN_ROOTCERTBUNDLE' => $dockerinstall::registry::auth_token::rootcertbundle,
+      'REGISTRY_AUTH_TOKEN_ROOTCERTBUNDLE' => $rootcertbundle,
       'REGISTRY_AUTH_TOKEN_AUTOREDIRECT'   => 'false'
     }
 
     $auth_token_volume = [
-      "${tokenbundle_certdir}:${tokenbundle_certdir}"
+      "${rootcertbundle}:${rootcertbundle}"
     ]
   }
   else {

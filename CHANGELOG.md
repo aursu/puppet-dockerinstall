@@ -30,3 +30,13 @@ All notable changes to this project will be documented in this file.
 * Bind certificate directory into registry container
 
 **Known Issues**
+
+## Release 0.6.3
+
+**Features**
+
+**Bugfixes**
+
+* Bind certificate into registry container instead certificate directory
+
+**Known Issues**
