@@ -19,3 +19,14 @@ All notable changes to this project will be documented in this file.
 * Added token certificate directory into Puppet management
 
 **Known Issues**
+
+## Release 0.6.2
+
+**Features**
+
+**Bugfixes**
+
+* Hardcoded certificate path
+* Bind certificate directory into registry container
+
+**Known Issues**
