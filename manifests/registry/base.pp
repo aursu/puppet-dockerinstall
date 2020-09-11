@@ -47,9 +47,9 @@ class dockerinstall::registry::base (
       '5000:5000',
     ],
     environment   => {
-                       'REGISTRY_STORAGE_DELETE_ENABLED' => 'true',
-                     } +
-                     $auth_tonken_environment,
+                        'REGISTRY_STORAGE_DELETE_ENABLED' => 'true',
+                      } +
+                      $auth_tonken_environment,
     docker_volume => [
       "${data_directory}:/var/lib/registry",
     ]
