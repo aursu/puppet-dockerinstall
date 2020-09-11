@@ -18,9 +18,9 @@ Puppet::Type.newtype(:dockerimage) do
         %r{^(.*):([\w][\w.-]{0,127})$},
         [
           [:path],
-          [:tag]
-        ]
-      ]
+          [:tag],
+        ],
+      ],
     ]
   end
 

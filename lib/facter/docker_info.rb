@@ -1,4 +1,6 @@
 require 'json'
+require 'English'
+
 Facter.add(:docker_info) do
   setcode do
     docker_info_json =  if File.executable?('/usr/bin/docker')
@@ -6,7 +8,7 @@ Facter.add(:docker_info) do
                         else
                           nil
                         end
-    if docker_info_json && $?.success?
+    if docker_info_json && $CHILD_STATUS.success?
       begin
         JSON.parse(docker_info_json)
       rescue JSON::ParserError
@@ -34,7 +36,7 @@ Facter.add(:docker_swarm) do
 
         swarm['JoinTokens'] = {
           'Worker' => swarm_join_token_worker.strip,
-          'Manager' => swarm_join_token_manager.strip
+          'Manager' => swarm_join_token_manager.strip,
         }
       else
         swarm['JoinTokens'] = {}

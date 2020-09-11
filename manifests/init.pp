@@ -1,3 +1,4 @@
+# Docker installation
 class dockerinstall (
     Dockerinstall::PackageName
             $package_name,

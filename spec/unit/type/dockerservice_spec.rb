@@ -15,9 +15,9 @@ describe Puppet::Type.type(:dockerservice) do
     params = {
       title: 'rpmbuild-curl/centos7curlbuild',
       configuration: '{}',
-      catalog: catalog
+      catalog: catalog,
     }
-    expect { described_class.new(params) }.to raise_error(Puppet::Error, %r{Service centos7curlbuild does not exist in configuration file})
+    expect { described_class.new(params) }.to raise_error(RuntimeError, %r{Service centos7curlbuild does not exist in configuration file})
   end
 
   context 'when title_patterns' do
@@ -139,7 +139,7 @@ describe Puppet::Type.type(:dockerservice) do
         project: '/var/run/compose/rpmbuild-curl',
         path: '/var/lib/build/rpmbuild-curl/docker-compose.yml',
         configuration: { 'services' => { 'centos6curlbuild' => {} } }.to_yaml,
-        catalog: catalog
+        catalog: catalog,
       }
       expect { described_class.new(params) }.to raise_error(Puppet::Error, %r{Path should be relative to project directory \(/var/run/compose/rpmbuild-curl\) - not absolute})
     end
@@ -151,7 +151,7 @@ describe Puppet::Type.type(:dockerservice) do
         title: 'curl/centos6curlbuild',
         path: '/var/lib/build/rpmbuild-curl/docker-compose.yml',
         configuration: { 'services' => { 'centos6curlbuild' => {} } }.to_yaml,
-        catalog: catalog
+        catalog: catalog,
       }
       expect { described_class.new(params) }.to raise_error(Puppet::Error, %r{File resource for configuration base path /var/lib/build/rpmbuild-curl not found})
     end

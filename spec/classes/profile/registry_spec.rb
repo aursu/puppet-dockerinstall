@@ -5,7 +5,7 @@ require 'spec_helper'
 describe 'dockerinstall::profile::registry' do
   let(:facts) do
     {
-      'stype' => 'web'
+      'stype' => 'web',
     }
   end
 
@@ -25,7 +25,7 @@ describe 'dockerinstall::profile::registry' do
 
       let(:params) do
         {
-          'server_name' => 'registry.domain.tld'
+          'server_name' => 'registry.domain.tld',
         }
       end
 

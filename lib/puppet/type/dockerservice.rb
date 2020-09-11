@@ -11,8 +11,8 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
     end
 
     validate do |value|
-      fail Puppet::Error, '%{name} must be a string' % { name: name.capitalize } unless value.is_a?(String)
-      fail Puppet::Error, '%{name} must be a non-empty string' % { name: name.capitalize } if value.empty?
+      raise Puppet::Error, '%{name} must be a string' % { name: name.capitalize } unless value.is_a?(String)
+      raise Puppet::Error, '%{name} must be a non-empty string' % { name: name.capitalize } if value.empty?
     end
   end
 
@@ -56,9 +56,9 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
         %r{^([-\w]+)/([-\w]+)$},
         [
           [:project],
-          [:name]
-        ]
-      ]
+          [:name],
+        ],
+      ],
     ]
   end
 
@@ -69,7 +69,7 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
     validate do |value|
       super(value)
       if value.include?('/')
-        fail Puppet::Error, 'Project path must be absolute' unless Puppet::Util.absolute_path?(value)
+        raise Puppet::Error, 'Project path must be absolute' unless Puppet::Util.absolute_path?(value)
       end
     end
 
@@ -89,7 +89,7 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
     desc 'Docker compose service name'
 
     validate do |value|
-      fail Puppet::Error, _('name must not contain whitespaces: %{name}') % { name: value } if value.index(%r{\s})
+      raise Puppet::Error, _('name must not contain whitespaces: %{name}') % { name: value } if value.index(%r{\s})
     end
   end
 
@@ -103,10 +103,10 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
     validate do |value|
       super(value)
       path = resource.fixpath(value)
-      fail Puppet::Error, 'Basedir must be absolute' unless Puppet::Util.absolute_path?(path)
+      raise Puppet::Error, 'Basedir must be absolute' unless Puppet::Util.absolute_path?(path)
 
       # fail if base directory is not in catalog
-      fail 'File resource for base directory %{path} not found' % { path: path } unless @resource.catalog.resource(:file, path)
+      raise 'File resource for base directory %{path} not found' % { path: path } unless @resource.catalog.resource(:file, path)
     end
 
     munge do |value|
@@ -130,11 +130,11 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
       if Puppet::Util.absolute_path?(value)
         project = @resource.parameter(:project).should
         if Puppet::Util.absolute_path?(project)
-          fail Puppet::Error, "Path should be relative to project directory (#{project}) - not absolute"
+          raise Puppet::Error, "Path should be relative to project directory (#{project}) - not absolute"
         end
 
         @dirname = resource.fixpath(File.dirname(value))
-        fail 'File resource for configuration base path %{path} not found' % { path: dirname } unless @resource.catalog.resource(:file, dirname)
+        raise 'File resource for configuration base path %{path} not found' % { path: dirname } unless @resource.catalog.resource(:file, dirname)
       end
     end
 
@@ -168,11 +168,11 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
     end
 
     validate do |value|
-      fail Puppet::Error, 'Configuration must be a string' unless value.is_a?(String)
-      fail Puppet::Error, 'Configuration must be a non-empty string' if value.empty?
+      raise Puppet::Error, 'Configuration must be a string' unless value.is_a?(String)
+      raise Puppet::Error, 'Configuration must be a non-empty string' if value.empty?
       begin
         data = YAML.safe_load(value)
-        fail Puppet::Error, _('%{path}: file does not contain a valid yaml hash') % { path: @resource[:path] } unless data.is_a?(Hash)
+        raise Puppet::Error, _('%{path}: file does not contain a valid yaml hash') % { path: @resource[:path] } unless data.is_a?(Hash)
       rescue YAML::SyntaxError => ex
         raise Puppet::Error, _("Unable to parse #{ex.message}")
       end
@@ -259,7 +259,7 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
 
   validate do
     data = YAML.safe_load(@parameters[:configuration].actual_content)
-    fail 'Service %{name} does not exist in configuration file' % { name: self[:name] } unless data['services'] && data['services'].include?(self[:name])
+    raise 'Service %{name} does not exist in configuration file' % { name: self[:name] } unless data['services'] && data['services'].include?(self[:name])
   end
 
   def fixpath(value)

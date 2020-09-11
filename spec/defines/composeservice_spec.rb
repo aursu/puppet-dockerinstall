@@ -14,7 +14,7 @@ describe 'dockerinstall::composeservice' do
   let(:title) { 'curl/centos7curlbuild' }
   let(:params) do
     {
-      configuration: configuration
+      configuration: configuration,
     }
   end
 

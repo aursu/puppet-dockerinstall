@@ -11,7 +11,7 @@ describe 'dockerinstall::webservice' do
   let(:params) do
     {
       docker_image: 'jenkinsci/blueocean:1.19.0',
-      manage_image: true
+      manage_image: true,
     }
   end
 
@@ -46,7 +46,7 @@ describe 'dockerinstall::webservice' do
           super().merge(
             docker_ulimits: {
               memlock: [-1, -1],
-              nofile: 65535
+              nofile: 65535,
             },
           )
         end
