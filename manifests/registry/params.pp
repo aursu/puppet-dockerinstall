@@ -33,4 +33,21 @@ class dockerinstall::registry::params {
   # Client authentication
   $internal_certdir = "${tlsinfo::params::certbase}/internal"
   $internal_cacert = "${internal_certdir}/ca.pem"
+
+  $gitlab_registry_key_path = '/var/opt/gitlab/gitlab-rails/etc/gitlab-registry.key'
+
+  # The service being authenticated.
+  $auth_token_service = 'container_registry'
+
+  # The name of the token issuer. The issuer inserts this into the token so it
+  # must match the value configured for the issuer.
+  $auth_token_issuer = 'omnibus-gitlab-issuer'
+
+  # The absolute path to the root certificate bundle. This bundle contains the
+  # public part of the certificates used to sign authentication tokens.
+  $auth_token_rootcertbundle = '/etc/docker/registry/tokenbundle.pem'
+
+  # When set to `true`, `realm` will automatically be set using the Host header
+  # of the request as the domain and a path of `/auth/token/`
+  $auth_token_autoredirect = false
 }

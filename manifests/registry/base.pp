@@ -10,6 +10,30 @@ class dockerinstall::registry::base (
             $data_directory = $dockerinstall::registry::params::data_directory,
 ) inherits dockerinstall::registry::params
 {
+  include dockerinstall::registry::auth_token
+
+  # auth:
+  #   token:
+  #     realm: https://gitlab1.domain.tld/jwt/auth
+  #     service: container_registry
+  #     issuer: omnibus-gitlab-issuer
+  #     rootcertbundle: /var/opt/gitlab/registry/gitlab-registry.crt
+  #     autoredirect: false
+
+  $auth_token_enable = $dockerinstall::registry::auth_token::enable
+  if $auth_token_enable {
+    $auth_tonken_environment = {
+      'REGISTRY_AUTH_TOKEN_REALM'          => $dockerinstall::registry::auth_token::token_realm,
+      'REGISTRY_AUTH_TOKEN_SERVICE'        => $dockerinstall::registry::auth_token::service,
+      'REGISTRY_AUTH_TOKEN_ISSUER'         => $dockerinstall::registry::auth_token::issuer,
+      'REGISTRY_AUTH_TOKEN_ROOTCERTBUNDLE' => $dockerinstall::registry::auth_token::rootcertbundle,
+      'REGISTRY_AUTH_TOKEN_AUTOREDIRECT'   => 'false'
+    }
+  }
+  else {
+    $auth_tonken_environment = {}
+  }
+
   $compose_service = $dockerinstall::registry::params::compose_service
   $compose_project = $dockerinstall::registry::params::compose_project
 
@@ -23,10 +47,22 @@ class dockerinstall::registry::base (
       '5000:5000',
     ],
     environment   => {
-      'REGISTRY_STORAGE_DELETE_ENABLED' => 'true',
-    },
+                       'REGISTRY_STORAGE_DELETE_ENABLED' => 'true',
+                     } +
+                     $auth_tonken_environment,
     docker_volume => [
       "${data_directory}:/var/lib/registry",
     ]
   }
+
+  # Read only mode environment:
+  # REGISTRY_STORAGE_MAINTENANCE_READOLY: "{\"enabled\": \"true\"}"
+
+  # garbage collector
+  # gc:
+  #   image: registry:2.7.1
+  #   volumes:
+  #     - /var/lib/registry:/var/lib/registry
+  #   entrypoint: [ "/bin/registry" ]
+  #   command: ["garbage-collect", "/etc/docker/registry/config.yml"]
 }

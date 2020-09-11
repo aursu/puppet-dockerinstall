@@ -44,10 +44,18 @@ class dockerinstall::params {
         $privatekeydir = '/etc/puppetlabs/puppet/ssl/private_keys'
     }
 
+    if $facts['clientcert'] {
+      $certname = $facts['clientcert']
+    }
+    else {
+      # fallback to fqdn
+      $certname = $facts['fqdn']
+    }
+
     $localcacert   = "${certdir}/ca.pem"
     # https://puppet.com/docs/puppet/5.3/lang_facts_and_builtin_vars.html#puppet-agent-facts
-    $hostcert      = "${certdir}/${::clientcert}.pem"
-    $hostprivkey   = "${privatekeydir}/${::clientcert}.pem"
+    $hostcert      = "${certdir}/${certname}.pem"
+    $hostprivkey   = "${privatekeydir}/${certname}.pem"
 
     # Swarm data
     $swarm = $facts['docker_swarm']
