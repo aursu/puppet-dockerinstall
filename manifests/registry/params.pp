@@ -46,7 +46,8 @@ class dockerinstall::registry::params {
 
   # The absolute path to the root certificate bundle. This bundle contains the
   # public part of the certificates used to sign authentication tokens.
-  $auth_token_rootcertbundle = '/etc/docker/registry/tokenbundle.pem'
+  $tokenbundle_certdir = '/etc/docker/registry'
+  $auth_token_rootcertbundle = "${tokenbundle_certdir}/tokenbundle.pem"
 
   # When set to `true`, `realm` will automatically be set using the Host header
   # of the request as the domain and a path of `/auth/token/`

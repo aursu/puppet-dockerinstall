@@ -57,6 +57,11 @@ class dockerinstall::registry::auth_token (
   #     autoredirect: false
 
   if $enable {
+    $certdir = $dockerinstall::registry::params::tokenbundle_certdir
+    file { $certdir:
+      ensure => directory,
+    }
+
     if $gitlab {
       unless $gitlab_host {
         fail('You must supply gitlab_host parameter to dockerinstall::registry::auth_token')
