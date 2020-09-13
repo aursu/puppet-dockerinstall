@@ -40,3 +40,14 @@ All notable changes to this project will be documented in this file.
 * Bind certificate into registry container instead certificate directory
 
 **Known Issues**
+
+## Release 0.6.4
+
+**Features**
+
+**Bugfixes**
+
+* Added ability to not import token certificate from PuppetDB (eg when registry
+  and GitLab reside on the same server)
+
+**Known Issues**
