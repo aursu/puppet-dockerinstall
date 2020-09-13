@@ -33,6 +33,12 @@
 #   The name of the token issuer. The issuer inserts this into the token so it
 #   must match the value configured for the issuer.
 #
+# @param registry_cert_export
+#   Whether to import token certificate from PuppetDB or not. If set to false
+#   than token certificate should be provide either via `gitlab_certificate` or
+#   it must be set via classes `gitlabinstall::gitlab` or
+#   `dockerinstall::registry::gitlab`
+#
 class dockerinstall::registry::auth_token (
   Boolean $enable               = false,
   Boolean $gitlab               = false,
