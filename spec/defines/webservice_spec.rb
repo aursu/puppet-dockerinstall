@@ -63,6 +63,52 @@ describe 'dockerinstall::webservice' do
             .with_configuration(%r{^[ ]{6}nofile: 65535$})
         }
       end
+
+      context 'when docker build specified' do
+        let(:params) do
+          super().merge(
+            docker_build: true,
+          )
+        end
+
+        it {
+          is_expected.to contain_dockerinstall__composeservice('namevar/namevar')
+            .with_configuration(%r{^[ ]{4}build:$})
+            .with_configuration(%r{^[ ]{4}  context: \.$})
+            .with_configuration(%r{^[ ]{4}  dockerfile: Dockerfile$})
+        }
+
+        context 'when docker file and context specified' do
+          let(:params) do
+            super().merge(
+              docker_context: '/var/run/compose/centos',
+              docker_file: '6/curl/Dockerfile',
+            )
+          end
+
+          it {
+            is_expected.to contain_dockerinstall__composeservice('namevar/namevar')
+              .with_configuration(%r{^[ ]{4}build:$})
+              .with_configuration(%r{^[ ]{4}  context: /var/run/compose/centos$})
+              .with_configuration(%r{^[ ]{4}  dockerfile: 6/curl/Dockerfile$})
+          }
+        end
+
+        context 'when docker build args specified' do
+          let(:params) do
+            super().merge(
+              docker_build_args: { 'centos' => '7.8.2003' },
+            )
+          end
+
+          it {
+            is_expected.to contain_dockerinstall__composeservice('namevar/namevar')
+              .with_configuration(%r{^[ ]{4}build:$})
+              .with_configuration(%r{^[ ]{4}  args:$})
+              .with_configuration(%r{^[ ]{4}    centos: 7.8.2003$})
+          }
+        end
+      end
     end
   end
 end

@@ -52,6 +52,15 @@ define dockerinstall::webservice (
       ]
     ]
   ]       $docker_dns           = undef,
+  Boolean $docker_build         = false,
+  String  $docker_context       = '.',
+  String  $docker_file          = 'Dockerfile',
+  Optional[
+    Variant[
+      Hash[String, String],
+      Array[String]
+    ]
+  ]       $docker_build_args    = undef,
   Boolean $decomission          = false,
 )
 {

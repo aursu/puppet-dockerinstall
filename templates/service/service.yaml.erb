@@ -56,6 +56,26 @@ services:
       - <%= dns %>
 <%   end -%>
 <% end -%>
+<% if @docker_build -%>
+    build:
+      context: <%= @docker_context %>
+      dockerfile: <%= @docker_file %>
+<%   if @docker_build_args.is_a?(Hash) -%>
+      args:
+<%     @docker_build_args.each do |name, value| -%>
+<%       if ['yes', 'no', 'true', 'false', true, false].include?(value) -%>
+        <%= name %>: "<%= value %>"
+<%       else -%>
+        <%= name %>: <%= value %>
+<%       end -%>
+<%     end -%>
+<%   elsif @docker_build_args.is_a?(Array) -%>
+      args:
+<%     @docker_build_args.each do |value| -%>
+        - <%= value %>
+<%     end -%>
+<%   end -%>
+<% end -%>
 <% if @docker_mtu -%>
 
 networks:

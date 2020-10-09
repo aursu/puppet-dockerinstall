@@ -62,7 +62,12 @@ Puppet::Type.type(:dockerservice).provide(
   # Don't support them specifying runlevels; always use the runlevels
   # in the init scripts.
   def reload
-    compose('-f', @resource[:path], '-p', @resource[:project], 'up', '-d', '--no-build', @resource[:name])
+    build_flag = if @resource.build?
+                   '--build'
+                 else
+                   '--no-build'
+                 end
+    compose('-f', @resource[:path], '-p', @resource[:project], 'up', '-d', build_flag, @resource[:name])
   rescue Puppet::ExecutionFailure => detail
     raise Puppet::Error, "Could not reload service: #{detail}", detail.backtrace
   end
@@ -72,7 +77,12 @@ Puppet::Type.type(:dockerservice).provide(
   end
 
   def startcmd
-    [command(:compose), '-f', @resource[:path], '-p', @resource[:project], 'up', '-d', '--no-build', @resource[:name]]
+    build_flag = if @resource.build?
+                   '--build'
+                 else
+                   '--no-build'
+                 end
+    [command(:compose), '-f', @resource[:path], '-p', @resource[:project], 'up', '-d', build_flag, @resource[:name]]
   end
 
   def stopcmd
@@ -102,5 +112,64 @@ Puppet::Type.type(:dockerservice).provide(
     else
       start if @resource[:ensure] == :running
     end
+  end
+
+  def configuration_validate(value)
+    data = YAML.safe_load(value)
+    raise Puppet::Error, _('%{path}: file does not contain a valid yaml hash') % { path: @resource[:path] } unless data.is_a?(Hash)
+  rescue YAML::SyntaxError => e
+    raise Puppet::Error, _("Unable to parse #{e.message}")
+  end
+
+  def docker_build_validate(build)
+    confpath = @resource[:path]
+    confdir  = File.dirname(confpath)
+
+    context = build['context']
+    dockerfile = build['dockerfile'] || 'Dockerfile'
+    context_path = nil
+
+    raise Puppet::Error, "Service 'build' parameter should contain 'context' parameter" unless context
+
+    case context
+    # when context is URL - git repositories and URLs to tarball are supported
+    when %r{^https?://}
+      # https://docs.docker.com/engine/reference/commandline/build/#git-repositories
+      # https://docs.docker.com/engine/reference/commandline/build/#tarball-contexts
+      unless context =~ %r{\.git(#.+)?$} || context =~ %r{(tgz|tar\.(gz|bz2|xz))$}
+        raise 'Docker build context must be either valid Git repo URL or URL to tarball file (tar.gz|tar.bz2|tar.xz)'
+      end
+    when %r{^/}
+      context_path = context
+    else
+      context_path = File.join(confdir, context)
+    end
+
+    return unless context_path
+
+    if context =~ %r{(tgz|tar\.(gz|bz2|xz))$}
+      raise Puppet::Error, "Docker build context tarball does not exist: #{context_path}" unless File.exist?(context_path)
+    else
+      raise Puppet::Error, "Docker build context directory does not exist: #{context_path}" unless File.directory?(context_path)
+      dockerfile_path = File.join(context_path, dockerfile)
+
+      raise Puppet::Error, "Docker file could not be found: #{dockerfile_path}" unless File.exist?(dockerfile_path)
+    end
+  end
+
+  def configuration_integrity
+    name     = @resource[:name]
+    data     = YAML.safe_load(resource.configuration)
+
+    # error if service does not exist in docker-compose yaml
+    raise 'Service %{name} does not exist in configuration file' % { name: name } unless data['services'] && data['services'].include?(name)
+
+    service = data['services'][name]
+    build = service['build']
+
+    return unless @resource.build?
+
+    raise Puppet::Error, "Service definition should contain 'image' and 'build' parameters" unless service['image'] && build
+    docker_build_validate(build)
   end
 end

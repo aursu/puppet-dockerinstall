@@ -8,7 +8,7 @@ describe Puppet::Type.type(:dockerservice) do
 
   before(:each) do
     catalog.add_resource basedir
-    File.stubs(:directory?).with('/run').returns(false)
+    allow(File).to receive(:directory?).with('/run').and_return(false)
   end
 
   it 'check fail  with empty configuration' do
@@ -42,7 +42,7 @@ describe Puppet::Type.type(:dockerservice) do
   context 'check basedir' do
     it 'when rundir is /run' do
       catalog.add_resource Puppet::Type.type(:file).new(name: '/run/compose')
-      File.stubs(:directory?).with('/run').returns(true)
+      allow(File).to receive(:directory?).with('/run').and_return(true)
       service = described_class.new(
         title: 'curl/centos7curlbuild',
         configuration: { 'services' => { 'centos7curlbuild' => {} } }.to_yaml,
@@ -142,6 +142,135 @@ describe Puppet::Type.type(:dockerservice) do
         catalog: catalog,
       }
       expect { described_class.new(params) }.to raise_error(Puppet::Error, %r{Path should be relative to project directory \(/var/run/compose/rpmbuild-curl\) - not absolute})
+    end
+  end
+
+  context 'check build' do
+    let(:params) do
+      {
+        title: 'curl/centos6curlbuild',
+        configuration: { 'services' => { 'centos6curlbuild' => {} } }.to_yaml,
+        build: true,
+        catalog: catalog,
+      }
+    end
+
+    context 'when no build/image properties are set' do
+      it {
+        expect { described_class.new(params) }.to raise_error(Puppet::Error, %r{Service definition should contain 'image' and 'build' parameters})
+      }
+    end
+
+    context 'when no context is set' do
+      let(:params) do
+        super().merge(
+          configuration: {
+            'services' => {
+              'centos6curlbuild' => {
+                'image' => 'centos6curlbuild',
+                'build' => {},
+              },
+            },
+          }.to_yaml,
+        )
+      end
+
+      it {
+        expect { described_class.new(params) }.to raise_error(Puppet::Error, %r{Service 'build' parameter should contain 'context' parameter})
+      }
+    end
+
+    context 'when context is set' do
+      let(:params) do
+        super().merge(
+          configuration: {
+            'services' => {
+              'centos6curlbuild' => {
+                'image' => 'centos6curlbuild',
+                'build' => {
+                  'context' => '.',
+                },
+              },
+            },
+          }.to_yaml,
+        )
+      end
+
+      context 'when context directory does not exist' do
+        it {
+          expect(File).to receive(:directory?)
+            .with('/var/run/compose/curl/.')
+          expect { described_class.new(params) }.to raise_error(Puppet::Error, %r{Docker build context directory does not exist: /var/run/compose/curl/\.})
+        }
+      end
+
+      context 'when context directory exists' do
+        it {
+          allow(File).to receive(:directory?)
+            .with('/var/run/compose/curl/.').and_return(true)
+          expect { described_class.new(params) }.to raise_error(Puppet::Error, %r{Docker file could not be found: /var/run/compose/curl/\./Dockerfile})
+        }
+      end
+
+      context 'when context directory and docker file exists' do
+        it {
+          allow(File).to receive(:directory?)
+            .with('/var/run/compose/curl/.').and_return(true)
+          allow(File).to receive(:exist?)
+            .with('/var/run/compose/curl/./Dockerfile').and_return(true)
+          expect { described_class.new(params) }.not_to raise_error
+        }
+      end
+
+      context 'when context is path to tarball file' do
+        let(:params) do
+          super().merge(
+            configuration: {
+              'services' => {
+                'centos6curlbuild' => {
+                  'image' => 'centos6curlbuild',
+                  'build' => {
+                    'context' => 'build/curl.tar.gz',
+                  },
+                },
+              },
+            }.to_yaml,
+          )
+        end
+
+        it {
+          expect { described_class.new(params) }.to raise_error(Puppet::Error, %r{Docker build context tarball does not exist: /var/run/compose/curl/build/curl.tar.gz})
+        }
+
+        context 'when context exists' do
+          it {
+            allow(File).to receive(:exist?)
+              .with('/var/run/compose/curl/build/curl.tar.gz').and_return(true)
+            expect { described_class.new(params) }.not_to raise_error
+          }
+        end
+      end
+
+      context 'when context is URL' do
+        let(:params) do
+          super().merge(
+            configuration: {
+              'services' => {
+                'centos6curlbuild' => {
+                  'image' => 'centos6curlbuild',
+                  'build' => {
+                    'context' => 'https://github.com/aursu/docker-centos.git#:6/curl',
+                  },
+                },
+              },
+            }.to_yaml,
+          )
+        end
+
+        it {
+          expect { described_class.new(params) }.not_to raise_error
+        }
+      end
     end
   end
 

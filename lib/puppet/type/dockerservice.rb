@@ -1,4 +1,5 @@
 require 'yaml'
+require 'puppet/parameter/boolean'
 
 Puppet::Type.newtype(:dockerservice, self_refresh: true) do
   @doc = 'Docker Compose service'
@@ -170,12 +171,7 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
     validate do |value|
       raise Puppet::Error, 'Configuration must be a string' unless value.is_a?(String)
       raise Puppet::Error, 'Configuration must be a non-empty string' if value.empty?
-      begin
-        data = YAML.safe_load(value)
-        raise Puppet::Error, _('%{path}: file does not contain a valid yaml hash') % { path: @resource[:path] } unless data.is_a?(Hash)
-      rescue YAML::SyntaxError => ex
-        raise Puppet::Error, _("Unable to parse #{ex.message}")
-      end
+      provider.configuration_validate(value) if provider.respond_to?(:configuration_validate)
     end
 
     munge do |value|
@@ -198,17 +194,19 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
 
     def sync
       event = stat ? :configuration_changed : :configuration_created
+
       mode_int = 0o0644
       File.open(@resource[:path], 'wb', mode_int) { |f| write(f) }
       # configuration synced here - no need to sync it elsewhere
       provider.configuration_sync = false
+
       event
     end
 
     def write(file)
       checksum = sha256_stream do |sum|
         sum << actual_content
-        file.print actual_content
+        file.print(actual_content)
       end
       "{sha256}#{checksum}"
     end
@@ -243,8 +241,17 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
     desc 'Specify a *stop* command manually.'
   end
 
+  # requirements: Docker compose file with 'build' and 'image' parameters
+  # 'build' parameter have to contain 'context' parameter and optionally 'dockerfile'
+  newparam(:build, boolean: true, parent: Puppet::Parameter::Boolean) do
+    desc 'Specify whether to build Docker image'
+
+    defaultto :false
+  end
+
   newparam(:replace, boolean: true, parent: Puppet::Parameter::Boolean) do
     desc 'Whether to replace a configuration file or not'
+
     defaultto :true
   end
 
@@ -258,8 +265,11 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
   end
 
   validate do
-    data = YAML.safe_load(@parameters[:configuration].actual_content)
-    raise 'Service %{name} does not exist in configuration file' % { name: self[:name] } unless data['services'] && data['services'].include?(self[:name])
+    provider.configuration_integrity if provider.respond_to?(:configuration_integrity)
+  end
+
+  def configuration
+    @parameters[:configuration].actual_content
   end
 
   def fixpath(value)
