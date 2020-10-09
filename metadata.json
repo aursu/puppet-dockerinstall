@@ -1,8 +1,8 @@
 {
   "name": "aursu-dockerinstall",
-  "version": "0.6.4",
+  "version": "0.7.0",
   "author": "aursu",
-  "summary": "Docker CE  installation and start",
+  "summary": "Docker CE installation and start",
   "license": "Apache-2.0",
   "source": "https://github.com/aursu/puppet-dockerinstall",
   "dependencies": [

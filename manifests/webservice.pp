@@ -1,12 +1,12 @@
-# A description of what this defined type does
+# Star compose service based on auto-generated compose file
 #
-# @summary A short summary of the purpose of this defined type.
+# @summary Star compose service based on auto-generated compose file
 #
 # @example
 #   dockerinstall::webservice { 'app': }
 #
 # @param env_name
-#   Development ennvironment for which service is running (eg prod, stage, test, qa etc)
+#   Development environment for which service is running (eg prod, stage, test, qa etc)
 define dockerinstall::webservice (
   String  $docker_image,
   Boolean $manage_image         = false,
