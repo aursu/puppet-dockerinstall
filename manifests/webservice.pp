@@ -1,12 +1,107 @@
-# Star compose service based on auto-generated compose file
+# Start compose service based on auto-generated compose file
 #
-# @summary Star compose service based on auto-generated compose file
+# @summary Start compose service based on auto-generated compose file
 #
 # @example
 #   dockerinstall::webservice { 'app': }
 #
+# @param docker_image
+#   Specify the image to start the container from.
+#   see: https://docs.docker.com/compose/compose-file/#image
+#
+# @param manage_image
+#   Whether to manage image with docker command or not
+#   if set to true - will define custom resource Dockerimage for image specified
+#   with parameter `docker_image`
+#
+# @param project_name
+#   Specify an alternate project name (default: directory name)
+#   see: https://docs.docker.com/compose/reference/overview/#use--p-to-specify-a-project-name
+#
+# @param service_name
+#   Service name inside docker compose file
+#   see: https://docs.docker.com/compose/compose-file/#service-configuration-reference
+#
 # @param env_name
 #   Development environment for which service is running (eg prod, stage, test, qa etc)
+#   It is mandatory for secrets setup into file secrets/<env_name>.env
+#   Also it could be used for service definition as <project_name>-<env_name>
+#
+# @param secrets
+#   Hash of environment variables to setup into environment file secrets/<env_name>.env
+#   see: https://docs.docker.com/compose/compose-file/#env_file
+#
+# @param environment
+#   Add environment variables. You can use either an array or a dictionary
+#   see: https://docs.docker.com/compose/compose-file/#environment
+#
+# @param compose_file_version
+#   Compose file versions
+#   see: https://docs.docker.com/compose/compose-file/#compose-and-docker-compatibility-matrix
+#
+# @param restart
+#   Restart policy to use for service
+#   see: https://docs.docker.com/compose/compose-file/#restart
+#
+# @param expose_ports
+#   Expose ports in short syntax
+#   see: https://docs.docker.com/compose/compose-file/#ports
+#
+# @param docker_volume
+#   Mount host paths or named volumes, specified as sub-options to a service.
+#   Short syntax is supported
+#   see: https://docs.docker.com/compose/compose-file/#volumes
+#
+# @param docker_extra_hosts
+#   Add hostname mappings. Use the same values as the docker client --add-host parameter.
+#   see: https://docs.docker.com/compose/compose-file/#extra_hosts
+#
+# @param project_volumes
+#   `volumes` section allows you to create named volumes that can be reused
+#   across multiple services
+#   see: https://docs.docker.com/compose/compose-file/#volume-configuration-reference
+#
+# @param docker_mtu
+#   Set the containers network MTU to specified value (for network `default`)
+#   see: https://docs.docker.com/engine/reference/commandline/network_create/#bridge-driver-options
+#
+# @param docker_ulimits
+#   Override the default ulimits for a container.
+#   see: https://docs.docker.com/compose/compose-file/#ulimits
+#
+# @param docker_dns
+#   Custom DNS servers.
+#   see: https://docs.docker.com/compose/compose-file/#dns
+#
+# @param docker_build
+#   Enable configuration options that are applied at build time.
+#   see: https://docs.docker.com/compose/compose-file/#build
+#
+# @param docker_context
+#   Either a path to a directory containing a Dockerfile, or a url to a git repository.
+#   see: https://docs.docker.com/compose/compose-file/#context
+#
+# @param docker_file
+#   Alternate Dockerfile.
+#   see: https://docs.docker.com/compose/compose-file/#dockerfile
+#
+# @param docker_build_args
+#   Add build arguments, which are environment variables accessible only during
+#   the build process.
+#   see: https://docs.docker.com/compose/compose-file/#args
+#
+# @param docker_command
+#   Override the default command.
+#   see: https://docs.docker.com/compose/compose-file/#command
+#
+# @param privileged
+#   Give extended privileges to this container. A "privileged" container is given
+#   access to all devices
+#   see: https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities
+#
+# @param decomission
+#   Compose service decomission (stop and removal)
+#
 define dockerinstall::webservice (
   String  $docker_image,
   Boolean $manage_image         = false,
@@ -19,11 +114,12 @@ define dockerinstall::webservice (
           $secrets              = undef,
   Optional[Hash[String, String]]
           $environment          = undef,
-  String  $compose_file_version = '3.5',
+  String  $compose_file_version = '3.8',
   Enum[
     'no',
     'always',
-    'on-failure'
+    'on-failure',
+    'unless-stopped'
   ]       $restart              = 'always',
   Optional[Array[String]]
           $expose_ports         = undef,
@@ -61,6 +157,13 @@ define dockerinstall::webservice (
       Array[String]
     ]
   ]       $docker_build_args    = undef,
+  Optional[
+    Variant[
+      String,
+      Array[String]
+    ]
+  ]       $docker_command       = undef,
+  Boolean $privileged           = false,
   Boolean $decomission          = false,
 )
 {

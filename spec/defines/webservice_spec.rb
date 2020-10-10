@@ -23,7 +23,7 @@ describe 'dockerinstall::webservice' do
 
       it {
         is_expected.to contain_dockerinstall__composeservice('namevar/namevar')
-          .with_configuration(%r{^version: "3.5"$})
+          .with_configuration(%r{^version: "3.8"$})
       }
 
       it {
@@ -108,6 +108,45 @@ describe 'dockerinstall::webservice' do
               .with_configuration(%r{^[ ]{4}    centos: 7.8.2003$})
           }
         end
+      end
+
+      context 'when docker command specified' do
+        let(:params) do
+          super().merge(
+            docker_command: 'bundle exec thin -p 3000',
+          )
+        end
+
+        it {
+          is_expected.to contain_dockerinstall__composeservice('namevar/namevar')
+            .with_configuration(%r{^[ ]{4}command: bundle exec thin -p 3000$})
+        }
+      end
+
+      context 'when docker command specified as array' do
+        let(:params) do
+          super().merge(
+            docker_command: ['bundle', 'exec', 'thin', '-p', '3000'],
+          )
+        end
+
+        it {
+          is_expected.to contain_dockerinstall__composeservice('namevar/namevar')
+            .with_configuration(%r{^[ ]{4}command: \["bundle", "exec", "thin", "-p", "3000"\]$})
+        }
+      end
+
+      context 'when privileged flag is set' do
+        let(:params) do
+          super().merge(
+            privileged: true,
+          )
+        end
+
+        it {
+          is_expected.to contain_dockerinstall__composeservice('namevar/namevar')
+            .with_configuration(%r{^[ ]{4}privileged: true$})
+        }
       end
     end
   end

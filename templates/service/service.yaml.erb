@@ -3,8 +3,15 @@ version: "<%= @compose_file_version %>"
 services:
   <%= @compose_service %>:
     image: <%= @docker_image %>
+<% if @docker_command -%>
+    command: <%= @docker_command %>
+<% end -%>
 <% if @restart -%>
+<%     if ['no', 'false', false].include?(@restart) -%>
+    restart: "no"
+<%     else -%>
     restart: <%= @restart %>
+<%     end -%>
 <% end -%>
 <% if @expose_ports -%>
     ports:
@@ -49,6 +56,9 @@ services:
       <%= name %>: <%= limit %>
 <%     end -%>
 <%   end -%>
+<% end -%>
+<% if @privileged -%>
+    privileged: true
 <% end -%>
 <% if @docker_dns -%>
     dns:
