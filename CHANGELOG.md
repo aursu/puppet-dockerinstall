@@ -51,3 +51,24 @@ All notable changes to this project will be documented in this file.
   and GitLab reside on the same server)
 
 **Known Issues**
+
+## Release 0.7.0
+
+**Features**
+
+* Added ability to build docker image before service run (for dockerservice)
+
+**Bugfixes**
+
+**Known Issues**
+
+## Release 0.7.1
+
+**Features**
+
+* Added docker compose parameters privileged and command
+* Added template for tokens' map
+
+**Bugfixes**
+
+**Known Issues**
