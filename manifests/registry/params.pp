@@ -50,4 +50,8 @@ class dockerinstall::registry::params {
   # When set to `true`, `realm` will automatically be set using the Host header
   # of the request as the domain and a path of `/auth/token/`
   $auth_token_autoredirect = false
+
+  # Nginx config to store tokens to projects map
+  $nginx_map_dir = $lsys::params::nginx_map_dir
+  $nginx_tokens_map = "${nginx_map_dir}/gitlab-auth-token.conf"
 }

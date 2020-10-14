@@ -1,0 +1,9 @@
+<% if @gitlab_tokens -%>
+<%   @gitlab_tokens.each do |project, token| -%>
+<%     next if project == 'default' -%>
+~^/v2/<%= project %> "<%= token %>";
+<%   end -%>
+<%   if @gitlab_tokens['default'] -%>
+~^/v2 "<%= @gitlab_tokens['default'] %>";
+<%   end -%>
+<% end -%>

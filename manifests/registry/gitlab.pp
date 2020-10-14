@@ -6,7 +6,7 @@
 #   include dockerinstall::registry::gitlab
 #
 # @param registry_cert_export
-#   Whether to write certificate content intoo local file system or export it to
+#   Whether to write certificate content into local file system or export it to
 #   Puppet DB
 #
 # @param registry_internal_certificate
@@ -19,10 +19,27 @@
 #   written to disk.
 #   default certificate location is /etc/docker/registry/tokenbundle.pem
 #
+# @param token_map_export
+#   Whether to export Nginx tokens map into PuppetDB or not
+#
+# @param token_map_setup
+#   Whether to setup Nginx tokens map locally or not (mutually exclusive with
+#   `token_map_export` with lower priority)
+#
+# @param nginx_tokens_map
+#   Path to Nginx config which represents map of tokenns to project. This config file
+#   is used in `include` directive for map $uri $gitlab_token {} configuration
+#   directive. See http://nginx.org/en/docs/http/ngx_http_map_module.html#map
+#   Default is /etc/nginx/conf.d/mapping/gitlab-auth-token.conf
+#
 class dockerinstall::registry::gitlab (
   Boolean $registry_cert_export          = true,
   Optional[String]
           $registry_internal_certificate = undef,
+  Boolean $token_map_export              = true,
+  Boolean $token_map_setup               = true,
+  Stdlib::Unixpath
+          $nginx_tokens_map              = $dockerinstall::registry::params::nginx_tokens_map,
   Optional[Stdlib::Fqdn]
           $gitlab_host                   = $dockerinstall::params::certname,
 ) inherits dockerinstall::registry::params
@@ -49,6 +66,22 @@ class dockerinstall::registry::gitlab (
 
     file { $registry_cert_path:
       content => $registry_cert_content,
+    }
+  }
+
+  $gitlab_tokens = $facts['gitlab_auth_token']
+  if $token_map_export {
+    @@file { 'registry_tokens_map':
+      ensure  => file,
+      path    => $nginx_tokens_map,
+      content => template('dockerinstall/registry/nginx/mapping/gitlab-auth-token.conf.erb'),
+      tag     => $gitlab_host,
+    }
+  }
+  elsif $token_map_setup {
+    file { $nginx_tokens_map:
+      ensure  => file,
+      content => template('dockerinstall/registry/nginx/mapping/gitlab-auth-token.conf.erb'),
     }
   }
 }

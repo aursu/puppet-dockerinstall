@@ -24,10 +24,10 @@ fixtures:
   repositories:
     lsys:
       repo: https://github.com/aursu/puppet-lsys.git
-      ref: tags/v0.5.3
+      ref: tags/v0.5.4
     nginx:
       repo: https://github.com/aursu/puppet-nginx.git
-      ref: tags/v1.1.1-rc0.7
+      ref: tags/v2.0.1-rc0.3
     puppet:
       repo: https://github.com/aursu/puppet-puppet.git
     selinux_core:

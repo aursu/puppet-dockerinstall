@@ -1,0 +1,15 @@
+map $uri $gitlab_token {
+  include <%= @nginx_tokens_map %>;
+}
+
+# if authorization via SSL is successfull then setup token
+# http://nginx.org/en/docs/http/ngx_http_ssl_module.html#ssl_verify_client
+map  $ssl_client_verify $ssl_authorization {
+  "SUCCESS" $gitlab_token;
+}
+
+# if not Authorization header provided - use SSL authorization
+map $http_authorization $proxy_authorization {
+  "" $ssl_authorization;
+  default $http_authorization;
+}
