@@ -4,6 +4,7 @@
 ~^/v2/<%= project %> "<%= token %>";
 <%   end -%>
 <%   if @gitlab_tokens['default'] -%>
+# default token rule
 ~^/v2 "<%= @gitlab_tokens['default'] %>";
 <%   end -%>
 <% end -%>

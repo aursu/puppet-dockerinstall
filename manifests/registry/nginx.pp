@@ -5,20 +5,25 @@
 # @example
 #   include dockerinstall::registry::nginx
 class dockerinstall::registry::nginx (
-    String  $server_name,
-    Boolean $ssl                   = false,
-    Optional[String]
-            $ssl_cert              = undef,
-    Optional[String]
-            $ssl_key               = undef,
-    Boolean $ssl_client_ca_auth    = false,
+  String  $server_name,
+  Boolean $ssl                   = false,
+  Optional[String]
+          $ssl_cert              = undef,
+  Optional[String]
+          $ssl_key               = undef,
+  Boolean $ssl_client_ca_auth    = false,
 
-    Boolean $manage_nginx_core     = true,
-    Boolean $manage_web_user       = true,
-    Boolean $manage_document_root  = true,
-    Boolean $global_ssl_redirect   = true,
+  Boolean $manage_nginx_core     = true,
+  Boolean $manage_web_user       = true,
+  Boolean $manage_document_root  = true,
+  Boolean $global_ssl_redirect   = true,
+  Stdlib::Unixpath
+          $nginx_tokens_map      = $dockerinstall::registry::params::nginx_tokens_map,
 ) inherits dockerinstall::registry::params
 {
+  include dockerinstall::registry::auth_token
+  $auth_token_enable = $dockerinstall::registry::auth_token::enable
+
   $nginx_upstream_members = $dockerinstall::registry::params::nginx_upstream_members
   $internal_cacert        = $dockerinstall::registry::params::internal_cacert
 
@@ -32,19 +37,30 @@ class dockerinstall::registry::nginx (
     fail('SSL certificate path and/or SSL private key path not provided')
   }
 
+  if $auth_token_enable  {
+    $auth_token_prepend = [
+      template('dockerinstall/registry/nginx/chunks/registry-auth.conf.erb')
+    ]
+  }
+  else {
+    $auth_token_prepend = []
+  }
+
   if $manage_nginx_core {
     class { 'lsys::nginx':
       manage_user          => $manage_web_user,
       manage_document_root => $manage_document_root,
       global_ssl_redirect  => $global_ssl_redirect,
+      manage_map_dir       => true,
       http_raw_prepend     => [
-        # Set a variable to help us decide if we need to add the
-        # 'Docker-Distribution-Api-Version' header.
-        # The registry always sets this header.
-        # In the case of nginx performing auth, the header is unset
-        # since nginx is auth-ing before proxying.
-        template('dockerinstall/registry/nginx/chunks/dont-duplicate-registry-header.erb'),
-      ],
+                                # Set a variable to help us decide if we need to add the
+                                # 'Docker-Distribution-Api-Version' header.
+                                # The registry always sets this header.
+                                # In the case of nginx performing auth, the header is unset
+                                # since nginx is auth-ing before proxying.
+                                template('dockerinstall/registry/nginx/chunks/dont-duplicate-registry-header.erb'),
+                              ] +
+                              $auth_token_prepend,
     }
   }
   else {
@@ -57,6 +73,12 @@ class dockerinstall::registry::nginx (
         ensure => directory,
         owner  => $daemon_user,
         group  => $daemon_group,
+      }
+    }
+
+    if $auth_token_enable  {
+      nginx::resource::config { '99-registry-auth':
+        template => 'dockerinstall/registry/nginx/chunks/registry-auth.conf.erb',
       }
     }
   }

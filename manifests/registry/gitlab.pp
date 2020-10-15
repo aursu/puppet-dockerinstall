@@ -1,6 +1,6 @@
-# @summary Export GitLab certificate for Registry authentication
+# @summary Export GitLab certificate and tokens map for Registry authentication
 #
-# Export GitLab certificate for Registry authentication
+# Export GitLab certificate and tokens map for Registry authentication
 #
 # @example
 #   include dockerinstall::registry::gitlab
