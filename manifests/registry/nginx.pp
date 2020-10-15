@@ -65,7 +65,7 @@ class dockerinstall::registry::nginx (
   }
   else {
     nginx::resource::config { '98-registry-header':
-      template => 'dockerinstall/registry/nginx/chunks/dont-duplicate-registry-header.erb',
+      content => template('dockerinstall/registry/nginx/chunks/dont-duplicate-registry-header.erb'),
     }
 
     if $manage_document_root {
@@ -78,7 +78,7 @@ class dockerinstall::registry::nginx (
 
     if $auth_token_enable  {
       nginx::resource::config { '99-registry-auth':
-        template => 'dockerinstall/registry/nginx/chunks/registry-auth.conf.erb',
+        content => template('dockerinstall/registry/nginx/chunks/registry-auth.conf.erb'),
       }
     }
   }

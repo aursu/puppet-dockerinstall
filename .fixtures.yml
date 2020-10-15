@@ -27,7 +27,7 @@ fixtures:
       ref: tags/v0.5.4
     nginx:
       repo: https://github.com/aursu/puppet-nginx.git
-      ref: tags/v2.0.1-rc0.3
+      ref: tags/v2.0.1-rc0.4
     puppet:
       repo: https://github.com/aursu/puppet-puppet.git
     selinux_core:
