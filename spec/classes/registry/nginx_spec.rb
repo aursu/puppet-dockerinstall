@@ -13,6 +13,17 @@ describe 'dockerinstall::registry::nginx' do
       end
 
       it { is_expected.to compile }
+
+      context 'with default settings' do
+        it {
+          is_expected.to contain_class('lsys::nginx')
+        }
+
+        it {
+          is_expected.to contain_file('/etc/nginx/conf.d/mapping')
+            .with_ensure('directory')
+        }
+      end
     end
   end
 end
