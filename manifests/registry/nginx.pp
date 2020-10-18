@@ -111,13 +111,13 @@ class dockerinstall::registry::nginx (
   }
 
   if $auth_token_enable {
-    $ssl_client_cert = undef
+    $ssl_client_cert = $internal_cacert
     # rule to deny non-authenticated users
     $ssl_client_check = [
       file('dockerinstall/registry/nginx/chunks/enable-client-auth-token.conf'),
     ]
     $auth_proxy_header = [
-      'Authorization $proxy_authorization'
+      'Authorization     $proxy_authorization'
     ]
   }
   # SSL/TLS client certificates auth only
