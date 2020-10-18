@@ -19,8 +19,8 @@
 #   The realm in which the registry server authenticates
 #   eg https://gitlab.domain.tld/jwt/auth
 #
-# @param gitlab_certificate
-#   Contents of the certificate that GitLab uses to sign the tokens.
+# @param realm_certificate
+#   Contents of the certificate that Realm (eg GitLab) uses to sign the tokens.
 #
 # @param rootcertbundle
 #   The absolute path to the root certificate bundle. This bundle contains the
@@ -35,7 +35,7 @@
 #
 # @param registry_cert_export
 #   Whether to import token certificate from PuppetDB or not. If set to false
-#   than token certificate should be provide either via `gitlab_certificate` or
+#   than token certificate should be provide either via `realm_certificate` or
 #   it must be set via classes `gitlabinstall::gitlab` or
 #   `dockerinstall::registry::gitlab`
 #
@@ -47,7 +47,7 @@ class dockerinstall::registry::auth_token (
   Optional[Stdlib::HTTPUrl]
           $realm                = undef,
   Optional[String]
-          $gitlab_certificate   = undef,
+          $realm_certificate    = undef,
   String  $service              = $dockerinstall::registry::params::auth_token_service,
   String  $issuer               = $dockerinstall::registry::params::auth_token_issuer,
   Boolean $registry_cert_export = true,
@@ -85,8 +85,8 @@ class dockerinstall::registry::auth_token (
       unless $realm {
         fail('You must supply auth_token_realm parameter to dockerinstall::registry::auth_token')
       }
-      unless $gitlab_certificate {
-        fail('You must supply gitlab_certificate parameter to dockerinstall::registry::auth_token')
+      unless $realm_certificate {
+        fail('You must supply realm_certificate parameter to dockerinstall::registry::auth_token')
       }
 
       $token_realm = $realm
@@ -98,7 +98,7 @@ class dockerinstall::registry::auth_token (
 
       file { 'registry_rootcertbundle':
         path    => $rootcertbundle,
-        content => $gitlab_certificate,
+        content => $realm_certificate,
       }
     }
   }
