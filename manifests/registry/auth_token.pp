@@ -1,4 +1,4 @@
-# @summary Enable integration of Registry into GitLab authentication
+# @summary Enable integration of Registry into GitLab authentication mechanism
 #
 # Enable integration of Registry into GitLab authentication
 # see https://docs.gitlab.com/ee/administration/packages/container_registry.html#enable-the-container-registry
@@ -12,7 +12,7 @@
 # @param gitlab
 #   Whether to enable GitLab as token provider or not
 #
-# @param gitlab_host
+# @param realm_host
 #   If GitLab is in use as token provider than GitLab host must be provided
 #
 # @param realm
@@ -43,7 +43,7 @@ class dockerinstall::registry::auth_token (
   Boolean $enable               = false,
   Boolean $gitlab               = false,
   Optional[Stdlib::Fqdn]
-          $gitlab_host          = undef,
+          $realm_host           = undef,
   Optional[Stdlib::HTTPUrl]
           $realm                = undef,
   Optional[String]
@@ -51,6 +51,7 @@ class dockerinstall::registry::auth_token (
   String  $service              = $dockerinstall::registry::params::auth_token_service,
   String  $issuer               = $dockerinstall::registry::params::auth_token_issuer,
   Boolean $registry_cert_export = true,
+  Boolean $token_map_export     = true,
 ) inherits dockerinstall::registry::params
 {
   # auth:
@@ -66,19 +67,19 @@ class dockerinstall::registry::auth_token (
 
   if $enable {
     if $gitlab {
-      unless $gitlab_host {
-        fail('You must supply gitlab_host parameter to dockerinstall::registry::auth_token')
+      unless $realm_host {
+        fail('You must supply realm_host parameter to dockerinstall::registry::auth_token (which is GitLab server name)')
       }
 
-      $token_realm = "https://${gitlab_host}/jwt/auth"
+      $token_realm = "https://${realm_host}/jwt/auth"
 
       if $registry_cert_export {
         file { $tokenbundle_certdir:
           ensure => directory,
         }
 
-        # export certificate from GitLab host gitlab_host
-        File <<| title == 'registry_rootcertbundle' and tag == $gitlab_host |>>
+        # export certificate from GitLab host realm_host
+        File <<| title == 'registry_rootcertbundle' and tag == $realm_host |>>
       }
     }
     else {
@@ -100,6 +101,10 @@ class dockerinstall::registry::auth_token (
         path    => $rootcertbundle,
         content => $realm_certificate,
       }
+    }
+
+    if $token_map_export {
+      File <<| title == 'registry_tokens_map' and tag == $realm_host |>>
     }
   }
 }

@@ -37,6 +37,7 @@ class dockerinstall::registry::nginx (
     fail('SSL certificate path and/or SSL private key path not provided')
   }
 
+  # Token based authentication
   if $auth_token_enable  {
     $auth_token_prepend = [
       template('dockerinstall/registry/nginx/chunks/registry-auth.conf.erb')
@@ -58,14 +59,14 @@ class dockerinstall::registry::nginx (
                                 # The registry always sets this header.
                                 # In the case of nginx performing auth, the header is unset
                                 # since nginx is auth-ing before proxying.
-                                template('dockerinstall/registry/nginx/chunks/dont-duplicate-registry-header.erb'),
+                                file('dockerinstall/registry/nginx/chunks/dont-duplicate-registry-header.conf'),
                               ] +
                               $auth_token_prepend,
     }
   }
   else {
     nginx::resource::config { '98-registry-header':
-      content => template('dockerinstall/registry/nginx/chunks/dont-duplicate-registry-header.erb'),
+      content => file('dockerinstall/registry/nginx/chunks/dont-duplicate-registry-header.conf'),
     }
 
     if $manage_document_root {
@@ -76,7 +77,7 @@ class dockerinstall::registry::nginx (
       }
     }
 
-    if $auth_token_enable  {
+    if $auth_token_enable {
       nginx::resource::config { '99-registry-auth':
         content => template('dockerinstall/registry/nginx/chunks/registry-auth.conf.erb'),
       }
@@ -109,17 +110,29 @@ class dockerinstall::registry::nginx (
     $listen_port = 80
   }
 
-  # Client auth
-  if $ssl_client_ca_auth {
+  if $auth_token_enable {
+    $ssl_client_cert = undef
+    # rule to deny non-authenticated users
+    $ssl_client_check = [
+      file('dockerinstall/registry/nginx/chunks/enable-client-auth-token.conf'),
+    ]
+    $auth_proxy_header = [
+      'Authorization $proxy_authorization'
+    ]
+  }
+  # SSL/TLS client certificates auth only
+  elsif $ssl_client_ca_auth {
     $ssl_client_cert = $internal_cacert
     # rule to deny non-authenticated users
     $ssl_client_check = [
-        template('dockerinstall/registry/nginx/chunks/enable-client-auth.erb'),
+      file('dockerinstall/registry/nginx/chunks/enable-client-auth.conf'),
     ]
+    $auth_proxy_header = []
   }
   else {
     $ssl_client_cert = undef
     $ssl_client_check = []
+    $auth_proxy_header = []
   }
 
   # default document root
@@ -171,7 +184,7 @@ class dockerinstall::registry::nginx (
     locations                 => {
       '/v2/'                  => {
         raw_prepend        => [
-                                template('dockerinstall/registry/nginx/chunks/restrict-old-docker-access.erb'),
+                                file('dockerinstall/registry/nginx/chunks/restrict-old-docker-access.conf'),
                               ] +
                               $ssl_client_check,
         add_header         => {
@@ -181,13 +194,14 @@ class dockerinstall::registry::nginx (
         },
         proxy              => 'http://docker-registry',
         proxy_set_header   => [
-          # required for docker client's sake
-          'Host              $http_host',
-          # pass on real client's IP
-          'X-Real-IP         $remote_addr',
-          'X-Forwarded-For   $proxy_add_x_forwarded_for',
-          'X-Forwarded-Proto $scheme',
-        ],
+                                # required for docker client's sake
+                                'Host              $http_host',
+                                # pass on real client's IP
+                                'X-Real-IP         $remote_addr',
+                                'X-Forwarded-For   $proxy_add_x_forwarded_for',
+                                'X-Forwarded-Proto $scheme',
+                              ] +
+                              $auth_proxy_header,
         proxy_read_timeout => 900,
       },
       '/registry-denied.json' => {
