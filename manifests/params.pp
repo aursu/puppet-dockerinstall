@@ -1,6 +1,4 @@
-# A description of what this class does
-#
-# @summary A short summary of the purpose of this class
+# @summary Module parameters
 #
 # @example
 #   include dockerinstall::params
@@ -12,7 +10,7 @@ class dockerinstall::params {
         $service_config_template = 'dockerinstall/docker.upstart.erb'
     }
     # predefined Docker Compose version - could  be overriden with dockerinstall::compose_version
-    $compose_version          = '1.26.2'
+    $compose_version          = '1.27.4'
     $compose_download_source  = 'https://github.com/docker/compose/releases/download'
 
     # docker compose project provides binaries only for x86_64 architecture
