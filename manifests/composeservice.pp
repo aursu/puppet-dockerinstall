@@ -1,6 +1,6 @@
-# A description of what this defined type does
+# Run compose service
 #
-# @summary A short summary of the purpose of this defined type.
+# @summary Run compose service
 #
 # @example
 #   dockerinstall::composeservice { 'namevar': }
@@ -18,6 +18,7 @@ define dockerinstall::composeservice (
           $project_basedir    = undef,
   Optional[Stdlib::Unixpath]
           $configuration_path = undef,
+  Boolean $build_image        = false,
 )
 {
   include dockerinstall::params
@@ -88,5 +89,6 @@ define dockerinstall::composeservice (
     basedir       => $project_basedir,
     project       => $project,
     path          => $configuration_path,
+    build         => $build_image,
   }
 }

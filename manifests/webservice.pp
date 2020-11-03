@@ -9,6 +9,9 @@
 #   Specify the image to start the container from.
 #   see: https://docs.docker.com/compose/compose-file/#image
 #
+# @param build_image
+#   Whether to build docker image using docker-compose command
+#
 # @param manage_image
 #   Whether to manage image with docker command or not
 #   if set to true - will define custom resource Dockerimage for image specified
@@ -105,6 +108,7 @@
 define dockerinstall::webservice (
   String  $docker_image,
   Boolean $manage_image         = false,
+  Boolean $build_image          = false,
   String  $project_name         = $name,
   Optional[String]
           $service_name         = undef,
@@ -243,5 +247,6 @@ define dockerinstall::webservice (
     project_basedir    => $project_basedir,
     configuration      => template('dockerinstall/service/service.yaml.erb'),
     configuration_path => $configuration_path,
+    build_image        => $build_image,
   }
 }

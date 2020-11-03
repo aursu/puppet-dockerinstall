@@ -82,3 +82,13 @@ All notable changes to this project will be documented in this file.
 **Bugfixes**
 
 **Known Issues**
+
+## Release 0.8.1
+
+**Features**
+
+* Added ability to pass build image flag from webservice
+
+**Bugfixes**
+
+**Known Issues**

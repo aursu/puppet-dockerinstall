@@ -7,8 +7,8 @@ describe 'dockerinstall::composeservice' do
   let(:libdir) { '/var/lib/compose' }
   let(:pre_condition) do
     <<-PRECOND
-    class {'dockerinstall': }
-    class {'dockerinstall::compose': }
+    class { 'dockerinstall': }
+    class { 'dockerinstall::compose': }
     PRECOND
   end
   let(:title) { 'curl/centos7curlbuild' }
@@ -26,9 +26,9 @@ describe 'dockerinstall::composeservice' do
         let(:rundir) { '/run/compose' }
         let(:pre_condition) do
           <<-PRECOND
-          class {'dockerinstall': }
-          class {'dockerinstall::compose': }
-          file {'/var/run/compose': ensure => directory, }
+          class { 'dockerinstall': }
+          class { 'dockerinstall::compose': }
+          file { '/var/run/compose': ensure => directory, }
           PRECOND
         end
       end
@@ -54,6 +54,25 @@ describe 'dockerinstall::composeservice' do
               'ensure' => 'running',
               'configuration' => configuration,
               'project' => 'rpmbuild-curl',
+              'build' => false,
+            )
+        }
+      end
+
+      context 'when build image requested' do
+        let(:params) do
+          super().merge(
+            'build_image' => true,
+          )
+        end
+
+        it {
+          is_expected.to contain_dockerservice('curl/centos7curlbuild')
+            .with(
+              'ensure' => 'running',
+              'configuration' => configuration,
+              'project' => 'curl',
+              'build' => true,
             )
         }
       end

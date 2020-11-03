@@ -1,6 +1,6 @@
-# A description of what this class does
+# Docker Compose installation
 #
-# @summary A short summary of the purpose of this class
+# @summary Docker Compose installation
 #
 # @example
 #   include dockerinstall::compose
