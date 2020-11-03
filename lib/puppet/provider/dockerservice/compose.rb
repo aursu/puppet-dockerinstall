@@ -136,7 +136,7 @@ Puppet::Type.type(:dockerservice).provide(
     when %r{^https?://}
       # https://docs.docker.com/engine/reference/commandline/build/#git-repositories
       # https://docs.docker.com/engine/reference/commandline/build/#tarball-contexts
-      unless context =~ %r{\.git(#.+)?$} || context =~ %r{(tgz|tar\.(gz|bz2|xz))$}
+      unless context =~ %r{\.git(#.+)?$} # || context =~ %r{(tgz|tar\.(gz|bz2|xz))$}
         raise 'Docker build context must be either valid Git repo URL or URL to tarball file (tar.gz|tar.bz2|tar.xz)'
       end
     when %r{^/}
@@ -147,14 +147,14 @@ Puppet::Type.type(:dockerservice).provide(
 
     return unless context_path
 
-    if context =~ %r{(tgz|tar\.(gz|bz2|xz))$}
-      raise Puppet::Error, "Docker build context tarball does not exist: #{context_path}" unless File.exist?(context_path)
-    else
-      raise Puppet::Error, "Docker build context directory does not exist: #{context_path}" unless File.directory?(context_path)
-      dockerfile_path = File.join(context_path, dockerfile)
+    # if context =~ %r{(tgz|tar\.(gz|bz2|xz))$}
+    #   raise Puppet::Error, "Docker build context tarball does not exist: #{context_path}" unless File.exist?(context_path)
+    # else
+    raise Puppet::Error, "Docker build context directory does not exist: #{context_path}" unless File.directory?(context_path)
+    dockerfile_path = File.join(context_path, dockerfile)
 
-      raise Puppet::Error, "Docker file could not be found: #{dockerfile_path}" unless File.exist?(dockerfile_path)
-    end
+    raise Puppet::Error, "Docker file could not be found: #{dockerfile_path}" unless File.exist?(dockerfile_path)
+    # end
   end
 
   def configuration_integrity
