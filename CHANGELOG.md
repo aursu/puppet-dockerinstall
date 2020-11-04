@@ -92,3 +92,14 @@ All notable changes to this project will be documented in this file.
 **Bugfixes**
 
 **Known Issues**
+
+## Release 0.8.2
+
+**Features**
+
+**Bugfixes**
+
+* Removed coontext and docker file existing check
+* bugfix: Docker Compose does not support tarball contexts
+
+**Known Issues**
