@@ -126,7 +126,7 @@ Puppet::Type.type(:dockerservice).provide(
     confdir  = File.dirname(confpath)
 
     context = build['context']
-    dockerfile = build['dockerfile'] || 'Dockerfile'
+    # dockerfile = build['dockerfile'] || 'Dockerfile'
     context_path = nil
 
     raise Puppet::Error, "Service 'build' parameter should contain 'context' parameter" unless context
@@ -145,7 +145,9 @@ Puppet::Type.type(:dockerservice).provide(
       context_path = File.join(confdir, context)
     end
 
-    # return unless context_path
+    return unless context_path
+
+    raise Puppet::Error, _('Context path must be absolute, not %{entry}') % { entry: context_path } unless Puppet::Util.absolute_path?(context_path)
 
     # raise Puppet::Error, "Docker build context directory does not exist: #{context_path}" unless File.directory?(context_path)
     # dockerfile_path = File.join(context_path, dockerfile)
