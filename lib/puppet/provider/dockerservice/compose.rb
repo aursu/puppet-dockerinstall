@@ -145,10 +145,10 @@ Puppet::Type.type(:dockerservice).provide(
       context_path = File.join(confdir, context)
     end
 
-    return unless context_path
+    # return unless context_path
 
     # raise Puppet::Error, "Docker build context directory does not exist: #{context_path}" unless File.directory?(context_path)
-    dockerfile_path = File.join(context_path, dockerfile)
+    # dockerfile_path = File.join(context_path, dockerfile)
 
     # raise Puppet::Error, "Docker file could not be found: #{dockerfile_path}" unless File.exist?(dockerfile_path)
   end
