@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'dockerinstall::registry::auth_token' do
+describe 'dockerinstall::setup' do
   let(:pre_condition) { 'include dockerinstall' }
 
   on_supported_os.each do |os, os_facts|

@@ -10,15 +10,12 @@ class dockerinstall::install (
     Boolean $manage_package          = $dockerinstall::manage_package,
     Array[String]
             $prerequired_packages    = $dockerinstall::prerequired_packages,
-    Boolean $manage_docker_certdir   = $dockerinstall::manage_docker_certdir,
-    Boolean $manage_docker_tlsdir    = $dockerinstall::manage_docker_tlsdir,
-    Stdlib::Unixpath
-            $docker_tlsdir           = $dockerinstall::params::docker_tlsdir,
     String  $containerd_package_name = $dockerinstall::containerd_package_name,
     String  $containerd_version      = $dockerinstall::containerd_version,
-) inherits dockerinstall::params
+)
 {
     include dockerinstall::repos
+    include dockerinstall::setup
 
     if $manage_package {
         # exclude docker and conteinerd.io from list of additional packages
@@ -48,26 +45,6 @@ class dockerinstall::install (
                 Yumrepo['docker'] -> Package['docker']
             }
             default: { }
-        }
-    }
-
-    file { '/etc/docker':
-        ensure => directory,
-    }
-
-    if $manage_docker_certdir {
-        file { '/etc/docker/certs.d':
-            ensure => directory,
-            owner  => 'root',
-            mode   => '0700',
-        }
-    }
-
-    if $manage_docker_tlsdir {
-        file { $docker_tlsdir:
-            ensure => directory,
-            owner  => 'root',
-            mode   => '0700',
         }
     }
 }

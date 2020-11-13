@@ -44,7 +44,8 @@ class dockerinstall::registry::gitlab (
           $gitlab_host                   = $dockerinstall::params::certname,
 ) inherits dockerinstall::registry::params
 {
-  $tokenbundle_certdir = $dockerinstall::registry::params::tokenbundle_certdir
+  include dockerinstall::registry::setup::token
+
   $registry_cert_path  = $dockerinstall::registry::params::auth_token_rootcertbundle
 
   $registry_cert_content = $registry_internal_certificate ? {
@@ -60,10 +61,6 @@ class dockerinstall::registry::gitlab (
     }
   }
   else {
-    file { $tokenbundle_certdir:
-      ensure => directory,
-    }
-
     file { $registry_cert_path:
       content => $registry_cert_content,
     }

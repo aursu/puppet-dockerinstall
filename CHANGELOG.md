@@ -103,3 +103,14 @@ All notable changes to this project will be documented in this file.
 * bugfix: Docker Compose does not support tarball contexts
 
 **Known Issues**
+
+## Release 0.8.3
+
+**Features**
+
+**Bugfixes**
+
+* Bugfix: directory /etc/docker/registry should be defined in case of registry
+  token authentication
+
+**Known Issues**

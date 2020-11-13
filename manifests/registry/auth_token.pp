@@ -54,6 +54,8 @@ class dockerinstall::registry::auth_token (
   Boolean $token_map_export     = true,
 ) inherits dockerinstall::registry::params
 {
+  include dockerinstall::registry::setup::token
+
   # auth:
   #   token:
   #     realm: https://gitlab1.domain.tld/jwt/auth
@@ -63,7 +65,6 @@ class dockerinstall::registry::auth_token (
   #     autoredirect: false
 
   $rootcertbundle = $dockerinstall::registry::params::auth_token_rootcertbundle
-  $tokenbundle_certdir = $dockerinstall::registry::params::tokenbundle_certdir
 
   if $enable {
     if $gitlab {
@@ -74,10 +75,6 @@ class dockerinstall::registry::auth_token (
       $token_realm = "https://${realm_host}/jwt/auth"
 
       if $registry_cert_export {
-        file { $tokenbundle_certdir:
-          ensure => directory,
-        }
-
         # export certificate from GitLab host realm_host
         File <<| title == 'registry_rootcertbundle' and tag == $realm_host |>>
       }
@@ -91,11 +88,6 @@ class dockerinstall::registry::auth_token (
       }
 
       $token_realm = $realm
-
-      # create certificate directory before creating certificate itself
-      file { $tokenbundle_certdir:
-        ensure => directory,
-      }
 
       file { 'registry_rootcertbundle':
         path    => $rootcertbundle,

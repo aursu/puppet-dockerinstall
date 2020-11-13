@@ -93,6 +93,8 @@ OsAB
 }
 
 describe 'dockerinstall::registry::gitlab' do
+  let(:pre_condition) { 'include dockerinstall' }
+
   on_supported_os.each do |os, os_facts|
     os_facts[:puppet_sslcert] = puppet_sslcert
 
