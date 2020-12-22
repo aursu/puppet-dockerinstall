@@ -124,3 +124,14 @@ All notable changes to this project will be documented in this file.
 **Bugfixes**
 
 **Known Issues**
+
+## Release 0.9.1
+
+**Features**
+
+* Added Docker 20.10 support
+* Added CentOS 8 support
+
+**Bugfixes**
+
+**Known Issues**
