@@ -33,6 +33,7 @@ dockerinstall::log_level: ~
 dockerinstall::log_opt: ~
 dockerinstall::manage_docker_certdir: true
 dockerinstall::manage_docker_tlsdir: true
+dockerinstall::docker_dir_ensure: directory
 dockerinstall::manage_os_users: true
 dockerinstall::manage_package: true
 dockerinstall::manage_service: true

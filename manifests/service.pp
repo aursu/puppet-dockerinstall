@@ -99,6 +99,7 @@ class dockerinstall::service (
     Boolean $overlay2_override_kernel_check = $dockerinstall::overlay2_override_kernel_check,
     Boolean $manage_users                   = $dockerinstall::manage_os_users,
     Boolean $manage_package                 = $dockerinstall::manage_package,
+    String  $service_config_ensure          = 'file',
 )
 {
     include systemd::systemctl::daemon_reload
@@ -108,13 +109,16 @@ class dockerinstall::service (
 
     if $manage_service {
         service { 'docker':
-            ensure     => $service_ensure,
-            name       => $service_name,
-            enable     => $service_enable,
-            hasstatus  => $service_hasstatus,
-            hasrestart => $service_hasrestart,
-            subscribe  => File['/etc/docker/daemon.json'],
-            alias      => 'docker',
+          ensure     => $service_ensure,
+          name       => $service_name,
+          enable     => $service_enable,
+          hasstatus  => $service_hasstatus,
+          hasrestart => $service_hasrestart,
+          alias      => 'docker',
+        }
+
+        if $service_ensure == 'running' {
+          File['/etc/docker/daemon.json'] ~> Service['docker']
         }
 
         if $manage_users {
@@ -131,23 +135,27 @@ class dockerinstall::service (
             }
 
             if $service_overrides_config and $service_overrides_template {
-                file { $service_overrides_config:
-                    ensure  => present,
-                    content => template($service_overrides_template),
-                    notify  => Class['systemd::systemctl::daemon_reload'],
-                    before  => Service['docker'],
-                }
-                if $service_config {
-                    File[$service_config] -> File[$service_overrides_config]
-                }
+              file { $service_overrides_config:
+                ensure  => $service_config_ensure,
+                content => template($service_overrides_template),
+                notify  => Class['systemd::systemctl::daemon_reload'],
+              }
+              if $service_config {
+                  File[$service_config] -> File[$service_overrides_config]
+              }
+              if $service_config_ensure == 'file' {
+                File[$service_overrides_config] -> Service['docker']
+              }
             }
 
             # for Upstart it is integrated into $service_config
             if $storage_config and $storage_config_template {
                 file { $storage_config:
-                    ensure  => present,
+                    ensure  => $service_config_ensure,
                     content => template($storage_config_template),
-                    notify  => Service['docker'],
+                }
+                if $service_config_ensure == 'file' {
+                  File[$storage_config] ~> Service['docker']
                 }
             }
         }
@@ -163,9 +171,12 @@ class dockerinstall::service (
 
         if $service_config {
             file { $service_config:
-                ensure  => present,
+                ensure  => $service_config_ensure,
                 content => template($config_template),
                 notify  => Service['docker'],
+            }
+            if $service_config_ensure == 'file' {
+              File[$service_config] ~> Service['docker']
             }
         }
     }

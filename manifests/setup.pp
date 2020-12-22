@@ -9,10 +9,13 @@ class dockerinstall::setup (
   Boolean $manage_docker_tlsdir  = $dockerinstall::manage_docker_tlsdir,
   Stdlib::Unixpath
           $docker_tlsdir         = $dockerinstall::params::docker_tlsdir,
+  String  $docker_dir_ensure     = $dockerinstall::docker_dir_ensure,
 ) inherits dockerinstall::params
 {
   file { '/etc/docker':
-    ensure => directory,
+    ensure  => $docker_dir_ensure,
+    recurse => true,
+    force   => true,
   }
 
   if $manage_docker_certdir {

@@ -114,3 +114,13 @@ All notable changes to this project will be documented in this file.
   token authentication
 
 **Known Issues**
+
+## Release 0.9.0
+
+**Features**
+
+* Added Docker decomission profile
+
+**Bugfixes**
+
+**Known Issues**

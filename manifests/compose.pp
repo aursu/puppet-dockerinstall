@@ -19,6 +19,7 @@ class dockerinstall::compose (
             $rundir           = $dockerinstall::params::compose_rundir,
     Stdlib::Absolutepath
             $libdir           = $dockerinstall::params::compose_libdir,
+    String  $binary_ensure    = 'file',
 ) inherits dockerinstall::params
 {
     # we allow user to not care about compose version and keep it default
@@ -39,34 +40,36 @@ class dockerinstall::compose (
     $checksum_version_name = "${checksum_name}.${download_version}"
     $checksum_download_path = "${tmpdir}/${checksum_version_name}"
 
-    exec {
-      default:
-        path => '/bin:/usr/bin',
-        cwd  => $tmpdir,
-      ;
-      # download checksm file into temporary directory
-      'docker-compose-checksum':
-        command => "curl -L ${download_url_base}/${checksum_name} -o ${checksum_version_name}",
-        creates => $checksum_download_path,
-      ;
-      # download binary if checksum not match
-      'docker-compose-download':
-        command => "curl -L ${download_url_base}/${download_name} -o ${download_name}",
-        unless  => "${checksum_command} -c ${checksum_version_name}",
-        require => Exec['docker-compose-checksum'],
-      ;
+    if $binary_ensure == 'file' {
+      exec {
+        default:
+          path => '/bin:/usr/bin',
+          cwd  => $tmpdir,
+        ;
+        # download checksm file into temporary directory
+        'docker-compose-checksum':
+          command => "curl -L ${download_url_base}/${checksum_name} -o ${checksum_version_name}",
+          creates => $checksum_download_path,
+        ;
+        # download binary if checksum not match
+        'docker-compose-download':
+          command => "curl -L ${download_url_base}/${download_name} -o ${download_name}",
+          unless  => "${checksum_command} -c ${checksum_version_name}",
+          require => Exec['docker-compose-checksum'],
+          notify  => File[$binary_path],
+        ;
+      }
     }
 
     # install binary into specified location (by default is
     # /usr/local/bin/docker-compose)
     file { $binary_path:
-        ensure    => file,
-        source    => "file://${tmpdir}/${download_name}",
-        mode      => '0755',
-        owner     => 'root',
-        group     => 'root',
-        subscribe => Exec['docker-compose-download'],
-        alias     => 'docker-compose',
+        ensure => $binary_ensure,
+        source => "file://${tmpdir}/${download_name}",
+        mode   => '0755',
+        owner  => 'root',
+        group  => 'root',
+        alias  => 'docker-compose',
     }
 
     file { [$rundir, $libdir]:

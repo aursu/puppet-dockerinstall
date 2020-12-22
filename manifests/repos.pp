@@ -11,6 +11,8 @@ class dockerinstall::repos (
     Boolean $gpgcheck               = $dockerinstall::repo_gpgcheck,
     Boolean $sslverify              = $dockerinstall::repo_sslverify,
     String  $basearch               = $::architecture,
+    Enum['present', 'absent']
+            $repo_ensure            = 'present',
 )
 {
   # https://docs.docker.com/install/linux/docker-ce/fedora/#set-up-the-repository
@@ -42,6 +44,7 @@ class dockerinstall::repos (
         default => '0',
       }
       yumrepo { 'docker':
+        ensure    => $repo_ensure,
         descr     => 'Docker',
         baseurl   => $rpmurl,
         gpgkey    => $gpgkey,
@@ -49,7 +52,8 @@ class dockerinstall::repos (
         sslverify => $sslverify_param,
       }
       file { '/etc/yum.repos.d/docker.repo':
-        mode => '0644',
+        ensure => $repo_ensure,
+        mode   => '0644',
       }
     }
   }

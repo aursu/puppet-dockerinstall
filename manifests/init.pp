@@ -120,4 +120,5 @@ class dockerinstall (
             $compose_version,
     Boolean $manage_docker_certdir,
     Boolean $manage_docker_tlsdir,
+    String  $docker_dir_ensure,
 ){}

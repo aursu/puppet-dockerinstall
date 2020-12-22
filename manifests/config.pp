@@ -22,13 +22,16 @@ class dockerinstall::config (
             $log_driver        = undef,
     Optional[Dockerinstall::Log::JSONFile]
             $log_opts          = undef,
+    String  $user_ensure       = 'present',
+    String  $group_ensure      = 'present',
+    String  $config_ensure     = 'file',
 )
 {
     include dockerinstall::install
 
     if $manage_users {
         group { 'docker':
-            ensure => 'present',
+            ensure => $group_ensure,
             name   => $group,
         }
 
@@ -40,15 +43,21 @@ class dockerinstall::config (
 
         user {
             default:
-              ensure     => 'present',
+              ensure     => $user_ensure,
               groups     => [ $group ],
               membership => 'minimum',
-              require    => Group['docker'],
             ;
             $users:
               tag => 'docker',
             ;
             'docker': ;
+        }
+
+        if $user_ensure == 'present' {
+          Group['docker'] -> User['docker']
+        }
+        else {
+          User['docker'] -> Group['docker']
         }
 
         if $manage_package {
@@ -77,6 +86,7 @@ class dockerinstall::config (
       dockerinstall::option('storage-opts', $storage_opts)
 
     file { '/etc/docker/daemon.json':
+      ensure  => $config_ensure,
       content => template('dockerinstall/daemon.json.erb'),
     }
 }
