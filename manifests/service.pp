@@ -173,7 +173,6 @@ class dockerinstall::service (
             file { $service_config:
                 ensure  => $service_config_ensure,
                 content => template($config_template),
-                notify  => Service['docker'],
             }
             if $service_config_ensure == 'file' {
               File[$service_config] ~> Service['docker']

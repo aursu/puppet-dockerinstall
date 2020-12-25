@@ -6,6 +6,18 @@ describe 'dockerinstall::profile::daemon' do
       let(:facts) { os_facts }
 
       it { is_expected.to compile }
+
+      # this check is major for daemon profile
+      it {
+        is_expected.to contain_package('docker')
+          .with_name('docker-ce')
+          .that_notifies('Service[docker]')
+      }
+
+      it {
+        is_expected.to contain_file('/etc/docker/daemon.json')
+          .that_notifies('Service[docker]')
+      }
     end
   end
 end

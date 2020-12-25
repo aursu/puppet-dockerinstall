@@ -61,8 +61,8 @@ class dockerinstall::config (
         }
 
         if $manage_package {
-            Package['docker'] -> Group['docker']
-            Package['docker'] -> User['docker']
+          Package['docker'] -> Group['docker']
+          Package['docker'] -> User['docker']
         }
     }
 
