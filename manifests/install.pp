@@ -1,7 +1,9 @@
-# == Class: dockerinstall::install
+# @summary Docker daemon installation from package repository.
 #
-# Module to install an up-to-date version of Docker from a package repository.
+# Docker daemon installation from package repository.
 #
+# @example
+#   include dockerinstall::install
 class dockerinstall::install (
     Dockerinstall::PackageName
             $package_name            = $dockerinstall::package_name,

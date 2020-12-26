@@ -1,6 +1,9 @@
-# == Class: dockerinstall::repos
+# @summary Docker repository managemennt
 #
+# Docker repository managemennt
 #
+# @example
+#   include dockerinstall::repos
 class dockerinstall::repos (
     Boolean $manage_package         = $dockerinstall::manage_package,
     Dockerinstall::Repo

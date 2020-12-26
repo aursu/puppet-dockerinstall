@@ -1,5 +1,9 @@
-# == Class: dockerinstall::config
+# @summary Docker config setup (daemon.json)
 #
+# Docker config setup (daemon.json)
+#
+# @example
+#   include dockerinstall::config
 class dockerinstall::config (
     Boolean $manage_users      = $dockerinstall::manage_os_users,
     Dockerinstall::UserList
