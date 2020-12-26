@@ -5,6 +5,8 @@
   "summary": "Docker CE installation and start",
   "license": "Apache-2.0",
   "source": "https://github.com/aursu/puppet-dockerinstall",
+  "project_page": "https://github.com/aursu/puppet-dockerinstall",
+  "issues_url": "https://github.com/aursu/puppet-dockerinstall/issues",
   "dependencies": [
     {
       "name": "aursu/lsys",
