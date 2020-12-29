@@ -1,6 +1,6 @@
 {
   "name": "aursu-dockerinstall",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "author": "aursu",
   "summary": "Docker CE installation and start",
   "license": "Apache-2.0",

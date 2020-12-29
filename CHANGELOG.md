@@ -145,3 +145,13 @@ All notable changes to this project will be documented in this file.
 * Added Docker daemon restart during Docker upgrade
 
 **Known Issues**
+
+## Release 0.9.3
+
+**Features**
+
+**Bugfixes**
+
+* Updated dependencies
+
+**Known Issues**
