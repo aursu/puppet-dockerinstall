@@ -32,6 +32,12 @@ describe 'dockerinstall::composeservice' do
           PRECOND
         end
       end
+
+      let(:params) do
+        super().merge(
+          'project_basedir' => rundir,
+        )
+      end
       let(:facts) { os_facts }
 
       it { is_expected.to compile }
