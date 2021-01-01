@@ -85,6 +85,8 @@ class dockerinstall::profile::registry (
       # we use Hiera for certificate/private key storage
       tlsinfo::certpair { $cert_identity:
         identity => true,
+        # in case of self signed CA
+        strict   => false,
       }
     }
   }
