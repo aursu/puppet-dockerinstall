@@ -31,13 +31,14 @@ describe 'dockerinstall::composeservice' do
           file { '/var/run/compose': ensure => directory, }
           PRECOND
         end
+      else
+        let(:pre_condition) do
+          <<-PRECOND
+          file { '/run/compose': ensure => directory, }
+          PRECOND
+        end
       end
 
-      let(:params) do
-        super().merge(
-          'project_basedir' => rundir,
-        )
-      end
       let(:facts) { os_facts }
 
       it { is_expected.to compile }
