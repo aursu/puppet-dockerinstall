@@ -155,3 +155,13 @@ All notable changes to this project will be documented in this file.
 * Updated dependencies
 
 **Known Issues**
+
+## Release 0.9.4
+
+**Features**
+
+**Bugfixes**
+
+* Adjusted module settings and dependencies
+
+**Known Issues**
