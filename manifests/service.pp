@@ -117,7 +117,6 @@ class dockerinstall::service (
 {
   include systemd::systemctl::daemon_reload
   include dockerinstall::config
-  include dockerinstall::install
   include dockerinstall::params
 
   if $manage_service {
@@ -128,49 +127,6 @@ class dockerinstall::service (
       hasstatus  => $service_hasstatus,
       hasrestart => $service_hasrestart,
       alias      => 'docker',
-    }
-
-    if $service_ensure == 'running' {
-      File['/etc/docker/daemon.json'] ~> Service['docker']
-    }
-
-    if $manage_users {
-      User['docker'] -> Service['docker']
-    }
-
-    if $manage_package {
-      Package['docker'] -> Service['docker']
-    }
-
-    if $facts['systemd'] {
-      file { '/etc/systemd/system/docker.service.d':
-        ensure => directory,
-      }
-
-      if $service_overrides_config and $service_overrides_template {
-        file { $service_overrides_config:
-          ensure  => $service_config_ensure,
-          content => template($service_overrides_template),
-          notify  => Class['systemd::systemctl::daemon_reload'],
-        }
-        if $service_config {
-          File[$service_config] -> File[$service_overrides_config]
-        }
-        if $service_config_ensure == 'file' {
-          File[$service_overrides_config] -> Service['docker']
-        }
-      }
-
-      # for Upstart it is integrated into $service_config
-      if $storage_config and $storage_config_template {
-        file { $storage_config:
-          ensure  => $service_config_ensure,
-          content => template($storage_config_template),
-        }
-        if $service_config_ensure == 'file' {
-          File[$storage_config] ~> Service['docker']
-        }
-      }
     }
 
     if $service_config_template {
@@ -190,6 +146,46 @@ class dockerinstall::service (
       if $service_config_ensure == 'file' {
         File[$service_config] ~> Service['docker']
       }
+    }
+
+    if $facts['systemd'] {
+      file { '/etc/systemd/system/docker.service.d':
+        ensure => directory,
+      }
+
+      if $service_overrides_config and $service_overrides_template {
+        file { $service_overrides_config:
+          ensure  => $service_config_ensure,
+          content => template($service_overrides_template),
+          notify  => Class['systemd::systemctl::daemon_reload'],
+        }
+        if $service_config {
+          File[$service_config] -> File[$service_overrides_config]
+        }
+        if $service_config_ensure == 'file' {
+          Class['dockerinstall::config']
+            -> File[$service_overrides_config]
+            -> Service['docker']
+        }
+      }
+    }
+
+    # for Upstart it is integrated into $service_config
+    if $storage_config and $storage_config_template {
+      file { $storage_config:
+        ensure  => $service_config_ensure,
+        content => template($storage_config_template),
+      }
+      if $service_config_ensure == 'file' {
+        File[$storage_config] ~> Service['docker']
+      }
+    }
+
+    if $service_ensure == 'running' {
+      include dockerinstall::install
+
+      Class['dockerinstall::config'] ~> Service['docker']
+      Class['dockerinstall::install'] -> Service['docker']
     }
   }
 }

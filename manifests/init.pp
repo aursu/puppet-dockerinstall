@@ -10,8 +10,6 @@ class dockerinstall (
     Dockerinstall::Repo
             $repo,
     String  $repo_location,
-    Dockerinstall::RepoOS
-            $repo_os,
     Boolean $repo_gpgcheck,
     Boolean $repo_sslverify,
     Array[String]
@@ -31,14 +29,6 @@ class dockerinstall (
             $service_overrides_config,
     Optional[String]
             $service_overrides_template,
-    Optional[String]
-            $service_config,
-    Optional[String]
-            $service_config_template,
-    Optional[String]
-            $storage_config,
-    Optional[String]
-            $storage_config_template,
     Optional[String]
             $root_dir,
     Optional[Dockerinstall::Multiple]
@@ -121,4 +111,15 @@ class dockerinstall (
     Boolean $manage_docker_certdir,
     Boolean $manage_docker_tlsdir,
     String  $docker_dir_ensure,
-){}
+    Optional[String]
+            $service_config_template,
+    Optional[String]
+            $storage_config_template,
+    Optional[String]
+            $service_config                 = $dockerinstall::params::service_config,
+    Optional[String]
+            $storage_config                 = $dockerinstall::params::storage_config,
+    Dockerinstall::RepoOS
+            $repo_os                        = $dockerinstall::params::repo_os,
+) inherits dockerinstall::params
+{}

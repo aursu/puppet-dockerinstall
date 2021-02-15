@@ -48,10 +48,8 @@ dockerinstall::repo: 'stable'
 dockerinstall::repo_gpgcheck: true
 dockerinstall::repo_sslverify: true
 dockerinstall::repo_location: 'https://download.docker.com/linux'
-dockerinstall::repo_os: ~
 dockerinstall::root_dir: ~
 dockerinstall::selinux_enabled: false
-dockerinstall::service_config: ~
 dockerinstall::service_config_template: ~
 dockerinstall::service_enable: true
 dockerinstall::service_ensure: 'running'
@@ -62,7 +60,6 @@ dockerinstall::service_overrides_config: '/etc/systemd/system/docker.service.d/s
 dockerinstall::service_overrides_template: 'dockerinstall/etc/systemd/system/docker.service.d/service-overrides.conf.erb'
 dockerinstall::socket_bind: 'unix:///var/run/docker.sock'
 dockerinstall::socket_group: ~
-dockerinstall::storage_config: ~
 dockerinstall::storage_config_template: 'dockerinstall/docker-storage.erb'
 dockerinstall::storage_driver: ~
 dockerinstall::tcp_bind: ~

@@ -9,6 +9,16 @@ describe 'dockerinstall::config' do
 
       it { is_expected.to compile }
 
+      it {
+        is_expected.to contain_group('docker')
+          .that_requires('Package[docker]')
+      }
+
+      it {
+        is_expected.to contain_user('docker')
+          .that_requires('Package[docker]')
+      }
+
       context 'check bip option' do
         let(:params) do
           {

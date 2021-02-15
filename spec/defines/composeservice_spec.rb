@@ -3,12 +3,13 @@ require 'yaml'
 
 describe 'dockerinstall::composeservice' do
   let(:configuration) { { 'services' => { 'centos7curlbuild' => {} } }.to_yaml }
-  let(:rundir) { '/var/run/compose' }
   let(:libdir) { '/var/lib/compose' }
   let(:pre_condition) do
     <<-PRECOND
     class { 'dockerinstall': }
     class { 'dockerinstall::compose': }
+    # only for testing
+    file { '/var/run/compose': ensure => directory }
     PRECOND
   end
   let(:title) { 'curl/centos7curlbuild' }
@@ -20,25 +21,6 @@ describe 'dockerinstall::composeservice' do
 
   on_supported_os.each do |os, os_facts|
     context "on #{os}" do
-      # can not use File.stubs for directory? call
-      # workaround is File[/var/run/compose] resource declaration
-      if ['redhat-7-x86_64', 'centos-7-x86_64'].include?(os)
-        let(:rundir) { '/run/compose' }
-        let(:pre_condition) do
-          <<-PRECOND
-          class { 'dockerinstall': }
-          class { 'dockerinstall::compose': }
-          file { '/var/run/compose': ensure => directory, }
-          PRECOND
-        end
-      else
-        let(:pre_condition) do
-          <<-PRECOND
-          file { '/run/compose': ensure => directory, }
-          PRECOND
-        end
-      end
-
       let(:facts) { os_facts }
 
       it { is_expected.to compile }

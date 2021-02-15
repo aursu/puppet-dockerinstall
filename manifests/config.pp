@@ -58,15 +58,12 @@ class dockerinstall::config (
         }
 
         if $user_ensure == 'present' {
-          Group['docker'] -> User['docker']
+          Class['dockerinstall::install']
+            -> Group['docker']
+            -> User['docker']
         }
         else {
           User['docker'] -> Group['docker']
-        }
-
-        if $manage_package {
-          Package['docker'] -> Group['docker']
-          Package['docker'] -> User['docker']
         }
     }
 

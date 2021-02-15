@@ -10,7 +10,7 @@ class dockerinstall::params {
         $service_config_template = 'dockerinstall/docker.upstart.erb'
     }
     # predefined Docker Compose version - could  be overriden with dockerinstall::compose_version
-    $compose_version          = '1.27.4'
+    $compose_version          = '1.28.2'
     $compose_download_source  = 'https://github.com/docker/compose/releases/download'
 
     # docker compose project provides binaries only for x86_64 architecture
@@ -21,14 +21,28 @@ class dockerinstall::params {
     $compose_checksum_command = 'sha256sum'
     $download_tmpdir          = '/tmp'
     $compose_binary_path      = '/usr/local/bin/docker-compose'
+    $compose_rundir           = '/run/compose'
 
-    if  $facts['os']['name'] in ['RedHat', 'CentOS'] and
-        $facts['os']['release']['major'] in ['7', '8'] {
-        $compose_rundir = '/run/compose'
+    case $facts['os']['family'] {
+      'Debian': {
+        $repo_os = $facts['os']['name'] ? {
+          'Ubuntu' => 'ubuntu',
+          default  => 'debian',
+        }
+        $service_config = '/etc/default/docker'
+        $storage_config = '/etc/default/docker-storage'
+      }
+      # default is RedHat based systems (CentOS)
+      default: {
+        $repo_os = $facts['os']['name'] ? {
+          'Fedora' => 'fedora',
+          default  => 'centos',
+        }
+        $service_config = '/etc/sysconfig/docker'
+        $storage_config = '/etc/sysconfig/docker-storage'
+      }
     }
-    else {
-        $compose_rundir = '/var/run/compose'
-    }
+
     $compose_libdir = '/var/lib/compose'
 
     # Client authentication

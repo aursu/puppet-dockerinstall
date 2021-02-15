@@ -39,14 +39,6 @@ class dockerinstall::install (
             name   => $containerd_package_name,
         }
 
-        case $facts['os']['family'] {
-            'Debian': {
-                Apt::Source['docker'] -> Package['docker']
-            }
-            'RedHat': {
-                Yumrepo['docker'] -> Package['docker']
-            }
-            default: { }
-        }
+        Class['dockerinstall::repos'] -> Package['docker']
     }
 }
