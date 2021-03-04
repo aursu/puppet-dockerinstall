@@ -19,10 +19,10 @@ define dockerinstall::registry::clientauth (
 
   # https://docs.docker.com/engine/security/certificates/
   # /etc/docker/certs.d/
-  # └── my-https.registry.example.com          <-- Hostname without port
-  #    ├── client.cert
-  #    ├── client.key
-  #    └── ca.crt
+  # +-- my-https.registry.example.com          <-- Hostname without port
+  #    |-- client.cert
+  #    |-- client.key
+  #    +-- ca.crt
   if $server_port {
     $auth_certdir = "/etc/docker/certs.d/${server_name}:${server_port}"
   }

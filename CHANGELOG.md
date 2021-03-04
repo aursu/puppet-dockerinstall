@@ -165,3 +165,13 @@ All notable changes to this project will be documented in this file.
 * Adjusted module settings and dependencies
 
 **Known Issues**
+
+## Release 0.9.5
+
+**Features**
+
+**Bugfixes**
+
+* Added missed dependency class into dockerinstall::registry::clientauth
+
+**Known Issues**

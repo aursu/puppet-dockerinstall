@@ -9,6 +9,8 @@ class dockerinstall::profile::registry::clientauth (
           $registry = undef,
 )
 {
+  include dockerinstall::setup
+
   if $registry {
     $registry.each |$server_name| {
       dockerinstall::registry::clientauth { $server_name: }
