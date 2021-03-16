@@ -7,6 +7,7 @@ class dockerinstall (
     String  $containerd_package_name,
     String  $containerd_version,
     Boolean $manage_package,
+    Boolean $manage_cli,
     Dockerinstall::Repo
             $repo,
     String  $repo_location,

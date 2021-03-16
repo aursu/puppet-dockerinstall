@@ -14,6 +14,8 @@ class dockerinstall::install (
             $prerequired_packages    = $dockerinstall::prerequired_packages,
     String  $containerd_package_name = $dockerinstall::containerd_package_name,
     String  $containerd_version      = $dockerinstall::containerd_version,
+    Boolean $manage_cli              = $dockerinstall::manage_cli,
+    String  $cli_package_name        = $dockerinstall::cli_package_name,
 )
 {
     include dockerinstall::repos
@@ -32,6 +34,13 @@ class dockerinstall::install (
         package { 'docker':
             ensure => $version,
             name   => $package_name,
+        }
+
+        if $manage_cli {
+            package { 'docker-cli':
+                ensure => $version,
+                name   => $cli_package_name,
+            }
         }
 
         package { 'containerd.io':
