@@ -37,12 +37,12 @@ dockerinstall::docker_dir_ensure: directory
 dockerinstall::manage_os_users: true
 dockerinstall::manage_package: true
 dockerinstall::manage_cli: true
-dockerinstall::cli_package_name: 'docker-ce'
+dockerinstall::cli_package_name: 'docker-ce-cli'
 dockerinstall::manage_service: true
 dockerinstall::mtu: ~
 dockerinstall::no_proxy: ~
 dockerinstall::overlay2_override_kernel_check: false
-dockerinstall::package_name: 'docker-ce-cli'
+dockerinstall::package_name: 'docker-ce'
 dockerinstall::prerequired_packages: []
 dockerinstall::proxy: ~
 dockerinstall::registry_mirror: ~
