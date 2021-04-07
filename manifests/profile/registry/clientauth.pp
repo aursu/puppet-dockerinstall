@@ -9,6 +9,7 @@ class dockerinstall::profile::registry::clientauth (
           $registry = undef,
 )
 {
+  include dockerinstall
   include dockerinstall::setup
 
   if $registry {
