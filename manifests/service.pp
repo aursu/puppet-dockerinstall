@@ -126,7 +126,6 @@ class dockerinstall::service (
       enable     => $service_enable,
       hasstatus  => $service_hasstatus,
       hasrestart => $service_hasrestart,
-      alias      => 'docker',
     }
 
     if $service_config_template {

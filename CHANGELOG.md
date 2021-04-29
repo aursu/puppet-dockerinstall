@@ -175,3 +175,13 @@ All notable changes to this project will be documented in this file.
 * Added missed dependency class into dockerinstall::registry::clientauth
 
 **Known Issues**
+
+## Release 0.10.0
+
+**Features**
+
+Added containment for several calsses and resources 
+
+**Bugfixes**
+
+**Known Issues**

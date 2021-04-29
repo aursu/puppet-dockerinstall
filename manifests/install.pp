@@ -32,8 +32,9 @@ class dockerinstall::install (
         }
 
         package { 'docker':
-            ensure => $version,
-            name   => $package_name,
+            ensure  => $version,
+            name    => $package_name,
+            require => Class['dockerinstall::repos'],
         }
 
         if $manage_cli {
@@ -47,7 +48,5 @@ class dockerinstall::install (
             ensure => $containerd_version,
             name   => $containerd_package_name,
         }
-
-        Class['dockerinstall::repos'] -> Package['docker']
     }
 }

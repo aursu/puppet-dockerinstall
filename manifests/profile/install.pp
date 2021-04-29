@@ -24,4 +24,5 @@ class dockerinstall::profile::install (
     version            => $dockerd_version,
     containerd_version => $containerd_version,
   }
+  contain dockerinstall::install
 }

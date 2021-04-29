@@ -59,17 +59,24 @@ class dockerinstall::compose (
           notify  => File[$binary_path],
         ;
       }
-    }
 
-    # install binary into specified location (by default is
-    # /usr/local/bin/docker-compose)
-    file { $binary_path:
-        ensure => $binary_ensure,
+      $compose_setup = {
         source => "file://${tmpdir}/${download_name}",
         mode   => '0755',
         owner  => 'root',
         group  => 'root',
-        alias  => 'docker-compose',
+      }
+    }
+    else {
+      $compose_setup = {}
+    }
+
+    # install binary into specified location (by default is
+    # /usr/local/bin/docker-compose)
+    file { 'docker-compose':
+      *      => $compose_setup,
+      ensure => $binary_ensure,
+      path   => $binary_path,
     }
 
     file { [$rundir, $libdir]:

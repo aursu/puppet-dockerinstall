@@ -11,16 +11,12 @@ class dockerinstall::profile::decomission {
     repo_ensure => 'absent',
   }
 
-  class { 'dockerinstall::setup':
-    docker_dir_ensure     => 'absent',
-    manage_docker_tlsdir  => false,
-    manage_docker_certdir => false,
-  }
-
   class { 'dockerinstall::install':
     version              => 'absent',
+    containerd_version   => 'absent',
     prerequired_packages => [],
   }
+  contain dockerinstall::install
 
   class { 'dockerinstall::config':
     config_ensure  => 'absent',
@@ -28,6 +24,7 @@ class dockerinstall::profile::decomission {
     group_ensure   => 'absent',
     manage_package => false,
   }
+  contain dockerinstall::config
 
   class { 'dockerinstall::service':
     service_ensure        => 'stopped',
@@ -36,6 +33,7 @@ class dockerinstall::profile::decomission {
     manage_users          => false,
     manage_package        => false,
   }
+  contain dockerinstall::service
 
   class { 'dockerinstall::compose':
     binary_ensure => 'absent',

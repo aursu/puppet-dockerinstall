@@ -79,9 +79,10 @@ class dockerinstall::profile::daemon (
         * =>  $tls_settings +
               $tcp_settings,
     }
+    contain dockerinstall::service
 
     class { 'dockerinstall::compose': }
 
-    Class['dockerinstall::install'] ~> Class['dockerinstall::service']
+    Class['dockerinstall::profile::install'] ~> Class['dockerinstall::service']
 }
 
