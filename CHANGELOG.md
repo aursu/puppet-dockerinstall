@@ -180,7 +180,7 @@ All notable changes to this project will be documented in this file.
 
 **Features**
 
-Added containment for several calsses and resources 
+* Added containment for several calsses and resources
 
 **Bugfixes**
 
