@@ -12,6 +12,7 @@ class dockerinstall::install (
     Boolean $manage_package          = $dockerinstall::manage_package,
     Array[String]
             $prerequired_packages    = $dockerinstall::prerequired_packages,
+    String  $prerequired_ensure      = 'installed',
     String  $containerd_package_name = $dockerinstall::containerd_package_name,
     String  $containerd_version      = $dockerinstall::containerd_version,
     Boolean $manage_cli              = $dockerinstall::manage_cli,
@@ -35,7 +36,7 @@ class dockerinstall::install (
     $managed_packages = $prerequired_packages - [ $package_name, $containerd_package_name, 'docker', 'containerd.io']
     $managed_packages.each |String $reqp| {
       package { $reqp:
-        ensure => installed,
+        ensure => $prerequired_ensure,
         before => Package['docker'],
       }
     }
@@ -51,6 +52,8 @@ class dockerinstall::install (
         ensure => $docker_version,
         name   => $cli_package_name,
       }
+
+      Package['docker'] -> Package['docker-cli']
     }
 
     package { 'containerd.io':
