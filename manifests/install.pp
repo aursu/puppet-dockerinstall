@@ -18,36 +18,44 @@ class dockerinstall::install (
     String  $cli_package_name        = $dockerinstall::cli_package_name,
 )
 {
-    include dockerinstall::setup
+  include dockerinstall::setup
 
-    if $manage_package {
-        include dockerinstall::repos
+  if $manage_package {
+    include dockerinstall::repos
 
-        # exclude docker and conteinerd.io from list of additional packages
-        $managed_packages = $prerequired_packages - [ $package_name, $containerd_package_name, 'docker', 'containerd.io']
-        $managed_packages.each |String $reqp| {
-            package { $reqp:
-                ensure => installed,
-                before => Package['docker'],
-            }
-        }
-
-        package { 'docker':
-            ensure  => $version,
-            name    => $package_name,
-            require => Class['dockerinstall::repos'],
-        }
-
-        if $manage_cli {
-            package { 'docker-cli':
-                ensure => $version,
-                name   => $cli_package_name,
-            }
-        }
-
-        package { 'containerd.io':
-            ensure => $containerd_version,
-            name   => $containerd_package_name,
-        }
+    if $containerd_version == 'absent' {
+      $docker_version = 'absent'
+      Package['docker'] -> Package['containerd.io']
     }
+    else {
+      $docker_version = $version
+    }
+
+    # exclude docker and conteinerd.io from list of additional packages
+    $managed_packages = $prerequired_packages - [ $package_name, $containerd_package_name, 'docker', 'containerd.io']
+    $managed_packages.each |String $reqp| {
+      package { $reqp:
+        ensure => installed,
+        before => Package['docker'],
+      }
+    }
+
+    package { 'docker':
+      ensure  => $docker_version,
+      name    => $package_name,
+      require => Class['dockerinstall::repos'],
+    }
+
+    if $manage_cli {
+      package { 'docker-cli':
+        ensure => $docker_version,
+        name   => $cli_package_name,
+      }
+    }
+
+    package { 'containerd.io':
+      ensure => $containerd_version,
+      name   => $containerd_package_name,
+    }
+  }
 }

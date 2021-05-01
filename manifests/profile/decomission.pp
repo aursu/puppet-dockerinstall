@@ -12,6 +12,8 @@ class dockerinstall::profile::decomission {
   }
 
   class { 'dockerinstall::install':
+    manage_package       => true,
+    manage_cli           => true,
     version              => 'absent',
     containerd_version   => 'absent',
     prerequired_packages => [],
@@ -27,6 +29,7 @@ class dockerinstall::profile::decomission {
   contain dockerinstall::config
 
   class { 'dockerinstall::service':
+    manage_service        => true,
     service_ensure        => 'stopped',
     service_config_ensure => 'absent',
     service_enable        => false,
