@@ -185,3 +185,13 @@ All notable changes to this project will be documented in this file.
 **Bugfixes**
 
 **Known Issues**
+
+## Release 0.10.1
+
+**Features**
+
+**Bugfixes**
+
+* Added additional dependencies during decomission
+
+**Known Issues**
