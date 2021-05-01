@@ -11,9 +11,13 @@ class dockerinstall::profile::decomission {
     repo_ensure => 'absent',
   }
 
-  package { 'docker-ce-rootless-extras':
-    ensure => 'absent',
-    before => Class['dockerinstall::install'],
+  package {
+    'docker-ce-rootless-extras': ;
+    'docker-scan-plugin': ;
+    default:
+      ensure => 'absent',
+      before => Class['dockerinstall::install']
+    ;
   }
 
   class { 'dockerinstall::install':
