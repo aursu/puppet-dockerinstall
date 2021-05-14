@@ -60,5 +60,8 @@ class dockerinstall::install (
       ensure => $containerd_version,
       name   => $containerd_package_name,
     }
+
+    Class['dockerinstall::repos'] -> Package['docker']
+    Class['dockerinstall::repos'] -> Package['containerd.io']
   }
 }
