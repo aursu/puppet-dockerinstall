@@ -42,8 +42,8 @@ class dockerinstall::install (
     }
 
     package { 'docker':
-      ensure  => $docker_version,
-      name    => $package_name,
+      ensure => $docker_version,
+      name   => $package_name,
     }
 
     if $manage_cli {
