@@ -195,3 +195,13 @@ All notable changes to this project will be documented in this file.
 * Added additional dependencies during decomission
 
 **Known Issues**
+
+## Release 0.10.2
+
+**Features**
+
+* Default docker compose version set to 1.29.2
+
+**Bugfixes**
+
+**Known Issues**
