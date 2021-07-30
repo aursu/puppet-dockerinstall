@@ -29,6 +29,8 @@ class dockerinstall::config (
     String  $user_ensure       = 'present',
     String  $group_ensure      = 'present',
     String  $config_ensure     = 'file',
+    Boolean $system_user       = true,
+    Boolean $system_group      = true,
 )
 {
     include dockerinstall::install
@@ -37,6 +39,7 @@ class dockerinstall::config (
         group { 'docker':
             ensure => $group_ensure,
             name   => $group,
+            system => $system_group,
         }
 
         $docker_users_list = $docker_users ? {
@@ -54,7 +57,9 @@ class dockerinstall::config (
             $users:
               tag => 'docker',
             ;
-            'docker': ;
+            'docker':
+              system => $system_user,
+            ;
         }
 
         if $user_ensure == 'present' {

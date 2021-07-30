@@ -196,6 +196,7 @@ define dockerinstall::webservice (
     if $decomission {
       file { $project_secrets:
         ensure => absent,
+        force  => true,
       }
       file { "${project_secrets}/${env_name}.env":
         ensure  => absent,
