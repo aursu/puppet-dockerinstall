@@ -215,3 +215,14 @@ All notable changes to this project will be documented in this file.
 **Bugfixes**
 
 **Known Issues**
+
+## Release 0.11.0
+
+**Features**
+
+* Added option selinux-enabled in daemon.json
+* Default Docker Compose version set to 2.2.2
+
+**Bugfixes**
+
+**Known Issues**

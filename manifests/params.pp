@@ -10,7 +10,7 @@ class dockerinstall::params {
         $service_config_template = 'dockerinstall/docker.upstart.erb'
     }
     # predefined Docker Compose version - could  be overriden with dockerinstall::compose_version
-    $compose_version          = '1.29.2'
+    $compose_version          = '2.2.2'
     $compose_download_source  = 'https://github.com/docker/compose/releases/download'
 
     # docker compose project provides binaries only for x86_64 architecture

@@ -2,6 +2,9 @@
 #
 # Docker config setup (daemon.json)
 #
+# @param selinux
+#   Whether to enable selinux support
+#
 # @example
 #   include dockerinstall::config
 class dockerinstall::config (
