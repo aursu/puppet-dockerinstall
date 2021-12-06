@@ -136,7 +136,7 @@ Puppet::Type.type(:dockerservice).provide(
     when %r{^https?://}
       # https://docs.docker.com/engine/reference/commandline/build/#git-repositories
       # https://docs.docker.com/engine/reference/commandline/build/#tarball-contexts
-      unless context =~ %r{\.git(#.+)?$}
+      unless context.match?(%r{\.git(#.+)?$})
         raise 'Docker build context must be valid Git repo URL'
       end
     when %r{^/}
