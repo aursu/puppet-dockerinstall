@@ -45,6 +45,26 @@ describe 'dockerinstall::config' do
         }
       end
 
+      context 'check selinux option' do
+        it {
+          is_expected.to contain_file('/etc/docker/daemon.json')
+            .with_content(%r{\{\}})
+        }
+
+        context 'check selinux option is set' do
+          let(:params) do
+            {
+              selinux: false,
+            }
+          end
+
+          it {
+            is_expected.to contain_file('/etc/docker/daemon.json')
+              .with_content(%r{\{"selinux-enabled":false\}})
+          }
+        end
+      end
+
       context 'check devicemapper storage options' do
         let(:params) do
           {

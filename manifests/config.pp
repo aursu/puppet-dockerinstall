@@ -15,6 +15,8 @@ class dockerinstall::config (
             $bip               = undef,
     Optional[Integer]
             $mtu               = undef,
+    Optional[Boolean]
+            $selinux           = undef,
     Optional[Dockerinstall::StorageDriver]
             $storage_driver    = undef,
     Optional[
@@ -89,7 +91,8 @@ class dockerinstall::config (
       dockerinstall::option('exec-opts', $exec_opts) +
       dockerinstall::option('log-driver', $log_driver) +
       dockerinstall::option('log-opts', $log_opts) +
-      dockerinstall::option('storage-opts', $storage_opts)
+      dockerinstall::option('storage-opts', $storage_opts) +
+      dockerinstall::option('selinux-enabled', $selinux)
 
     file { '/etc/docker/daemon.json':
       ensure  => $config_ensure,

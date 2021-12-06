@@ -9,6 +9,8 @@ class dockerinstall::profile::daemon (
           $network_bridge_ip = undef,
   Optional[Integer]
           $mtu               = undef,
+  Optional[Boolean]
+          $selinux           = undef,
   Optional[String]
           $storage_driver    = undef,
   Optional[Array[String]]
@@ -34,6 +36,7 @@ class dockerinstall::profile::daemon (
     class { 'dockerinstall::config':
       bip            => $network_bridge_ip,
       mtu            => $mtu,
+      selinux        => $selinux,
       storage_driver => $storage_driver,
       storage_opts   => $storage_opts,
       cgroup_driver  => $cgroup_driver,
