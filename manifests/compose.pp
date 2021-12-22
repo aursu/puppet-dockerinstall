@@ -54,7 +54,8 @@ class dockerinstall::compose (
         # download checksm file into temporary directory
         'docker-compose-checksum':
           command => "curl -L ${download_url_base}/${checksum_name} -o ${checksum_version_name}",
-          creates => $checksum_download_path,
+          # creates => $checksum_download_path,
+          unless  => "grep ${download_name} ${checksum_download_path}",
         ;
         # download binary if checksum not match
         'docker-compose-download':
