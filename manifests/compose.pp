@@ -33,7 +33,12 @@ class dockerinstall::compose (
     }
 
     # in URL base folder lcated Docker Compose binary and checksum
-    $download_url_base = "${download_source}/${download_version}"
+    if versioncmp($download_version, '2.0.0') >= 0 {
+      $download_url_base = "${download_source}/v${download_version}"
+    }
+    else {
+      $download_url_base = "${download_source}/${download_version}"
+    }
 
     # we store all checksum files in temporary folder, therefore add suffix to
     # not overwrite
