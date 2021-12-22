@@ -24,10 +24,12 @@ class dockerinstall::globals (
   if versioncmp($compose_download_version, '2.0.0') >= 0 {
     $compose_download_name    = $dockerinstall::params::composev2_download_name
     $compose_download_urlbase = "${compose_download_source}/v${compose_download_version}"
+    $install_plugin           = true
   }
   else {
     $compose_download_name    = $dockerinstall::params::compose_download_name
     $compose_download_urlbase = "${compose_download_source}/${compose_download_version}"
+    $install_plugin           = false
   }
   $compose_checksum_name      = "${compose_download_name}.sha256"
 }

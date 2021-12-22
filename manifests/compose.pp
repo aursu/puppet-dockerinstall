@@ -2,6 +2,10 @@
 #
 # @summary Docker Compose installation
 #
+# @param install_plugin
+#   Whether to install Docker Compose as docker CLI plugin
+#   It works only for Docker Compose v2+
+#
 # @example
 #   include dockerinstall::compose
 class dockerinstall::compose (
@@ -17,12 +21,15 @@ class dockerinstall::compose (
     Stdlib::Absolutepath
             $libdir           = $dockerinstall::params::compose_libdir,
     String  $binary_ensure    = 'file',
+    Boolean $install_plugin   = $dockerinstall::globals::install_plugin,
 ) inherits dockerinstall::globals
 {
     $download_version  = $dockerinstall::globals::compose_download_version
 
     # in URL base folder located Docker Compose binary and checksum
     $download_url_base = $dockerinstall::globals::compose_download_urlbase
+
+    $plugin_path       = $dockerinstall::params::compose_plugin_path
 
     # we store all checksum files in temporary folder, therefore add suffix to
     # not overwrite
@@ -46,7 +53,7 @@ class dockerinstall::compose (
           command => "curl -L ${download_url_base}/${download_name} -o ${download_name}",
           unless  => "${checksum_command} -c ${checksum_version_name}",
           require => Exec['docker-compose-checksum'],
-          notify  => File[$binary_path],
+          notify  => File['docker-compose'],
         ;
       }
 
@@ -55,6 +62,18 @@ class dockerinstall::compose (
         mode   => '0755',
         owner  => 'root',
         group  => 'root',
+      }
+
+      if $install_plugin {
+        file { 'docker-compose-plugin':
+          ensure  => file,
+          source  => "file://${tmpdir}/${download_name}",
+          mode    => '0755',
+          owner   => 'root',
+          group   => 'root',
+          path    => $plugin_path,
+          require => Exec['docker-compose-download'],
+        }
       }
     }
     else {

@@ -9,6 +9,9 @@ class dockerinstall::params {
     else {
         $service_config_template = 'dockerinstall/docker.upstart.erb'
     }
+
+    $docker_plugins_dir = '/usr/libexec/docker/cli-plugins'
+
     # predefined Docker Compose version - could  be overriden with dockerinstall::compose_version
     $compose_version          = '2.2.2'
     $compose_download_source  = 'https://github.com/docker/compose/releases/download'
@@ -22,6 +25,7 @@ class dockerinstall::params {
     $download_tmpdir          = '/tmp'
     $compose_binary_path      = '/usr/local/bin/docker-compose'
     $compose_rundir           = '/run/compose'
+    $compose_plugin_path      = "${docker_plugins_dir}/docker-compose"
 
     case $facts['os']['family'] {
       'Debian': {
