@@ -5,11 +5,8 @@
 # @example
 #   include dockerinstall::compose
 class dockerinstall::compose (
-    Optional[String]
-            $version          = $dockerinstall::compose_version,
-    String  $download_source  = $dockerinstall::params::compose_download_source,
-    String  $download_name    = $dockerinstall::params::compose_download_name,
-    String  $checksum_name    = $dockerinstall::params::compose_checksum_name,
+    String  $download_name    = $dockerinstall::globals::compose_download_name,
+    String  $checksum_name    = $dockerinstall::globals::compose_checksum_name,
     String  $checksum_command = $dockerinstall::params::compose_checksum_command,
     Stdlib::Absolutepath
             $tmpdir           = $dockerinstall::params::download_tmpdir,
@@ -20,25 +17,12 @@ class dockerinstall::compose (
     Stdlib::Absolutepath
             $libdir           = $dockerinstall::params::compose_libdir,
     String  $binary_ensure    = 'file',
-) inherits dockerinstall::params
+) inherits dockerinstall::globals
 {
-    # we allow user to not care about compose version and keep it default
-    # (specified in params)
-    # $download_version - either user specified or default
-    if $version {
-        $download_version = $version
-    }
-    else {
-        $download_version = $dockerinstall::params::compose_version
-    }
+    $download_version  = $dockerinstall::globals::compose_download_version
 
-    # in URL base folder lcated Docker Compose binary and checksum
-    if versioncmp($download_version, '2.0.0') >= 0 {
-      $download_url_base = "${download_source}/v${download_version}"
-    }
-    else {
-      $download_url_base = "${download_source}/${download_version}"
-    }
+    # in URL base folder located Docker Compose binary and checksum
+    $download_url_base = $dockerinstall::globals::compose_download_urlbase
 
     # we store all checksum files in temporary folder, therefore add suffix to
     # not overwrite
