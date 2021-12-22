@@ -21,7 +21,7 @@ Puppet::Type.type(:dockerservice).provide(
                   rescue Puppet::ExecutionFailure
                     false
                   else
-                    true
+                    compose('--version').match?(%r{version 1\.[0-9]+\.[0-9]+})
                   end
   end
 
