@@ -5,8 +5,9 @@
 # @example
 #   include dockerinstall::globals
 class dockerinstall::globals (
-  String $compose_version         = $dockerinstall::compose_version,
-  String $compose_download_source = $dockerinstall::params::compose_download_source,
+  String  $compose_download_source = $dockerinstall::params::compose_download_source,
+  Optional[String]
+          $compose_version         = $dockerinstall::compose_version,
 ) inherits dockerinstall::params
 {
   # we allow user to not care about compose version and keep it default
