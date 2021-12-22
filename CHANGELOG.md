@@ -226,3 +226,16 @@ All notable changes to this project will be documented in this file.
 **Bugfixes**
 
 **Known Issues**
+
+## Release 0.12.0
+
+**Features**
+
+* Added ability to install Docker Compose CLI plugin fro Compose v2+
+
+**Bugfixes**
+
+* Fixed Docker Compose v2+ installation
+* Fixed Dockerservice provider to support Docker Compose v2+
+
+**Known Issues**
