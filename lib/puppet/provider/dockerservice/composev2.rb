@@ -30,7 +30,7 @@ Puppet::Type.type(:dockerservice).provide(
     # Don't fail when the exit status is not 0.
     output = ucommand(:status, false)
     if output
-      services = output.split(%r{\n}).select { |l| l.start_with?("#{@resource[:project]}_#{@resource[:name]}_") }
+      services = output.split(%r{\n}).select { |l| l.start_with?("#{@resource[:project]}-#{@resource[:name]}-") || l.start_with?("#{@resource[:project]}_#{@resource[:name]}_") }
       services.each do |l|
         # paused | restarting | removing | running | dead | created | exited
         m = %r{\s+(paused|restarting|removing|created|running( \(.+\))?|exited \([-0-9]+\)|dead \([-0-9]+\))\s+}.match(l)

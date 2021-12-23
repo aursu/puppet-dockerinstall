@@ -239,3 +239,14 @@ All notable changes to this project will be documented in this file.
 * Fixed Dockerservice provider to support Docker Compose v2+
 
 **Known Issues**
+
+## Release 0.12.1
+
+**Features**
+
+**Bugfixes**
+
+* Fixed dockerservice provider for never version docker compose
+  container name and project separator now is "-" instead "_"
+
+**Known Issues**
