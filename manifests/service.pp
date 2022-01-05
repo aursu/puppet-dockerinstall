@@ -115,7 +115,6 @@ class dockerinstall::service (
     String  $service_config_ensure          = 'file',
 )
 {
-  include systemd::systemctl::daemon_reload
   include dockerinstall::config
   include dockerinstall::params
 
@@ -148,22 +147,19 @@ class dockerinstall::service (
     }
 
     if $facts['systemd'] {
-      file { '/etc/systemd/system/docker.service.d':
-        ensure => directory,
-      }
-
       if $service_overrides_config and $service_overrides_template {
-        file { $service_overrides_config:
-          ensure  => $service_config_ensure,
-          content => template($service_overrides_template),
-          notify  => Class['systemd::systemctl::daemon_reload'],
+        systemd::dropin_file { 'docker-service-overrides':
+          ensure   => $service_config_ensure,
+          filename => 'service-overrides.conf',
+          unit     => 'docker.service',
+          content  => template($service_overrides_template),
         }
         if $service_config {
-          File[$service_config] -> File[$service_overrides_config]
+          File[$service_config] -> Systemd::Dropin_file['docker-service-overrides']
         }
         if $service_config_ensure == 'file' {
           Class['dockerinstall::config']
-            -> File[$service_overrides_config]
+            -> Systemd::Dropin_file['docker-service-overrides']
             -> Service['docker']
         }
       }

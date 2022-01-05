@@ -1,6 +1,6 @@
 {
   "name": "aursu-dockerinstall",
-  "version": "0.12.1",
+  "version": "0.13.0",
   "author": "aursu",
   "summary": "Docker CE installation and start",
   "license": "Apache-2.0",
@@ -41,7 +41,7 @@
       "version_requirement": ">= 4.13.0 < 9.0.0"
     },
     {
-      "name": "camptocamp/systemd",
+      "name": "puppet/systemd",
       "version_requirement": ">= 2.9.0 < 4.0.0"
     }
   ],

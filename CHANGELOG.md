@@ -250,3 +250,15 @@ All notable changes to this project will be documented in this file.
   container name and project separator now is "-" instead "_"
 
 **Known Issues**
+
+## Release 0.13.0
+
+**Features**
+
+* Updated fixtures and module meta
+
+**Bugfixes**
+
+* Removed dependency on systemd::systemctl::daemon_reload
+
+**Known Issues**
