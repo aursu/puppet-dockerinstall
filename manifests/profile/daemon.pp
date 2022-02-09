@@ -87,6 +87,6 @@ class dockerinstall::profile::daemon (
     class { 'dockerinstall::compose': }
 
     Class['dockerinstall::profile::install'] ~> Class['dockerinstall::service']
-    Class['dockerinstall::profile::install'] ~> Class['dockerinstall::compose']
+    Class['dockerinstall::profile::install'] -> Class['dockerinstall::compose']
 }
 
