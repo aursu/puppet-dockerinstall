@@ -262,3 +262,13 @@ All notable changes to this project will be documented in this file.
 * Removed dependency on systemd::systemctl::daemon_reload
 
 **Known Issues**
+
+## Release 0.13.1
+
+**Features**
+
+* Added repository metadata update commands
+
+**Bugfixes**
+
+**Known Issues**

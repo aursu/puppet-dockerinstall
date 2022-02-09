@@ -20,6 +20,7 @@ class dockerinstall::install (
 )
 {
   include dockerinstall::setup
+  include dockerinstall::repos::update
 
   if $manage_package {
     include dockerinstall::repos
@@ -60,7 +61,9 @@ class dockerinstall::install (
       name   => $containerd_package_name,
     }
 
-    Class['dockerinstall::repos'] -> Package['docker']
-    Class['dockerinstall::repos'] -> Package['containerd.io']
+    Class['dockerinstall::repos'] ~> Class['dockerinstall::repos::update']
+
+    Class['dockerinstall::repos::update'] -> Package['docker']
+    Class['dockerinstall::repos::update'] -> Package['containerd.io']
   }
 }
