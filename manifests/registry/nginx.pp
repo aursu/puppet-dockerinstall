@@ -182,6 +182,28 @@ class dockerinstall::registry::nginx (
       403 => '/registry-denied.json',
     },
     locations                 => {
+      # added location for exect /v2/ request
+      '= /v2/'                  => {
+        raw_prepend        => [
+                                file('dockerinstall/registry/nginx/chunks/restrict-old-docker-access.conf'),
+                              ],
+        add_header         => {
+          # If $docker_distribution_api_version is empty, the header is not added.
+          # See the map directive above where this variable is defined.
+          'Docker-Distribution-Api-Version' => { '$docker_distribution_api_version' => 'always' },
+        },
+        proxy              => 'http://docker-registry',
+        proxy_set_header   => [
+                                # required for docker client's sake
+                                'Host              $http_host',
+                                # pass on real client's IP
+                                'X-Real-IP         $remote_addr',
+                                'X-Forwarded-For   $proxy_add_x_forwarded_for',
+                                'X-Forwarded-Proto $scheme',
+                              ] +
+                              $auth_proxy_header,
+        proxy_read_timeout => 900,
+      },
       '/v2/'                  => {
         raw_prepend        => [
                                 file('dockerinstall/registry/nginx/chunks/restrict-old-docker-access.conf'),
