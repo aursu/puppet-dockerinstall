@@ -25,6 +25,10 @@ class dockerinstall::install (
   if $manage_package {
     include dockerinstall::repos
 
+    # The Docker daemon relies on a OCI compliant runtime (invoked via the
+    # containerd daemon) as its interface to the Linux kernel namespaces,
+    # cgroups, and SELinux.
+    # By default, the Docker daemon automatically starts containerd
     if $containerd_version == 'absent' {
       $docker_version = 'absent'
       Package['docker'] -> Package['containerd.io']
@@ -47,7 +51,7 @@ class dockerinstall::install (
       name   => $package_name,
     }
 
-    if $manage_cli {
+    if $manage_cli and $cli_package_name {
       package { 'docker-cli':
         ensure => $docker_version,
         name   => $cli_package_name,

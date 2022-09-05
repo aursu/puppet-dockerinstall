@@ -13,7 +13,7 @@ class dockerinstall::params {
     $docker_plugins_dir = '/usr/libexec/docker/cli-plugins'
 
     # predefined Docker Compose version - could  be overriden with dockerinstall::compose_version
-    $compose_version          = '2.2.2'
+    $compose_version          = '2.10.2'
     $compose_download_source  = 'https://github.com/docker/compose/releases/download'
 
     # docker compose project provides binaries only for x86_64 architecture
@@ -29,9 +29,20 @@ class dockerinstall::params {
 
     case $facts['os']['family'] {
       'Debian': {
-        $repo_os = $facts['os']['name'] ? {
-          'Ubuntu' => 'ubuntu',
-          default  => 'debian',
+        case $facts['os']['name'] {
+          'Ubuntu': {
+            $repo_os = 'ubuntu'
+            # case $facts['os']['release']['major'] {
+            #   # Ubuntu 20.04
+            #   '20.04': {
+            #   }
+            #   default: {
+            #   }
+            # }
+          }
+          default: {
+            $repo_os = 'debian'
+          }
         }
         $service_config = '/etc/default/docker'
         $storage_config = '/etc/default/docker-storage'
