@@ -272,3 +272,15 @@ All notable changes to this project will be documented in this file.
 **Bugfixes**
 
 **Known Issues**
+
+## Release 0.13.2
+
+**Features**
+
+* Updated composer
+
+**Bugfixes**
+
+* Fixed athentication issue
+
+**Known Issues**
