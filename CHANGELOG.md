@@ -284,3 +284,13 @@ All notable changes to this project will be documented in this file.
 * Fixed athentication issue
 
 **Known Issues**
+
+## Release 0.13.3
+
+**Features**
+
+**Bugfixes**
+
+* Updated version to cover Ubuntu versions
+
+**Known Issues**
