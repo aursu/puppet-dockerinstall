@@ -41,3 +41,5 @@ docker_swarm:
   JoinTokens:
     Worker: "SWMTKN-1-2pt66je5c3fejw4adu8kcsoeid4rkk9fdy1s1bibm9plzuq8d0-ebcr22sn5z7cf9f76098v3gef"
     Manager: "SWMTKN-1-2pt66je5c3fejw4adu8kcsoeid4rkk9fdy1s1bibm9plzuq8d0-ch26mhdxkas5eci9ai80yb67m"
+
+clientcert: steves-macbook-pro.local
