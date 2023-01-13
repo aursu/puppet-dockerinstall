@@ -19,8 +19,7 @@ class dockerinstall::registry::nginx (
   Boolean $global_ssl_redirect   = true,
   Stdlib::Unixpath
           $nginx_tokens_map      = $dockerinstall::registry::params::nginx_tokens_map,
-) inherits dockerinstall::registry::params
-{
+) inherits dockerinstall::registry::params {
   include dockerinstall::registry::auth_token
   $auth_token_enable = $dockerinstall::registry::auth_token::enable
 
@@ -38,9 +37,9 @@ class dockerinstall::registry::nginx (
   }
 
   # Token based authentication
-  if $auth_token_enable  {
+  if $auth_token_enable {
     $auth_token_prepend = [
-      template('dockerinstall/registry/nginx/chunks/registry-auth.conf.erb')
+      template('dockerinstall/registry/nginx/chunks/registry-auth.conf.erb'),
     ]
   }
   else {
@@ -183,7 +182,7 @@ class dockerinstall::registry::nginx (
     },
     locations                 => {
       # added location for exect /v2/ request
-      '= /v2/'                  => {
+      '= /v2/'                => {
         raw_prepend        => [
                                 file('dockerinstall/registry/nginx/chunks/restrict-old-docker-access.conf'),
                               ],

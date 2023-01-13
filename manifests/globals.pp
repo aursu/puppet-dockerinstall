@@ -5,19 +5,17 @@
 # @example
 #   include dockerinstall::globals
 class dockerinstall::globals (
-  String  $compose_download_source = $dockerinstall::params::compose_download_source,
-  Optional[String]
-          $compose_version         = $dockerinstall::compose_version,
-) inherits dockerinstall::params
-{
+  String $compose_download_source = $dockerinstall::params::compose_download_source,
+  Optional[String] $compose_version = $dockerinstall::compose_version,
+) inherits dockerinstall::params {
   # we allow user to not care about compose version and keep it default
   # (specified in params)
   # $compose_download_version - either user specified or default
   if $compose_version {
-      $compose_download_version = $compose_version
+    $compose_download_version = $compose_version
   }
   else {
-      $compose_download_version = $dockerinstall::params::compose_version
+    $compose_download_version = $dockerinstall::params::compose_version
   }
 
   # in URL base folder lcated Docker Compose binary and checksum

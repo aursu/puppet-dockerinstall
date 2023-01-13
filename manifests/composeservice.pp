@@ -19,8 +19,7 @@ define dockerinstall::composeservice (
   Optional[Stdlib::Unixpath]
           $configuration_path = undef,
   Boolean $build_image        = false,
-)
-{
+) {
   include dockerinstall::params
   $libdir = $dockerinstall::params::compose_libdir
 
@@ -68,7 +67,7 @@ define dockerinstall::composeservice (
 
   if $project_basedir {
     unless  $project_basedir in ['/run', '/var/run', '/lib', '/var/lib', $libdir, $basedir] or
-            defined(File[$project_basedir]) {
+    defined(File[$project_basedir]) {
       file { $project_basedir:
         ensure => 'directory',
         force  => true,
