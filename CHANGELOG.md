@@ -295,11 +295,12 @@ All notable changes to this project will be documented in this file.
 
 **Known Issues**
 
-## Release 0.13.4
+## Release 0.13.5
 
 **Features**
 
 * Added flag to allow users access to Docker TLS assets
+* Added this flag  into `install` and  `daemon` pofiles
 
 **Bugfixes**
 
