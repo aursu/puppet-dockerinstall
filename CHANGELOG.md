@@ -294,3 +294,13 @@ All notable changes to this project will be documented in this file.
 * Updated version to cover Ubuntu versions
 
 **Known Issues**
+
+## Release 0.13.4
+
+**Features**
+
+* Added flag to allow users access to Docker TLS assets
+
+**Bugfixes**
+
+**Known Issues**
