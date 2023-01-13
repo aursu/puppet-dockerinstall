@@ -34,6 +34,7 @@ describe 'dockerinstall::setup' do
             users_access: true,
           }
         end
+
         it {
           is_expected.to contain_file('/etc/docker/tls')
             .with_ensure('directory')
@@ -47,6 +48,7 @@ describe 'dockerinstall::setup' do
             docker_dir_ensure: 'absent',
           }
         end
+
         it {
           is_expected.to contain_file('/etc/docker')
             .with_ensure('absent')
