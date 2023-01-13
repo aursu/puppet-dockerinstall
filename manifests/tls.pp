@@ -5,10 +5,9 @@
 # @example
 #   include dockerinstall::tls
 class dockerinstall::tls (
-  Stdlib::Unixpath
-          $docker_tlsdir = $dockerinstall::params::docker_tlsdir,
-) inherits dockerinstall::params
-{
+  Stdlib::Unixpath $docker_tlsdir = $dockerinstall::params::docker_tlsdir,
+  Boolean $users_access = $dockerinstall::tls_users_access,
+) inherits dockerinstall::params {
   include dockerinstall::params
 
   $localcacert = $dockerinstall::params::localcacert
@@ -26,18 +25,25 @@ class dockerinstall::tls (
 
   # CA certificate
   file { "${docker_tlsdir}/ca.pem":
-      source  => "file://${localcacert}",
+    source  => "file://${localcacert}",
   }
 
   # Client certificate
   file { "${docker_tlsdir}/cert.pem":
-      source  => "file://${hostcert}",
+    source  => "file://${hostcert}",
+  }
+
+  if $users_access {
+    $tls_key_mode = '0644'
+  }
+  else {
+    $tls_key_mode = '0400'
   }
 
   # Client private key
   file { "${docker_tlsdir}/key.pem":
-      source => "file://${hostprivkey}",
-      owner  => 'root',
-      mode   => '0400',
+    source => "file://${hostprivkey}",
+    owner  => 'root',
+    mode   => $tls_key_mode,
   }
 }

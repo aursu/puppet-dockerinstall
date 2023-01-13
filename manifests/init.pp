@@ -117,11 +117,11 @@ class dockerinstall (
             $service_config_template,
     Optional[String]
             $storage_config_template,
+    Boolean $tls_users_access,
     Optional[String]
             $service_config                 = $dockerinstall::params::service_config,
     Optional[String]
             $storage_config                 = $dockerinstall::params::storage_config,
     Dockerinstall::RepoOS
             $repo_os                        = $dockerinstall::params::repo_os,
-) inherits dockerinstall::params
-{}
+) inherits dockerinstall::params {}

@@ -70,6 +70,7 @@ dockerinstall::tls_cert: '/etc/docker/tls/cert.pem'
 dockerinstall::tls_enable: false
 dockerinstall::tls_key: '/etc/docker/tls/key.pem'
 dockerinstall::tls_verify: true
+dockerinstall::tls_users_access: false
 dockerinstall::tmp_dir: ~
 dockerinstall::version: 'installed'
 dockerinstall::containerd_package_name: 'containerd.io'
