@@ -21,8 +21,7 @@ class dockerinstall::profile::registry (
   Boolean $manage_nginx_core      = true,
   Boolean $manage_web_user        = true,
   Boolean $global_ssl_redirect    = true,
-)
-{
+) {
   include tlsinfo
   include dockerinstall::registry::base
 
