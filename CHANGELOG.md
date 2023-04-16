@@ -305,3 +305,13 @@ All notable changes to this project will be documented in this file.
 **Bugfixes**
 
 **Known Issues**
+
+## Release 0.13.6
+
+**Features**
+
+* Docker registry default version 2.8.1
+
+**Bugfixes**
+
+**Known Issues**

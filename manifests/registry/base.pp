@@ -5,7 +5,7 @@
 # @example
 #   include dockerinstall::registry::base
 class dockerinstall::registry::base (
-    String  $docker_image   = 'registry:2.7.1',
+    String  $docker_image   = 'registry:2.8.1',
     Stdlib::Unixpath
             $data_directory = $dockerinstall::registry::params::data_directory,
 ) inherits dockerinstall::registry::params
