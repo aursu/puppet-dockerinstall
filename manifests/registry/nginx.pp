@@ -116,7 +116,7 @@ class dockerinstall::registry::nginx (
       file('dockerinstall/registry/nginx/chunks/enable-client-auth-token.conf'),
     ]
     $auth_proxy_header = [
-      'Authorization     $proxy_authorization'
+      'Authorization     $proxy_authorization',
     ]
   }
   # SSL/TLS client certificates auth only
