@@ -110,14 +110,10 @@ define dockerinstall::webservice (
   Boolean $manage_image         = false,
   Boolean $build_image          = false,
   String  $project_name         = $name,
-  Optional[String]
-          $service_name         = undef,
-  Optional[String]
-          $env_name             = undef,
-  Optional[Hash[String, String]]
-          $secrets              = undef,
-  Optional[Hash[String, String]]
-          $environment          = undef,
+  Optional[String] $service_name = undef,
+  Optional[String] $env_name = undef,
+  Optional[Hash[String, String]] $secrets = undef,
+  Optional[Hash[String, String]] $environment = undef,
   String  $compose_file_version = '3.8',
   Enum[
     'no',
@@ -125,16 +121,11 @@ define dockerinstall::webservice (
     'on-failure',
     'unless-stopped'
   ]       $restart              = 'always',
-  Optional[Array[String]]
-          $expose_ports         = undef,
-  Optional[Array[String]]
-          $docker_volume        = undef,
-  Optional[Array[String, 1]]
-          $docker_extra_hosts   = undef,
-  Optional[Array[String]]
-          $project_volumes      = undef,
-  Optional[Integer]
-          $docker_mtu           = undef,
+  Optional[Array[String]] $expose_ports = undef,
+  Optional[Array[String]] $docker_volume = undef,
+  Optional[Array[String, 1]] $docker_extra_hosts = undef,
+  Optional[Array[String]] $project_volumes = undef,
+  Optional[Integer] $docker_mtu = undef,
   Optional[
     Hash[
       String,
@@ -208,10 +199,10 @@ define dockerinstall::webservice (
       }
 
       file { "${project_secrets}/${env_name}.env":
-          ensure  => file,
-          content => template('dockerinstall/service/secrets.env.erb'),
-          notify  => Dockerservice[$project_title],
-          mode    => '0600',
+        ensure  => file,
+        content => template('dockerinstall/service/secrets.env.erb'),
+        notify  => Dockerservice[$project_title],
+        mode    => '0600',
       }
     }
   }

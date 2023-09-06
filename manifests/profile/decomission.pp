@@ -17,7 +17,7 @@ class dockerinstall::profile::decomission {
     default:
       ensure => 'absent',
       before => Class['dockerinstall::install']
-    ;
+      ;
   }
 
   class { 'dockerinstall::install':
@@ -52,6 +52,6 @@ class dockerinstall::profile::decomission {
   }
 
   Class['dockerinstall::service']
-    -> Class['dockerinstall::config']
-    -> Class['dockerinstall::install']
+  -> Class['dockerinstall::config']
+  -> Class['dockerinstall::install']
 }

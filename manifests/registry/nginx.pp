@@ -5,20 +5,17 @@
 # @example
 #   include dockerinstall::registry::nginx
 class dockerinstall::registry::nginx (
-  String  $server_name,
-  Boolean $ssl                   = false,
-  Optional[String]
-          $ssl_cert              = undef,
-  Optional[String]
-          $ssl_key               = undef,
-  Boolean $ssl_client_ca_auth    = false,
+  String $server_name,
+  Boolean $ssl = false,
+  Optional[String] $ssl_cert = undef,
+  Optional[String] $ssl_key = undef,
+  Boolean $ssl_client_ca_auth = false,
 
-  Boolean $manage_nginx_core     = true,
-  Boolean $manage_web_user       = true,
-  Boolean $manage_document_root  = true,
-  Boolean $global_ssl_redirect   = true,
-  Stdlib::Unixpath
-          $nginx_tokens_map      = $dockerinstall::registry::params::nginx_tokens_map,
+  Boolean $manage_nginx_core = true,
+  Boolean $manage_web_user = true,
+  Boolean $manage_document_root = true,
+  Boolean $global_ssl_redirect = true,
+  Stdlib::Unixpath $nginx_tokens_map = $dockerinstall::registry::params::nginx_tokens_map,
 ) inherits dockerinstall::registry::params {
   include dockerinstall::registry::auth_token
   $auth_token_enable = $dockerinstall::registry::auth_token::enable
@@ -53,14 +50,14 @@ class dockerinstall::registry::nginx (
       global_ssl_redirect  => $global_ssl_redirect,
       manage_map_dir       => true,
       http_raw_prepend     => [
-                                # Set a variable to help us decide if we need to add the
-                                # 'Docker-Distribution-Api-Version' header.
-                                # The registry always sets this header.
-                                # In the case of nginx performing auth, the header is unset
-                                # since nginx is auth-ing before proxying.
-                                file('dockerinstall/registry/nginx/chunks/dont-duplicate-registry-header.conf'),
-                              ] +
-                              $auth_token_prepend,
+        # Set a variable to help us decide if we need to add the
+        # 'Docker-Distribution-Api-Version' header.
+        # The registry always sets this header.
+        # In the case of nginx performing auth, the header is unset
+        # since nginx is auth-ing before proxying.
+        file('dockerinstall/registry/nginx/chunks/dont-duplicate-registry-header.conf'),
+      ] +
+      $auth_token_prepend,
     }
   }
   else {
@@ -97,7 +94,7 @@ class dockerinstall::registry::nginx (
   # Allow httpd to can network connect
   # Allow access by executing:
   # setsebool -P httpd_can_network_connect 1
-  if $facts['selinux'] {
+  if $facts['os']['selinux']['enabled'] {
     selinux::boolean { 'httpd_can_network_connect': }
   }
 
@@ -184,8 +181,8 @@ class dockerinstall::registry::nginx (
       # added location for exect /v2/ request
       '= /v2/'                => {
         raw_prepend        => [
-                                file('dockerinstall/registry/nginx/chunks/restrict-old-docker-access.conf'),
-                              ],
+          file('dockerinstall/registry/nginx/chunks/restrict-old-docker-access.conf'),
+        ],
         add_header         => {
           # If $docker_distribution_api_version is empty, the header is not added.
           # See the map directive above where this variable is defined.
@@ -193,21 +190,21 @@ class dockerinstall::registry::nginx (
         },
         proxy              => 'http://docker-registry',
         proxy_set_header   => [
-                                # required for docker client's sake
-                                'Host              $http_host',
-                                # pass on real client's IP
-                                'X-Real-IP         $remote_addr',
-                                'X-Forwarded-For   $proxy_add_x_forwarded_for',
-                                'X-Forwarded-Proto $scheme',
-                              ] +
-                              $auth_proxy_header,
+          # required for docker client's sake
+          'Host              $http_host',
+          # pass on real client's IP
+          'X-Real-IP         $remote_addr',
+          'X-Forwarded-For   $proxy_add_x_forwarded_for',
+          'X-Forwarded-Proto $scheme',
+        ] +
+        $auth_proxy_header,
         proxy_read_timeout => 900,
       },
       '/v2/'                  => {
         raw_prepend        => [
-                                file('dockerinstall/registry/nginx/chunks/restrict-old-docker-access.conf'),
-                              ] +
-                              $ssl_client_check,
+          file('dockerinstall/registry/nginx/chunks/restrict-old-docker-access.conf'),
+        ] +
+        $ssl_client_check,
         add_header         => {
           # If $docker_distribution_api_version is empty, the header is not added.
           # See the map directive above where this variable is defined.
@@ -215,19 +212,19 @@ class dockerinstall::registry::nginx (
         },
         proxy              => 'http://docker-registry',
         proxy_set_header   => [
-                                # required for docker client's sake
-                                'Host              $http_host',
-                                # pass on real client's IP
-                                'X-Real-IP         $remote_addr',
-                                'X-Forwarded-For   $proxy_add_x_forwarded_for',
-                                'X-Forwarded-Proto $scheme',
-                              ] +
-                              $auth_proxy_header,
+          # required for docker client's sake
+          'Host              $http_host',
+          # pass on real client's IP
+          'X-Real-IP         $remote_addr',
+          'X-Forwarded-For   $proxy_add_x_forwarded_for',
+          'X-Forwarded-Proto $scheme',
+        ] +
+        $auth_proxy_header,
         proxy_read_timeout => 900,
       },
       '/registry-denied.json' => {
         www_root => $document_root,
-      }
+      },
     },
     use_default_location      => false,
   }

@@ -66,7 +66,7 @@ function dockerinstall::option(String $name, Data $value) >> Hash {
     'oom-score-adjust'    => Integer,
     'node-generic-resources' => Array,
     'runtimes'               => Hash,
-    'default-address-pools'  => Array
+    'default-address-pools'  => Array,
   }
 
   if $options[$name] and $value =~ $options[$name] {

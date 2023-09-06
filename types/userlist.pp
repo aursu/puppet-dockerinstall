@@ -1,4 +1,4 @@
 type Dockerinstall::UserList = Variant[
-    String,
-    Array[String, 1]
+  String,
+  Array[String, 1]
 ]

@@ -5,9 +5,8 @@
 # @example
 #   include dockerinstall::registry::base
 class dockerinstall::registry::base (
-    String  $docker_image   = 'registry:2.8.1',
-    Stdlib::Unixpath
-            $data_directory = $dockerinstall::registry::params::data_directory,
+  String $docker_image = 'registry:2.8.1',
+  Stdlib::Unixpath $data_directory = $dockerinstall::registry::params::data_directory,
 ) inherits dockerinstall::registry::params {
   include dockerinstall::registry::auth_token
   $rootcertbundle = $dockerinstall::registry::auth_token::rootcertbundle
@@ -27,11 +26,11 @@ class dockerinstall::registry::base (
       'REGISTRY_AUTH_TOKEN_SERVICE'        => $dockerinstall::registry::auth_token::service,
       'REGISTRY_AUTH_TOKEN_ISSUER'         => $dockerinstall::registry::auth_token::issuer,
       'REGISTRY_AUTH_TOKEN_ROOTCERTBUNDLE' => $rootcertbundle,
-      'REGISTRY_AUTH_TOKEN_AUTOREDIRECT'   => 'false'
+      'REGISTRY_AUTH_TOKEN_AUTOREDIRECT'   => 'false',
     }
 
     $auth_token_volume = [
-      "${rootcertbundle}:${rootcertbundle}"
+      "${rootcertbundle}:${rootcertbundle}",
     ]
   }
   else {
@@ -52,13 +51,13 @@ class dockerinstall::registry::base (
       '5000:5000',
     ],
     environment   => {
-                        'REGISTRY_STORAGE_DELETE_ENABLED' => 'true',
-                      } +
-                      $auth_tonken_environment,
+      'REGISTRY_STORAGE_DELETE_ENABLED' => 'true',
+    } +
+    $auth_tonken_environment,
     docker_volume => [
-                        "${data_directory}:/var/lib/registry",
-                      ] +
-                      $auth_token_volume,
+      "${data_directory}:/var/lib/registry",
+    ] +
+    $auth_token_volume,
   }
 
   # Read only mode environment:

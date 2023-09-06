@@ -5,18 +5,15 @@
 # @example
 #   include dockerinstall::install
 class dockerinstall::install (
-    Dockerinstall::PackageName
-            $package_name            = $dockerinstall::package_name,
-    Dockerinstall::Version
-            $version                 = $dockerinstall::version,
-    Boolean $manage_package          = $dockerinstall::manage_package,
-    Array[String]
-            $prerequired_packages    = $dockerinstall::prerequired_packages,
-    String  $prerequired_ensure      = 'installed',
-    String  $containerd_package_name = $dockerinstall::containerd_package_name,
-    String  $containerd_version      = $dockerinstall::containerd_version,
-    Boolean $manage_cli              = $dockerinstall::manage_cli,
-    String  $cli_package_name        = $dockerinstall::cli_package_name,
+  Dockerinstall::PackageName $package_name = $dockerinstall::package_name,
+  Dockerinstall::Version $version = $dockerinstall::version,
+  Boolean $manage_package = $dockerinstall::manage_package,
+  Array[String] $prerequired_packages = $dockerinstall::prerequired_packages,
+  String $prerequired_ensure = 'installed',
+  String $containerd_package_name = $dockerinstall::containerd_package_name,
+  String $containerd_version = $dockerinstall::containerd_version,
+  Boolean $manage_cli = $dockerinstall::manage_cli,
+  String $cli_package_name = $dockerinstall::cli_package_name,
 ) {
   include dockerinstall::setup
   include dockerinstall::repos::update

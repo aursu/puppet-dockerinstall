@@ -9,16 +9,12 @@ define dockerinstall::composeservice (
   Variant[
     Enum['stopped', 'running'],
     Boolean
-  ]       $ensure             = 'running',
-  Optional[String]
-          $project_name       = undef,
-  Optional[Stdlib::Unixpath]
-          $project_directory  = undef,
-  Optional[Stdlib::Unixpath]
-          $project_basedir    = undef,
-  Optional[Stdlib::Unixpath]
-          $configuration_path = undef,
-  Boolean $build_image        = false,
+  ] $ensure = 'running',
+  Optional[String] $project_name = undef,
+  Optional[Stdlib::Unixpath] $project_directory = undef,
+  Optional[Stdlib::Unixpath] $project_basedir = undef,
+  Optional[Stdlib::Unixpath] $configuration_path = undef,
+  Boolean $build_image = false,
 ) {
   include dockerinstall::params
   $libdir = $dockerinstall::params::compose_libdir

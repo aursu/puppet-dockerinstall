@@ -1,4 +1,4 @@
 type Dockerinstall::Multiple = Variant[
-    String,
-    Array[String]
+  String,
+  Array[String]
 ]

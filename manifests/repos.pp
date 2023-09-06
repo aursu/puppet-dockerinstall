@@ -5,17 +5,14 @@
 # @example
 #   include dockerinstall::repos
 class dockerinstall::repos (
-    Boolean $manage_package         = $dockerinstall::manage_package,
-    Dockerinstall::Repo
-            $repo                   = $dockerinstall::repo,
-    String  $location               = $dockerinstall::repo_location,
-    Dockerinstall::RepoOS
-            $os                     = $dockerinstall::repo_os,
-    Boolean $gpgcheck               = $dockerinstall::repo_gpgcheck,
-    Boolean $sslverify              = $dockerinstall::repo_sslverify,
-    String  $basearch               = $::architecture,
-    Enum['present', 'absent']
-            $repo_ensure            = 'present',
+  Boolean $manage_package = $dockerinstall::manage_package,
+  Dockerinstall::Repo $repo = $dockerinstall::repo,
+  String $location = $dockerinstall::repo_location,
+  Dockerinstall::RepoOS $os = $dockerinstall::repo_os,
+  Boolean $gpgcheck = $dockerinstall::repo_gpgcheck,
+  Boolean $sslverify = $dockerinstall::repo_sslverify,
+  String $basearch = $facts['os']['architecture'],
+  Enum['present', 'absent'] $repo_ensure = 'present',
 ) {
   # https://docs.docker.com/install/linux/docker-ce/fedora/#set-up-the-repository
   # https://docs.docker.com/install/linux/docker-ce/centos/#set-up-the-repository
@@ -34,7 +31,7 @@ class dockerinstall::repos (
         key          => {
           id     => '9DC858229FC7DD38854AE2D88D81803C0EBFCD88',
           source => $gpgkey,
-        }
+        },
       }
     }
     else {

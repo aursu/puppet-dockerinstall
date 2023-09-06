@@ -11,7 +11,7 @@ class dockerinstall::swarm::worker (
       Stdlib::Fqdn,
       Stdlib::IP::Address
     ]
-  ]       $manager_node = undef,
+  ] $manager_node = undef,
 ) {
   include dockerinstall::params
   $swarm_enabled = $dockerinstall::params::swarm_enabled
@@ -20,7 +20,7 @@ class dockerinstall::swarm::worker (
 
   $is_worker     = ! $is_manager
 
-  $node_name = $::fqdn
+  $node_name = $facts['networking']['fqdn']
   $nodeid = $swarm['NodeID']
 
   if $enable {

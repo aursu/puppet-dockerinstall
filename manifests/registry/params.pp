@@ -12,10 +12,10 @@ class dockerinstall::registry::params {
   # we use default settings defined by Docker Registry v2 project
   # it is port 5000 for registry service on localhost
   $nginx_upstream_members = {
-      'localhost:5000' => {
-          server => 'localhost',
-          port   => 5000,
-      }
+    'localhost:5000' => {
+      server => 'localhost',
+      port   => 5000,
+    },
   }
 
   # we use Docker Compose to start registry

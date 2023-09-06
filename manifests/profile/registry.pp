@@ -5,22 +5,18 @@
 # @example
 #   include dockerinstall::registry
 class dockerinstall::profile::registry (
-  String  $server_name,
-  Optional[String]
-          $cert_identity          = $server_name,
-  Boolean $ssl_client_ca_auth     = true,
-  Optional[Array[Stdlib::Fqdn]]
-          $ssl_client_ca_certs    = undef,
-  Boolean $manage_cert_data       = true,
+  String $server_name,
+  Optional[String] $cert_identity = $server_name,
+  Boolean $ssl_client_ca_auth = true,
+  Optional[Array[Stdlib::Fqdn]] $ssl_client_ca_certs = undef,
+  Boolean $manage_cert_data = true,
   # TLS data
-  Optional[String]
-          $ssl_cert               = undef,
-  Optional[String]
-          $ssl_key                = undef,
+  Optional[String] $ssl_cert = undef,
+  Optional[String] $ssl_key = undef,
   # WEB service
-  Boolean $manage_nginx_core      = true,
-  Boolean $manage_web_user        = true,
-  Boolean $global_ssl_redirect    = true,
+  Boolean $manage_nginx_core = true,
+  Boolean $manage_web_user = true,
+  Boolean $global_ssl_redirect = true,
 ) {
   include tlsinfo
   include dockerinstall::registry::base

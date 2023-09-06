@@ -6,9 +6,8 @@
 #   dockerinstall::swarm::node { 'worker/sman1.domain.com': }
 #   dockerinstall::swarm::node { 'manager/sman2.domain.com': }
 define dockerinstall::swarm::node (
-  String  $join_token,
-  Optional[Stdlib::IP::Address]
-          $manager_node_ip = undef,
+  String $join_token,
+  Optional[Stdlib::IP::Address] $manager_node_ip = undef,
 ) {
   unless '/' in $name {
     fail('Dockerinstall::Swarm::Node must have resource title either "worker/<Node FQDN or IP>" or "manager/<Node FQDN or IP>"')

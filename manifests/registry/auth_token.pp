@@ -40,18 +40,15 @@
 #   `dockerinstall::registry::gitlab`
 #
 class dockerinstall::registry::auth_token (
-  Boolean $enable               = false,
-  Boolean $gitlab               = false,
-  Optional[Stdlib::Fqdn]
-          $realm_host           = undef,
-  Optional[Stdlib::HTTPUrl]
-          $realm                = undef,
-  Optional[String]
-          $realm_certificate    = undef,
-  String  $service              = $dockerinstall::registry::params::auth_token_service,
-  String  $issuer               = $dockerinstall::registry::params::auth_token_issuer,
+  Boolean $enable = false,
+  Boolean $gitlab = false,
+  Optional[Stdlib::Fqdn] $realm_host = undef,
+  Optional[Stdlib::HTTPUrl] $realm = undef,
+  Optional[String] $realm_certificate = undef,
+  String $service = $dockerinstall::registry::params::auth_token_service,
+  String $issuer = $dockerinstall::registry::params::auth_token_issuer,
   Boolean $registry_cert_export = true,
-  Boolean $token_map_export     = true,
+  Boolean $token_map_export = true,
 ) inherits dockerinstall::registry::params {
   include dockerinstall::registry::setup::token
 

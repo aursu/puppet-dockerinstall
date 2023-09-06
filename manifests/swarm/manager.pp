@@ -6,14 +6,13 @@
 #   include dockerinstall::swarm::manager
 class dockerinstall::swarm::manager (
   Boolean $enable = true,
-  Optional[Stdlib::IP::Address]
-          $advertise_addr = undef,
+  Optional[Stdlib::IP::Address] $advertise_addr = undef,
   Optional[
     Variant[
       Stdlib::Fqdn,
       Stdlib::IP::Address
     ]
-  ]       $manager_node = undef,
+  ] $manager_node = undef,
 ) {
   include dockerinstall::params
   $swarm_enabled = $dockerinstall::params::swarm_enabled
@@ -28,7 +27,7 @@ class dockerinstall::swarm::manager (
     }
   }
 
-  $node_name = $facts['fqdn']
+  $node_name = $facts['networking']['fqdn']
   $nodeid = $swarm['NodeID']
 
   if $enable {

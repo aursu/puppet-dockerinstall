@@ -33,15 +33,12 @@
 #   Default is /etc/nginx/conf.d/mapping/gitlab-auth-token.conf
 #
 class dockerinstall::registry::gitlab (
-  Boolean $registry_cert_export          = true,
-  Optional[String]
-          $registry_internal_certificate = undef,
-  Boolean $token_map_export              = true,
-  Boolean $token_map_setup               = true,
-  Stdlib::Unixpath
-          $nginx_tokens_map              = $dockerinstall::registry::params::nginx_tokens_map,
-  Optional[Stdlib::Fqdn]
-          $gitlab_host                   = $dockerinstall::params::certname,
+  Boolean $registry_cert_export = true,
+  Optional[String] $registry_internal_certificate = undef,
+  Boolean $token_map_export = true,
+  Boolean $token_map_setup = true,
+  Stdlib::Unixpath $nginx_tokens_map = $dockerinstall::registry::params::nginx_tokens_map,
+  Optional[Stdlib::Fqdn] $gitlab_host = $dockerinstall::params::certname,
 ) inherits dockerinstall::registry::params {
   include dockerinstall::registry::setup::token
 

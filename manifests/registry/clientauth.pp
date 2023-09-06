@@ -5,10 +5,8 @@
 # @example
 #   dockerinstall::registry::clientauth { 'namevar': }
 define dockerinstall::registry::clientauth (
-  Stdlib::Fqdn
-          $server_name = $name,
-  Optional[Stdlib::Port]
-          $server_port = undef,
+  Stdlib::Fqdn $server_name = $name,
+  Optional[Stdlib::Port] $server_port = undef,
 ) {
   include dockerinstall::params
 
@@ -35,16 +33,16 @@ define dockerinstall::registry::clientauth (
 
   # CA certificate
   file { "${auth_certdir}/ca.crt":
-      source  => "file://${localcacert}",
+    source => "file://${localcacert}",
   }
 
   # Client certificate
   file { "${auth_certdir}/client.cert":
-      source  => "file://${hostcert}",
+    source => "file://${hostcert}",
   }
 
   # Client private key
   file { "${auth_certdir}/client.key":
-      source  => "file://${hostprivkey}",
+    source => "file://${hostprivkey}",
   }
 }
