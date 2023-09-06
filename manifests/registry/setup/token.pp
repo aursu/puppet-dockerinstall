@@ -5,8 +5,7 @@
 # @example
 #   include dockerinstall::registry::setup::token
 class dockerinstall::registry::setup::token (
-) inherits dockerinstall::registry::params
-{
+) inherits dockerinstall::registry::params {
   include dockerinstall::setup
 
   $tokenbundle_certdir = $dockerinstall::registry::params::tokenbundle_certdir

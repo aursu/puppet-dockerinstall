@@ -8,8 +8,7 @@ class dockerinstall::registry::base (
     String  $docker_image   = 'registry:2.8.1',
     Stdlib::Unixpath
             $data_directory = $dockerinstall::registry::params::data_directory,
-) inherits dockerinstall::registry::params
-{
+) inherits dockerinstall::registry::params {
   include dockerinstall::registry::auth_token
   $rootcertbundle = $dockerinstall::registry::auth_token::rootcertbundle
 

@@ -5,36 +5,38 @@ fixtures:
   forge_modules:
     apt:
       repo: puppetlabs/apt
-      ref: 8.3.0
+      ref: 9.1.0
     concat:
-      repo: "puppetlabs/concat"
-      ref: "7.1.1"
+      repo: puppetlabs/concat
+      ref: 9.0.0
     puppet_agent:
-      repo: "puppetlabs/puppet_agent"
-      ref: "4.9.0"
+      repo: puppetlabs/puppet_agent
+      ref: 4.14.0
     selinux:
-      repo: "puppet/selinux"
-      ref: "3.4.1"
+      repo: puppet/selinux
+      ref: 4.0.0
     selinux_core:
       repo: puppetlabs/selinux_core
       puppet_version: ">= 6.0.0"
     stdlib:
-      repo: "puppetlabs/stdlib"
-      ref: "8.1.0"
+      repo: puppetlabs/stdlib
+      ref: 9.3.0
     systemd:
-      repo: "puppet/systemd"
-      ref: "3.5.1"
+      repo: puppet/systemd
+      ref: 6.0.0
     yumrepo_core:
       repo: puppetlabs/yumrepo_core
       puppet_version: ">= 6.0.0"
   repositories:
     lsys:
       repo: https://github.com/aursu/puppet-lsys.git
-      ref: tags/v0.24.3
+      ref: tags/v0.42.0
     nginx:
       repo: https://github.com/aursu/puppet-nginx.git
-      ref: tags/v3.3.1-rc0.4
+      ref: tags/v4.4.1-rc0.2
     puppet:
       repo: https://github.com/aursu/puppet-puppet.git
+      ref: tags/v0.7.1
     tlsinfo:
       repo: https://github.com/aursu/puppet-tlsinfo.git
+      ref: tags/v0.3.7

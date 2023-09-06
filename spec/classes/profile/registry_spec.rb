@@ -19,15 +19,6 @@ describe 'dockerinstall::profile::registry' do
 
   on_supported_os.each do |os, os_facts|
     os_facts[:os]['selinux'] = { 'enabled' => false }
-    os_facts[:os]['distro'] ||= {}
-    os_facts[:os]['distro']['codename'] = case os
-                                          when %r{ubuntu-16.04}
-                                            'xenial'
-                                          when %r{ubuntu-18.04}
-                                            'bionic'
-                                          when %r{ubuntu-20.04}
-                                            'focal'
-                                          end
 
     context "on #{os}" do
       let(:facts) do

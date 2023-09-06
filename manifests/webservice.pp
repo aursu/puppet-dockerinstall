@@ -169,8 +169,7 @@ define dockerinstall::webservice (
   ]       $docker_command       = undef,
   Boolean $privileged           = false,
   Boolean $decomission          = false,
-)
-{
+) {
   include dockerinstall::params
   $project_basedir   = $dockerinstall::params::compose_libdir
 

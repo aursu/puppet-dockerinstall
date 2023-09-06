@@ -315,3 +315,13 @@ All notable changes to this project will be documented in this file.
 **Bugfixes**
 
 **Known Issues**
+
+## Release 0.14.0
+
+**Features**
+
+* PDK version 3.0.0
+
+**Bugfixes**
+
+**Known Issues**

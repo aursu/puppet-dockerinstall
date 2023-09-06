@@ -12,8 +12,7 @@ class dockerinstall::swarm::worker (
       Stdlib::IP::Address
     ]
   ]       $manager_node = undef,
-)
-{
+) {
   include dockerinstall::params
   $swarm_enabled = $dockerinstall::params::swarm_enabled
   $is_manager    = $dockerinstall::params::is_swarm_manager

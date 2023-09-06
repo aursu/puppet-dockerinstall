@@ -5,10 +5,8 @@
 # @example
 #   include dockerinstall::profile::registry::clientauth
 class dockerinstall::profile::registry::clientauth (
-  Optional[Array[Stdlib::Fqdn]]
-          $registry = undef,
-)
-{
+  Optional[Array[Stdlib::Fqdn]] $registry = undef,
+) {
   include dockerinstall
   include dockerinstall::setup
 

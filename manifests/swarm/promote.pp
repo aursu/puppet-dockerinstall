@@ -6,8 +6,7 @@
 #   dockerinstall::swarm::promote { 'namevar': }
 define dockerinstall::swarm::promote (
   String $nodeid = $name,
-)
-{
+) {
   # promote: https://docs.docker.com/engine/reference/commandline/node_promote/
   exec { "docker node promote ${nodeid}":
     path => '/bin:/usr/bin',

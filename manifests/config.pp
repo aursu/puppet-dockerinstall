@@ -36,8 +36,7 @@ class dockerinstall::config (
     String  $config_ensure     = 'file',
     Boolean $system_user       = true,
     Boolean $system_group      = true,
-)
-{
+) {
     include dockerinstall::install
 
     if $manage_users {
@@ -56,7 +55,7 @@ class dockerinstall::config (
         user {
             default:
               ensure     => $user_ensure,
-              groups     => [ $group ],
+              groups     => [$group],
               membership => 'minimum',
             ;
             $users:

@@ -113,8 +113,7 @@ class dockerinstall::service (
     Boolean $manage_users                   = $dockerinstall::manage_os_users,
     Boolean $manage_package                 = $dockerinstall::manage_package,
     String  $service_config_ensure          = 'file',
-)
-{
+) {
   include dockerinstall::config
   include dockerinstall::params
 

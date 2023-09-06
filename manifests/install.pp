@@ -17,8 +17,7 @@ class dockerinstall::install (
     String  $containerd_version      = $dockerinstall::containerd_version,
     Boolean $manage_cli              = $dockerinstall::manage_cli,
     String  $cli_package_name        = $dockerinstall::cli_package_name,
-)
-{
+) {
   include dockerinstall::setup
   include dockerinstall::repos::update
 
@@ -38,7 +37,7 @@ class dockerinstall::install (
     }
 
     # exclude docker and conteinerd.io from list of additional packages
-    $managed_packages = $prerequired_packages - [ $package_name, $containerd_package_name, 'docker', 'containerd.io']
+    $managed_packages = $prerequired_packages - [$package_name, $containerd_package_name, 'docker', 'containerd.io']
     $managed_packages.each |String $reqp| {
       package { $reqp:
         ensure => $prerequired_ensure,

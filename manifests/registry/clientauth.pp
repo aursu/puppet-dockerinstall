@@ -9,8 +9,7 @@ define dockerinstall::registry::clientauth (
           $server_name = $name,
   Optional[Stdlib::Port]
           $server_port = undef,
-)
-{
+) {
   include dockerinstall::params
 
   $localcacert = $dockerinstall::params::localcacert

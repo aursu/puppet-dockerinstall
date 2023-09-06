@@ -16,8 +16,7 @@ class dockerinstall::repos (
     String  $basearch               = $::architecture,
     Enum['present', 'absent']
             $repo_ensure            = 'present',
-)
-{
+) {
   # https://docs.docker.com/install/linux/docker-ce/fedora/#set-up-the-repository
   # https://docs.docker.com/install/linux/docker-ce/centos/#set-up-the-repository
   $distrourl = "${location}/${os}"

@@ -42,8 +42,7 @@ class dockerinstall::registry::gitlab (
           $nginx_tokens_map              = $dockerinstall::registry::params::nginx_tokens_map,
   Optional[Stdlib::Fqdn]
           $gitlab_host                   = $dockerinstall::params::certname,
-) inherits dockerinstall::registry::params
-{
+) inherits dockerinstall::registry::params {
   include dockerinstall::registry::setup::token
 
   $registry_cert_path  = $dockerinstall::registry::params::auth_token_rootcertbundle

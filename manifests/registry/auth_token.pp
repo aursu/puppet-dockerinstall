@@ -52,8 +52,7 @@ class dockerinstall::registry::auth_token (
   String  $issuer               = $dockerinstall::registry::params::auth_token_issuer,
   Boolean $registry_cert_export = true,
   Boolean $token_map_export     = true,
-) inherits dockerinstall::registry::params
-{
+) inherits dockerinstall::registry::params {
   include dockerinstall::registry::setup::token
 
   # auth:
