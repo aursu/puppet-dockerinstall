@@ -316,12 +316,14 @@ All notable changes to this project will be documented in this file.
 
 **Known Issues**
 
-## Release 0.14.0
+## Release 0.14.1
 
 **Features**
 
 * PDK version 3.0.0
 
 **Bugfixes**
+
+* Fixed PDK warnings
 
 **Known Issues**
