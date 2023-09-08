@@ -45,6 +45,10 @@ Puppet::Type.type(:dockerservice).provide(
     @property_flush[:configuration] = value
   end
 
+  def version
+    @version ||= compose('--version')[%r{version v?((1|2)\.[0-9]+\.[0-9]+)}, 1]
+  end
+
   def status
     return :stopped if configuration_sync
     # Don't fail when the exit status is not 0.

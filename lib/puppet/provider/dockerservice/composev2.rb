@@ -33,8 +33,14 @@ Puppet::Type.type(:dockerservice).provide(
       services = output.split(%r{\n}).select { |l| l.start_with?("#{@resource[:project]}-#{@resource[:name]}-") || l.start_with?("#{@resource[:project]}_#{@resource[:name]}_") }
       services.each do |l|
         # paused | restarting | removing | running | dead | created | exited
-        m = %r{\s+(paused|restarting|removing|created|running( \(.+\))?|exited \([-0-9]+\)|dead \([-0-9]+\))\s+}.match(l)
-        return :running if m[1].include?('running')
+        # up to 2.14.1 docker  compose has had own syntax for ps command
+        if version.match?(%r{2\.(([1-9]|1[0-3])\.[0-9]+|14\.0)})
+          m = %r{\s+(paused|restarting|removing|created|running( \(.+\))?|exited \([-0-9]+\)|dead \([-0-9]+\))\s+}.match(l)
+          return :running if m[1].include?('running')
+        else
+          m = %r{\s+(Paused|Restarting|Ghost|Up( \(.+\))?|Exit [-0-9]+)\s+}.match(l)
+          return :running if m[1].include?('Up')
+        end
       end
     end
     :stopped

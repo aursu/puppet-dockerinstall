@@ -327,3 +327,13 @@ All notable changes to this project will be documented in this file.
 * Fixed PDK warnings
 
 **Known Issues**
+
+## Release 0.15.0
+
+**Features**
+
+**Bugfixes**
+
+* Fixed error with container status for docker compose 2.14.1+
+
+**Known Issues**
