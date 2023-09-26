@@ -9,6 +9,12 @@ fixtures:
     concat:
       repo: puppetlabs/concat
       ref: 9.0.0
+    lsys:
+      repo: aursu/lsys
+      ref: 0.46.0
+    nginx:
+      repo: aursu/nginx
+      ref: 4.4.2
     puppet_agent:
       repo: puppetlabs/puppet_agent
       ref: 4.14.0
@@ -28,12 +34,6 @@ fixtures:
       repo: puppetlabs/yumrepo_core
       puppet_version: ">= 6.0.0"
   repositories:
-    lsys:
-      repo: https://github.com/aursu/puppet-lsys.git
-      ref: tags/v0.42.0
-    nginx:
-      repo: https://github.com/aursu/puppet-nginx.git
-      ref: tags/v4.4.1-rc0.2
     puppet:
       repo: https://github.com/aursu/puppet-puppet.git
       ref: tags/v0.7.1

@@ -337,3 +337,13 @@ All notable changes to this project will be documented in this file.
 * Fixed error with container status for docker compose 2.14.1+
 
 **Known Issues**
+
+## Release 0.16.0
+
+**Features**
+
+* Setup `aursu/nginx` as a dependency
+
+**Bugfixes**
+
+**Known Issues**
