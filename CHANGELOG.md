@@ -338,12 +338,14 @@ All notable changes to this project will be documented in this file.
 
 **Known Issues**
 
-## Release 0.16.0
+## Release 0.16.1
 
 **Features**
 
 * Setup `aursu/nginx` as a dependency
 
 **Bugfixes**
+
+* Added support for Ubuntu Focal package version
 
 **Known Issues**
