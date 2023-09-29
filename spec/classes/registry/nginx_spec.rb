@@ -18,7 +18,7 @@ describe 'dockerinstall::registry::nginx' do
 
       context 'with default settings' do
         it {
-          is_expected.to contain_class('lsys::nginx')
+          is_expected.to contain_class('lsys_nginx')
         }
 
         it {

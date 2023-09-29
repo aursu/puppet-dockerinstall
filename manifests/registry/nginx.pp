@@ -18,15 +18,16 @@ class dockerinstall::registry::nginx (
   Stdlib::Unixpath $nginx_tokens_map = $dockerinstall::registry::params::nginx_tokens_map,
 ) inherits dockerinstall::registry::params {
   include dockerinstall::registry::auth_token
+
   $auth_token_enable = $dockerinstall::registry::auth_token::enable
 
   $nginx_upstream_members = $dockerinstall::registry::params::nginx_upstream_members
   $internal_cacert        = $dockerinstall::registry::params::internal_cacert
 
-  $nginx_user_home        = $lsys::params::nginx_user_home
-  $document_root          = "${nginx_user_home}/html"
-  $daemon_user            = $lsys::webserver::params::user
-  $daemon_group           = $lsys::webserver::params::group
+  $user_home              = $lsys_nginx::params::user_home
+  $document_root          = "${user_home}/html"
+  $daemon_user            = $bsys::webserver::params::user
+  $daemon_group           = $bsys::webserver::params::group
 
   # if SSL enabled - both certificate and key must be provided
   if $ssl and !($ssl_cert and $ssl_key) {
@@ -44,7 +45,7 @@ class dockerinstall::registry::nginx (
   }
 
   if $manage_nginx_core {
-    class { 'lsys::nginx':
+    class { 'lsys_nginx':
       manage_user          => $manage_web_user,
       manage_document_root => $manage_document_root,
       global_ssl_redirect  => $global_ssl_redirect,

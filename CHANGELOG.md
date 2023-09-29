@@ -349,3 +349,13 @@ All notable changes to this project will be documented in this file.
 * Added support for Ubuntu Focal package version
 
 **Known Issues**
+
+## Release 0.17.0
+
+**Features**
+
+* Setup `aursu/lsys_nginx` as a dependency
+
+**Bugfixes**
+
+**Known Issues**

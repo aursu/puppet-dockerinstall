@@ -6,15 +6,21 @@ fixtures:
     apt:
       repo: puppetlabs/apt
       ref: 9.1.0
+    bsys:
+      repo: aursu/bsys
+      ref: 0.4.0
     concat:
       repo: puppetlabs/concat
       ref: 9.0.0
-    lsys:
-      repo: aursu/lsys
-      ref: 0.46.0
+    lsys_nginx:
+      repo: aursu/lsys_nginx
+      ref: 0.47.0
     nginx:
       repo: aursu/nginx
       ref: 4.4.2
+    puppet:
+      repo: aursu/puppet
+      ref: 0.8.0
     puppet_agent:
       repo: puppetlabs/puppet_agent
       ref: 4.14.0
@@ -30,13 +36,9 @@ fixtures:
     systemd:
       repo: puppet/systemd
       ref: 6.0.0
+    tlsinfo:
+      repo: aursu/tlsinfo
+      ref: 0.5.0
     yumrepo_core:
       repo: puppetlabs/yumrepo_core
       puppet_version: ">= 6.0.0"
-  repositories:
-    puppet:
-      repo: https://github.com/aursu/puppet-puppet.git
-      ref: tags/v0.7.1
-    tlsinfo:
-      repo: https://github.com/aursu/puppet-tlsinfo.git
-      ref: tags/v0.3.7

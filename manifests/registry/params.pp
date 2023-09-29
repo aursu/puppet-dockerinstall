@@ -6,8 +6,7 @@
 #   include dockerinstall::registry::params
 class dockerinstall::registry::params {
   include dockerinstall::params
-  include tlsinfo::params
-  include lsys::params
+  include lsys_nginx::params
 
   # we use default settings defined by Docker Registry v2 project
   # it is port 5000 for registry service on localhost
@@ -32,8 +31,8 @@ class dockerinstall::registry::params {
   $data_directory = '/var/lib/registry'
 
   # Client authentication
-  $internal_certdir = "${tlsinfo::params::certbase}/internal"
-  $internal_cacert = "${internal_certdir}/ca.pem"
+  $internal_certdir = $bsys::webserver::params::internal_certdir
+  $internal_cacert = $bsys::webserver::params::internal_cacert
 
   # The service being authenticated.
   $auth_token_service = 'container_registry'
@@ -52,6 +51,6 @@ class dockerinstall::registry::params {
   $auth_token_autoredirect = false
 
   # Nginx config to store tokens to projects map
-  $nginx_map_dir = $lsys::params::nginx_map_dir
+  $nginx_map_dir = $lsys_nginx::params::map_dir
   $nginx_tokens_map = "${nginx_map_dir}/gitlab-auth-token.conf"
 }
