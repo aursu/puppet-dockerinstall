@@ -369,3 +369,13 @@ All notable changes to this project will be documented in this file.
 **Bugfixes**
 
 **Known Issues**
+
+## Release 0.18.0
+
+**Features**
+
+* Added docker version 26.x
+
+**Bugfixes**
+
+**Known Issues**
