@@ -21,32 +21,34 @@ class dockerinstall::setup (
   Boolean $users_access = $dockerinstall::tls_users_access,
   Enum['directory', 'absent'] $docker_dir_ensure = $dockerinstall::docker_dir_ensure,
 ) inherits dockerinstall::params {
-  file { '/etc/docker':
-    ensure  => $docker_dir_ensure,
-    recurse => true,
-    force   => true,
-  }
-
-  if $manage_docker_certdir {
-    file { '/etc/docker/certs.d':
-      ensure => directory,
-      owner  => 'root',
-      mode   => '0700',
+  if $facts['identity']['user'] == 'root' {
+    file { '/etc/docker':
+      ensure  => $docker_dir_ensure,
+      recurse => true,
+      force   => true,
     }
-  }
 
-  if $users_access {
-    $docker_tlsdir_mode = '0711'
-  }
-  else {
-    $docker_tlsdir_mode = '0700'
-  }
+    if $manage_docker_certdir {
+      file { '/etc/docker/certs.d':
+        ensure => directory,
+        owner  => 'root',
+        mode   => '0700',
+      }
+    }
 
-  if $manage_docker_tlsdir {
-    file { $docker_tlsdir:
-      ensure => directory,
-      owner  => 'root',
-      mode   => $docker_tlsdir_mode,
+    if $users_access {
+      $docker_tlsdir_mode = '0711'
+    }
+    else {
+      $docker_tlsdir_mode = '0700'
+    }
+
+    if $manage_docker_tlsdir {
+      file { $docker_tlsdir:
+        ensure => directory,
+        owner  => 'root',
+        mode   => $docker_tlsdir_mode,
+      }
     }
   }
 }

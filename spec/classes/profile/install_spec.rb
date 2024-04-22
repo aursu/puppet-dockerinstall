@@ -3,7 +3,18 @@ require 'spec_helper'
 describe 'dockerinstall::profile::install' do
   on_supported_os.each do |os, os_facts|
     context "on #{os}" do
-      let(:facts) { os_facts }
+      # Fix for CentOS 9
+      let(:facts) { os_facts.merge(
+          {
+            identity: { "gid" => 0,
+              "group" => "root",
+              "privileged" => true,
+              "uid" => 0,
+              "user" => "root"
+            }
+          }
+        )
+      }
 
       it { is_expected.to compile }
 

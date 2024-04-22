@@ -11,14 +11,14 @@ describe 'dockerinstall::compose' do
 
       it {
         is_expected.to contain_exec('docker-compose-checksum')
-          .with_command('curl -L https://github.com/docker/compose/releases/download/v2.24.6/docker-compose-linux-x86_64.sha256 -o docker-compose-linux-x86_64.sha256.2.24.6')
-          .with_unless('grep docker-compose-linux-x86_64 /tmp/docker-compose-linux-x86_64.sha256.2.24.6')
+          .with_command('curl -L https://github.com/docker/compose/releases/download/v2.26.1/docker-compose-linux-x86_64.sha256 -o docker-compose-linux-x86_64.sha256.2.26.1')
+          .with_unless('grep docker-compose-linux-x86_64 /tmp/docker-compose-linux-x86_64.sha256.2.26.1')
       }
 
       it {
         is_expected.to contain_exec('docker-compose-download')
-          .with_command('curl -L https://github.com/docker/compose/releases/download/v2.24.6/docker-compose-linux-x86_64 -o docker-compose-linux-x86_64')
-          .with_unless('sha256sum -c docker-compose-linux-x86_64.sha256.2.24.6')
+          .with_command('curl -L https://github.com/docker/compose/releases/download/v2.26.1/docker-compose-linux-x86_64 -o docker-compose-linux-x86_64')
+          .with_unless('sha256sum -c docker-compose-linux-x86_64.sha256.2.26.1')
       }
 
       it {
