@@ -28,6 +28,26 @@ class dockerinstall::params {
   $compose_plugin_path      = "${docker_plugins_dir}/docker-compose"
 
   case $facts['os']['family'] {
+    'windows' : {
+      $repo_os = undef
+      $service_config = undef
+      $storage_config = undef
+      if $facts['docker_dir_path'] {
+        $docker_dir_path = $facts['docker_dir_path']
+      }
+      else {
+        $docker_dir_path = 'C:\\ProgramData\\docker'
+      }
+      # {
+      #     "hosts": ["tcp://0.0.0.0:2376", "npipe://"],
+      #     "tlsverify": true,
+      #     "tlscacert": "C:\\ProgramData\\docker\\certs.d\\ca.pem",
+      #     "tlscert": "C:\\ProgramData\\docker\\certs.d\\server-cert.pem",
+      #     "tlskey": "C:\\ProgramData\\docker\\certs.d\\server-key.pem",
+      # }
+      $docker_tlsdir = 'C:\\ProgramData\\docker\\certs.d'
+      $docker_certdir = 'C:\\ProgramData\\docker\\certs.d'
+    }
     'Debian': {
       case $facts['os']['name'] {
         'Ubuntu': {
@@ -39,6 +59,9 @@ class dockerinstall::params {
       }
       $service_config = '/etc/default/docker'
       $storage_config = '/etc/default/docker-storage'
+      $docker_dir_path = '/etc/docker'
+      $docker_tlsdir = '/etc/docker/tls'
+      $docker_certdir = '/etc/docker/certs.d'
     }
     # default is RedHat based systems (CentOS)
     default: {
@@ -48,6 +71,9 @@ class dockerinstall::params {
       }
       $service_config = '/etc/sysconfig/docker'
       $storage_config = '/etc/sysconfig/docker-storage'
+      $docker_dir_path = '/etc/docker'
+      $docker_tlsdir = '/etc/docker/tls'
+      $docker_certdir = '/etc/docker/certs.d'
     }
   }
 
@@ -92,6 +118,4 @@ class dockerinstall::params {
   else {
     $is_swarm_manager = undef
   }
-
-  $docker_tlsdir = '/etc/docker/tls'
 }

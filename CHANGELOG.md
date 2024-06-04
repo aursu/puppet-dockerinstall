@@ -379,3 +379,13 @@ All notable changes to this project will be documented in this file.
 **Bugfixes**
 
 **Known Issues**
+
+## Release 0.19.0
+
+**Features**
+
+* Added Windows support for private Registries auth
+
+**Bugfixes**
+
+**Known Issues**

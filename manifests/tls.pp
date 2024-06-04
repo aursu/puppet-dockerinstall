@@ -5,14 +5,14 @@
 # @example
 #   include dockerinstall::tls
 class dockerinstall::tls (
-  Stdlib::Unixpath $docker_tlsdir = $dockerinstall::params::docker_tlsdir,
   Boolean $users_access = $dockerinstall::tls_users_access,
-) inherits dockerinstall::params {
+) {
   include dockerinstall::params
 
   $localcacert = $dockerinstall::params::localcacert
   $hostcert    = $dockerinstall::params::hostcert
   $hostprivkey = $dockerinstall::params::hostprivkey
+  $docker_tlsdir = $dockerinstall::params::docker_tlsdir
 
   # --tlscacert string                      Trust certs signed only by this CA (default "~/.docker/ca.pem")
   # --tlscert string                        Path to TLS certificate file (default "~/.docker/cert.pem")

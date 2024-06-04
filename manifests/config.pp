@@ -31,7 +31,7 @@ class dockerinstall::config (
 ) {
   include dockerinstall::install
 
-  if $manage_users {
+  if $manage_users and $facts['kernel'] == 'Linux' {
     group { 'docker':
       ensure => $group_ensure,
       name   => $group,
@@ -71,7 +71,7 @@ class dockerinstall::config (
   # TLS
   # https://docs.docker.com/engine/security/https/
 
-  if $cgroup_driver {
+  if $cgroup_driver and $facts['kernel'] == 'Linux' {
     $exec_opts = ["native.cgroupdriver=${cgroup_driver}"]
   }
   else {

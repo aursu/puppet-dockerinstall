@@ -2,6 +2,12 @@
 #
 # Setup client cert auth for registry usung Puppet CA certificates
 #
+# @param server_name
+#   Docker registry server name
+#
+# @param server_port
+#   Docker registry server port
+#
 # @example
 #   dockerinstall::registry::clientauth { 'namevar': }
 define dockerinstall::registry::clientauth (
@@ -13,18 +19,25 @@ define dockerinstall::registry::clientauth (
   $localcacert = $dockerinstall::params::localcacert
   $hostcert    = $dockerinstall::params::hostcert
   $hostprivkey = $dockerinstall::params::hostprivkey
+  $docker_certdir = $dockerinstall::params::docker_certdir
 
   # https://docs.docker.com/engine/security/certificates/
   # /etc/docker/certs.d/
   # +-- my-https.registry.example.com          <-- Hostname without port
-  #    |-- client.cert
-  #    |-- client.key
-  #    +-- ca.crt
+  #    |-- client.cert                         <-- .cert suffix is mandatory
+  #    |-- client.key                          <-- .key seffix is mandatory and name w/o suffix
+  #    |                                            must match to name w/o .cert suffix
+  #    +-- ca.crt                              <-- .crt suffix is mandatory
   if $server_port {
-    $auth_certdir = "/etc/docker/certs.d/${server_name}:${server_port}"
+    if $facts['os']['family'] == 'windows' {
+      $auth_certdir = "${docker_certdir}/${server_name}${server_port}"
+    }
+    else {
+      $auth_certdir = "${docker_certdir}/${server_name}:${server_port}"
+    }
   }
   else {
-    $auth_certdir = "/etc/docker/certs.d/${server_name}"
+    $auth_certdir = "${docker_certdir}/${server_name}"
   }
 
   file { $auth_certdir:

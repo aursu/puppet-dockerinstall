@@ -46,3 +46,15 @@ Facter.add(:docker_swarm) do
     end
   end
 end
+
+Facter.add(:docker_dir_path) do
+  confine osfamily: :windows
+  setcode do
+    progdata = Puppet::Util.get_env('ProgramData')
+    if progdata
+      "#{progdata}\\docker"
+    else
+      nil
+    end
+  end
+end
