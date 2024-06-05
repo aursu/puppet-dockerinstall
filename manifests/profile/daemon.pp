@@ -15,13 +15,14 @@ class dockerinstall::profile::daemon (
   Optional[Hash] $log_opts = undef,
   Boolean $docker0_bind = false,
   Boolean $tls_enable = false,
-  Stdlib::Unixpath $docker_tlsdir = $dockerinstall::params::docker_tlsdir,
   Boolean $tls_users_access = false,
-) inherits dockerinstall::params {
+) {
   include dockerinstall::profile::install
+  include dockerinstall::params
+
+  $docker_tlsdir = $dockerinstall::params::docker_tlsdir
 
   class { 'dockerinstall::tls':
-    docker_tlsdir => $docker_tlsdir,
     users_access  => $tls_users_access,
   }
 

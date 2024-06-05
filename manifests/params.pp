@@ -33,10 +33,10 @@ class dockerinstall::params {
       $service_config = undef
       $storage_config = undef
       if $facts['docker_dir_path'] {
-        $docker_dir_path = $facts['docker_dir_path']
+        $docker_dir = $facts['docker_dir_path']
       }
       else {
-        $docker_dir_path = 'C:\\ProgramData\\docker'
+        $docker_dir = 'C:\\ProgramData\\docker'
       }
       # {
       #     "hosts": ["tcp://0.0.0.0:2376", "npipe://"],
@@ -59,7 +59,7 @@ class dockerinstall::params {
       }
       $service_config = '/etc/default/docker'
       $storage_config = '/etc/default/docker-storage'
-      $docker_dir_path = '/etc/docker'
+      $docker_dir = '/etc/docker'
       $docker_tlsdir = '/etc/docker/tls'
       $docker_certdir = '/etc/docker/certs.d'
     }
@@ -71,7 +71,7 @@ class dockerinstall::params {
       }
       $service_config = '/etc/sysconfig/docker'
       $storage_config = '/etc/sysconfig/docker-storage'
-      $docker_dir_path = '/etc/docker'
+      $docker_dir = '/etc/docker'
       $docker_tlsdir = '/etc/docker/tls'
       $docker_certdir = '/etc/docker/certs.d'
     }
