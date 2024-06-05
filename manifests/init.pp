@@ -78,5 +78,6 @@ class dockerinstall (
   Boolean $tls_users_access,
   Optional[String] $service_config = $dockerinstall::params::service_config,
   Optional[String] $storage_config = $dockerinstall::params::storage_config,
-  Dockerinstall::RepoOS $repo_os = $dockerinstall::params::repo_os,
+  # For Windows it is unset
+  Optional[Dockerinstall::RepoOS] $repo_os = $dockerinstall::params::repo_os,
 ) inherits dockerinstall::params {}
