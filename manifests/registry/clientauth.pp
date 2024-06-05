@@ -30,32 +30,55 @@ define dockerinstall::registry::clientauth (
   #    +-- ca.crt                              <-- .crt suffix is mandatory
   if $server_port {
     if $facts['os']['family'] == 'windows' {
-      $auth_certdir = "${docker_certdir}/${server_name}${server_port}"
+      $auth_certdir = "${docker_certdir}\\${server_name}${server_port}"
     }
     else {
       $auth_certdir = "${docker_certdir}/${server_name}:${server_port}"
     }
   }
   else {
-    $auth_certdir = "${docker_certdir}/${server_name}"
+    if $facts['os']['family'] == 'windows' {
+      $auth_certdir = "${docker_certdir}\\${server_name}"
+    }
+    else {
+      $auth_certdir = "${docker_certdir}/${server_name}"
+    }
   }
 
   file { $auth_certdir:
     ensure => directory,
   }
 
-  # CA certificate
-  file { "${auth_certdir}/ca.crt":
-    source => "file://${localcacert}",
-  }
+  if $facts['os']['family'] == 'windows' {
+    # CA certificate
+    file { "${auth_certdir}\\ca.crt":
+      source => $localcacert,
+    }
 
-  # Client certificate
-  file { "${auth_certdir}/client.cert":
-    source => "file://${hostcert}",
-  }
+    # Client certificate
+    file { "${auth_certdir}\\client.cert":
+      source => $hostcert,
+    }
 
-  # Client private key
-  file { "${auth_certdir}/client.key":
-    source => "file://${hostprivkey}",
+    # Client private key
+    file { "${auth_certdir}\\client.key":
+      source => $hostprivkey,
+    }
+  }
+  else {
+    # CA certificate
+    file { "${auth_certdir}/ca.crt":
+      source => "file://${localcacert}",
+    }
+
+    # Client certificate
+    file { "${auth_certdir}/client.cert":
+      source => "file://${hostcert}",
+    }
+
+    # Client private key
+    file { "${auth_certdir}/client.key":
+      source => "file://${hostprivkey}",
+    }
   }
 }
