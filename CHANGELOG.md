@@ -397,6 +397,7 @@ All notable changes to this project will be documented in this file.
 **Features**
 
 * Added Windows support for private Registries auth (inside user home directory)
+* PDK upgrade to 3.2.0
 
 **Bugfixes**
 
