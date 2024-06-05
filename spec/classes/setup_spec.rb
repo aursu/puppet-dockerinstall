@@ -8,17 +8,19 @@ describe 'dockerinstall::setup' do
   on_supported_os.each do |os, os_facts|
     context "on #{os}" do
       # Fix for CentOS 9
-      let(:facts) { os_facts.merge(
+      let(:facts) do
+        os_facts.merge(
           {
-            identity: { "gid" => 0,
-              "group" => "root",
-              "privileged" => true,
-              "uid" => 0,
-              "user" => "root"
+            identity: {
+              'gid' => 0,
+              'group' => 'root',
+              'privileged' => true,
+              'uid' => 0,
+              'user' => 'root',
             }
-          }
+          },
         )
-      }
+      end
 
       it { is_expected.to compile }
 
