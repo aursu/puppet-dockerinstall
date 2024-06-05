@@ -58,3 +58,29 @@ Facter.add(:docker_dir_path) do
     end
   end
 end
+
+Facter.add(:docker_user_dir_path) do
+  confine osfamily: :windows
+  setcode do
+    homedrive = Puppet::Util.get_env('HOMEDRIVE')
+    homepath = Puppet::Util.get_env('HOMEPATH')
+    if homedrive && homepath
+      "#{homedrive}#{homepath}\\.docker"
+    else
+      nil
+    end
+  end
+end
+
+Facter.add(:docker_username) do
+  confine osfamily: :windows
+  setcode do
+    Puppet::Util.get_env('USERNAME')
+  end
+end
+
+Facter.add(:docker_user_home) do
+  setcode do
+    Puppet::Util.get_env('HOME')
+  end
+end

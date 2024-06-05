@@ -30,4 +30,51 @@ class dockerinstall::globals (
     $install_plugin           = false
   }
   $compose_checksum_name      = "${compose_download_name}.sha256"
+
+  if $facts['os']['family'] == 'windows' {
+    if $facts['docker_user_home'] {
+      $docker_user_home = $facts['docker_user_home']
+      $docker_user_dir = "${$docker_user_home}\\.docker"
+    }
+    elsif $facts['docker_user_dir_path'] {
+      $docker_user_dir = $facts['docker_user_dir_path']
+    }
+    elsif $facts['docker_username'] {
+      $docker_username = $facts['docker_username']
+      $docker_user_dir = "C:\\Users\\${docker_username}\\.docker"
+    }
+    else {
+      $docker_user_dir = undef
+    }
+
+    if $docker_user_dir {
+      $docker_user_certdir = "${docker_user_dir}\\certs.d"
+    }
+    else {
+      $docker_user_certdir = undef
+    }
+  }
+  else {
+    if $facts['docker_user_home'] {
+      $docker_user_home = $facts['docker_user_home']
+      $docker_user_dir = "${$docker_user_home}/.docker"
+    }
+    elsif $facts['identity']['user'] == 'root' {
+      $docker_user_dir = '/root/.docker'
+    }
+    elsif $facts['identity']['user'] {
+      $docker_username = $facts['identity']['user']
+      $docker_user_dir = "/home/${docker_username}/.docker"
+    }
+    else {
+      $docker_user_dir = undef
+    }
+
+    if $docker_user_dir {
+      $docker_user_certdir = "${docker_user_dir}/certs.d"
+    }
+    else {
+      $docker_user_certdir = undef
+    }
+  }
 }

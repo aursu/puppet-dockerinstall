@@ -391,3 +391,13 @@ All notable changes to this project will be documented in this file.
 * Fixed paths to Windows keys
 
 **Known Issues**
+
+## Release 0.20.0
+
+**Features**
+
+* Added Windows support for private Registries auth (inside user home directory)
+
+**Bugfixes**
+
+**Known Issues**

@@ -22,10 +22,23 @@ class dockerinstall::setup (
   Enum['directory', 'absent'] $docker_dir_ensure = $dockerinstall::docker_dir_ensure,
 ) {
   include dockerinstall::params
+  include dockerinstall::globals
 
   $docker_dir = $dockerinstall::params::docker_dir
   $docker_certdir = $dockerinstall::params::docker_certdir
   $docker_tlsdir = $dockerinstall::params::docker_tlsdir
+  $docker_user_dir = $dockerinstall::globals::docker_user_dir
+  $docker_user_certdir = $dockerinstall::globals::docker_user_certdir
+
+  if $docker_user_dir and $docker_user_certdir {
+    file { $docker_user_dir:
+      ensure => directory,
+    }
+
+    file { $docker_user_certdir:
+      ensure => directory,
+    }
+  }
 
   if $facts['os']['family'] == 'windows' {
     if $facts['identity']['privileged'] {
