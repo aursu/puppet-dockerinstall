@@ -1,6 +1,11 @@
 require 'spec_helper'
 
 describe 'dockerinstall::registry::clientauth' do
+  let(:pre_condition) do
+    <<-PRECOND
+    class { 'dockerinstall': }
+    PRECOND
+  end
   let(:title) { 'namevar' }
   let(:params) do
     {}
