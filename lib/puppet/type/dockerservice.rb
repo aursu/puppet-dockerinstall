@@ -9,6 +9,7 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
 
     munge do |value|
       @should = value
+      value
     end
 
     validate do |value|
