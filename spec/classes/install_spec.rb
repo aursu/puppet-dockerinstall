@@ -18,7 +18,7 @@ describe 'dockerinstall::install' do
       when %r{centos}
         it {
           is_expected.to contain_package('docker')
-            .that_requires('Yumrepo[docker]')
+            .that_requires('Yumrepo[docker-ce]')
         }
       end
     end
