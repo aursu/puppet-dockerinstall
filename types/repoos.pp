@@ -1,1 +1,1 @@
-type Dockerinstall::RepoOS = Enum['centos', 'debian', 'fedora', 'ubuntu']
+type Dockerinstall::RepoOS = Enum['centos', 'debian', 'fedora', 'rhel', 'ubuntu']
