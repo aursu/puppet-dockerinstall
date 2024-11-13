@@ -35,7 +35,7 @@ fixtures:
       ref: 9.3.0
     systemd:
       repo: puppet/systemd
-      ref: 6.0.0
+      ref: 7.1.0
     tlsinfo:
       repo: aursu/tlsinfo
       ref: 0.5.0
