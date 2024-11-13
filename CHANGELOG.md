@@ -392,13 +392,14 @@ All notable changes to this project will be documented in this file.
 
 **Known Issues**
 
-## Release 0.21.0
+## Release 0.22.0
 
 **Features**
 
 * Added Windows support for private Registries auth (inside user home directory)
-* PDK upgrade to 3.2.0
-* Updated Ubunru repo
+* PDK upgrade to 3.3.0
+* Updated Ubuntu repo
+* Added docker compose plugin provider for custom type `dockerservice`
 
 **Bugfixes**
 
