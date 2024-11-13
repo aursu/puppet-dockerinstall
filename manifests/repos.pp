@@ -25,22 +25,23 @@ class dockerinstall::repos (
     if $manage_package {
       if $facts['os']['family'] == 'Debian' {
         # https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository
-        exec { 'curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/trusted.gpg.d/docker.asc':
+        exec { "curl -fsSL ${gpgkey} -o /etc/apt/trusted.gpg.d/docker.asc":
           path   => '/usr/bin:/bin',
           unless => 'gpg /etc/apt/trusted.gpg.d/docker.asc',
-          before => Apt::Source['cri-o'],
+          before => Apt::Source['docker'],
         }
 
         apt::source { 'docker':
           comment      => 'docker apt repository',
-          location     => 'https://download.docker.com/linux/ubuntu',
+          location     => $distrourl,
           release      => $facts['os']['distro']['codename'],
-          repos        => 'stable',
-          architecture => $facts['os']['architecture'],
-          keyring      => '/etc/apt/keyrings/docker.asc',
+          repos        => $repo,
+          architecture => $basearch,
+          keyring      => '/etc/apt/trusted.gpg.d/docker.asc',
         }
       }
       else {
+        # https://docs.docker.com/engine/install/rhel/#install-using-the-repository
         $gpgcheck_param = $gpgcheck ? {
           true    => '1',
           default => '0',
@@ -49,15 +50,16 @@ class dockerinstall::repos (
           true    => '1',
           default => '0',
         }
-        yumrepo { 'docker':
+
+        yumrepo { 'docker-ce':
           ensure    => $repo_ensure,
-          descr     => 'Docker',
+          descr     => 'Docker CE Stable - $basearch',
           baseurl   => $rpmurl,
           gpgkey    => $gpgkey,
           gpgcheck  => $gpgcheck_param,
           sslverify => $sslverify_param,
         }
-        file { '/etc/yum.repos.d/docker.repo':
+        file { '/etc/yum.repos.d/docker-ce.repo':
           ensure => $repo_ensure,
           mode   => '0644',
         }

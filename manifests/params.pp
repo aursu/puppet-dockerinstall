@@ -67,7 +67,8 @@ class dockerinstall::params {
     default: {
       $repo_os = $facts['os']['name'] ? {
         'Fedora' => 'fedora',
-        default  => 'centos',
+        'CentOS' => 'centos',
+        default  => 'rhel',
       }
       $service_config = '/etc/sysconfig/docker'
       $storage_config = '/etc/sysconfig/docker-storage'
