@@ -21,8 +21,8 @@ class dockerinstall::profile::registry (
   include tlsinfo
   include dockerinstall::registry::base
 
-  include puppet::params
-  $localcacert = $puppet::params::localcacert
+  include puppet::globals
+  $localcacert = $puppet::globals::localcacert
 
   include dockerinstall::registry::params
   $internal_certdir = $dockerinstall::registry::params::internal_certdir

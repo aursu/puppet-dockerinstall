@@ -18,9 +18,6 @@ fixtures:
     nginx:
       repo: aursu/nginx
       ref: 4.4.2
-    puppet:
-      repo: aursu/puppet
-      ref: 0.8.0
     puppet_agent:
       repo: puppetlabs/puppet_agent
       ref: 4.14.0
@@ -42,3 +39,7 @@ fixtures:
     yumrepo_core:
       repo: puppetlabs/yumrepo_core
       puppet_version: ">= 6.0.0"
+  repositories:
+    puppet:
+      repo: https://github.com/aursu/puppet-puppet.git
+      ref: "tags/v0.30.4"

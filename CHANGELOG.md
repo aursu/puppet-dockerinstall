@@ -404,3 +404,13 @@ All notable changes to this project will be documented in this file.
 **Bugfixes**
 
 **Known Issues**
+
+## Release 0.22.1
+
+**Features**
+
+**Bugfixes**
+
+* Added compatibility with new puppet module
+
+**Known Issues**
