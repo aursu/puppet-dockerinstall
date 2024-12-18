@@ -405,12 +405,13 @@ All notable changes to this project will be documented in this file.
 
 **Known Issues**
 
-## Release 0.22.1
+## Release 0.22.2
 
 **Features**
 
 **Bugfixes**
 
+* Added 27.x into list of allowed versions
 * Added compatibility with new puppet module
 
 **Known Issues**
