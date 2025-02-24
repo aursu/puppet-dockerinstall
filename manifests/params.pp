@@ -13,7 +13,7 @@ class dockerinstall::params {
   $docker_plugins_dir = '/usr/libexec/docker/cli-plugins'
 
   # predefined Docker Compose version - could  be overriden with dockerinstall::compose_version
-  $compose_version          = '2.26.1'
+  $compose_version          = '2.32.4'
   $compose_download_source  = 'https://github.com/docker/compose/releases/download'
 
   # docker compose project provides binaries only for x86_64 architecture
