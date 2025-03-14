@@ -405,7 +405,7 @@ All notable changes to this project will be documented in this file.
 
 **Known Issues**
 
-## Release 0.23.0
+## Release 0.23.1
 
 **Features**
 
@@ -415,5 +415,6 @@ All notable changes to this project will be documented in this file.
 
 * Added 27.x into list of allowed versions
 * Added compatibility with new puppet module
+* Removed deprecated `version` top scope Compose parameter
 
 **Known Issues**
