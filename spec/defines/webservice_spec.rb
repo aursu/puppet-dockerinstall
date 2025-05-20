@@ -23,7 +23,7 @@ describe 'dockerinstall::webservice' do
 
       it {
         is_expected.to contain_dockerinstall__composeservice('namevar/namevar')
-          .with_configuration(%r{^version: "3.8"$})
+          .without_configuration(%r{^version:})
       }
 
       it {
