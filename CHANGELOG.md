@@ -405,11 +405,12 @@ All notable changes to this project will be documented in this file.
 
 **Known Issues**
 
-## Release 0.23.2
+## Release 0.23.3
 
 **Features**
 
 * Updated module dependencies
+* Added ability to disable access logs in registry
 
 **Bugfixes**
 

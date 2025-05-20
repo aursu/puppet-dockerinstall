@@ -2,11 +2,15 @@
 #
 # Run registry container
 #
+# @param environment
+#   Additional registry container environment
+#
 # @example
 #   include dockerinstall::registry::base
 class dockerinstall::registry::base (
   String $docker_image = 'registry:2.8.1',
   Stdlib::Unixpath $data_directory = $dockerinstall::registry::params::data_directory,
+  Boolean $accesslog_disabled = false,
 ) inherits dockerinstall::registry::params {
   include dockerinstall::registry::auth_token
   $rootcertbundle = $dockerinstall::registry::auth_token::rootcertbundle
@@ -38,6 +42,15 @@ class dockerinstall::registry::base (
     $auth_token_volume = []
   }
 
+  if $accesslog_disabled {
+    $accesslog_disabled_environment = {
+      'REGISTRY_LOG_ACCESSLOG_DISABLED' => 'true',
+    }
+  }
+  else {
+    $accesslog_disabled_environment = {}
+  }
+
   $compose_service = $dockerinstall::registry::params::compose_service
   $compose_project = $dockerinstall::registry::params::compose_project
 
@@ -50,10 +63,12 @@ class dockerinstall::registry::base (
     expose_ports  => [
       '5000:5000',
     ],
+    # Use the delete structure to enable the deletion of image blobs and manifests by digest
     environment   => {
       'REGISTRY_STORAGE_DELETE_ENABLED' => 'true',
     } +
-    $auth_tonken_environment,
+    $auth_tonken_environment +
+    $accesslog_disabled_environment,
     docker_volume => [
       "${data_directory}:/var/lib/registry",
     ] +
