@@ -22,11 +22,11 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
   newproperty(:ensure) do
     desc 'Whether a service should be running.'
 
-    newvalue(:stopped, :event => :service_stopped) do # rubocop:disable Style/HashSyntax
+    newvalue(:stopped, :event => :service_stopped) do
       provider.stop
     end
 
-    newvalue(:running, :event => :service_started, :invalidate_refreshes => true) do # rubocop:disable Style/HashSyntax
+    newvalue(:running, :event => :service_started, :invalidate_refreshes => true) do
       provider.start
     end
 
@@ -64,7 +64,7 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
     ]
   end
 
-  newparam(:project, namevar: true, :parent => DockerserviceParam) do # rubocop:disable Style/HashSyntax
+  newparam(:project, namevar: true, :parent => DockerserviceParam) do
     desc 'Docker Compose project name. It could be absolute path to a project
       directory or just alternate project name'
 
@@ -95,7 +95,7 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
     end
   end
 
-  newparam(:basedir, :parent => DockerserviceParam) do # rubocop:disable Style/HashSyntax
+  newparam(:basedir, :parent => DockerserviceParam) do
     desc 'The directory where to store Docker Compose projects (it could be
       runtime or temporary directory). By default /var/run/compose'
 
@@ -117,7 +117,7 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
     end
   end
 
-  newparam(:path, :parent => DockerserviceParam) do # rubocop:disable Style/HashSyntax
+  newparam(:path, :parent => DockerserviceParam) do
     desc 'Path to Docker Compose configuration file. Path should be
       absolute or relative to Project directory'
 

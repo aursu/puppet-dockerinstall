@@ -26,10 +26,9 @@ fixtures:
       ref: 4.0.0
     selinux_core:
       repo: puppetlabs/selinux_core
-      puppet_version: ">= 6.0.0"
     stdlib:
       repo: puppetlabs/stdlib
-      ref: 9.3.0
+      ref: 9.7.0
     systemd:
       repo: puppet/systemd
       ref: 7.1.0
@@ -38,7 +37,6 @@ fixtures:
       ref: 0.5.0
     yumrepo_core:
       repo: puppetlabs/yumrepo_core
-      puppet_version: ">= 6.0.0"
   repositories:
     puppet:
       repo: https://github.com/aursu/puppet-puppet.git

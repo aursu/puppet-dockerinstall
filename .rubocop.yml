@@ -5,7 +5,7 @@ require:
 AllCops:
   NewCops: enable
   DisplayCopNames: true
-  TargetRubyVersion: '2.6'
+  TargetRubyVersion: '3.1'
   Include:
   - "**/*.rb"
   Exclude:
@@ -423,6 +423,8 @@ Style/GlobalStdStream:
 Style/HashAsLastArrayItem:
   Enabled: false
 Style/HashLikeCase:
+  Enabled: false
+Style/HashSyntax:
   Enabled: false
 Style/HashTransformKeys:
   Enabled: false

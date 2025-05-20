@@ -1,7 +1,7 @@
 Puppet::Type.type(:dockerservice).provide(
   :compose,
   # set ini_setting as the parent provider
-  :parent => Puppet::Type.type(:service).provider(:base), # rubocop:disable Style/HashSyntax
+  :parent => Puppet::Type.type(:service).provider(:base),
 ) do
   @doc = 'Docker service provider'
 
