@@ -14,8 +14,7 @@ describe 'dockerinstall::registry::base' do
     context "on #{os}" do
       let(:facts) { os_facts }
       let(:params) do
-        {
-        }
+        {}
       end
 
       it { is_expected.to compile }
@@ -29,7 +28,7 @@ describe 'dockerinstall::registry::base' do
             'build' => false,
           )
           .without_path
-        
+
         is_expected.to contain_dockerservice('registry/registry')
           .with_configuration(%r{- 5000:5000})
 

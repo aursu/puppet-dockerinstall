@@ -144,8 +144,8 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
       path = resource.fixpath(value)
       if Puppet::Util.absolute_path?(path)
         path
-      else
-        File.join(@resource[:basedir], @resource[:project], path) if @resource[:basedir]
+      elsif @resource[:basedir]
+        File.join(@resource[:basedir], @resource[:project], path)
       end
     end
   end
