@@ -3,7 +3,7 @@
 # Docker registry installation profile
 #
 # @example
-#   include dockerinstall::registry
+#   include dockerinstall::profile::registry
 class dockerinstall::profile::registry (
   String $server_name,
   Optional[String] $cert_identity = $server_name,
