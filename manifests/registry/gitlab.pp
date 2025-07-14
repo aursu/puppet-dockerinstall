@@ -44,21 +44,23 @@ class dockerinstall::registry::gitlab (
 
   $registry_cert_path  = $dockerinstall::registry::params::auth_token_rootcertbundle
 
-  $registry_cert_content = $registry_internal_certificate ? {
-    String  => $registry_internal_certificate,
-    default => $facts['puppet_sslcert']['hostcert']['data'],
-  }
-
-  if $registry_cert_export {
-    @@file { 'registry_rootcertbundle':
-      path    => $registry_cert_path,
-      content => $registry_cert_content,
-      tag     => $gitlab_host,
+  if $registry_internal_certificate or ($facts['puppet_sslcert'] and $facts['puppet_sslcert']['hostcert'] and $facts['puppet_sslcert']['hostcert']['data']) {
+    $registry_cert_content = $registry_internal_certificate ? {
+      String  => $registry_internal_certificate,
+      default => $facts['puppet_sslcert']['hostcert']['data'],
     }
-  }
-  else {
-    file { $registry_cert_path:
-      content => $registry_cert_content,
+
+    if $registry_cert_export {
+      @@file { 'registry_rootcertbundle':
+        path    => $registry_cert_path,
+        content => $registry_cert_content,
+        tag     => $gitlab_host,
+      }
+    }
+    else {
+      file { $registry_cert_path:
+        content => $registry_cert_content,
+      }
     }
   }
 

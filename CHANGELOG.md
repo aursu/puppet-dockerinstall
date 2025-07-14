@@ -419,3 +419,13 @@ All notable changes to this project will be documented in this file.
 * Removed deprecated `version` top scope Compose parameter
 
 **Known Issues**
+
+## Release 0.23.4
+
+**Features**
+
+**Bugfixes**
+
+* fact `puppet_sslcert` could be not accessible on newly built server
+
+**Known Issues**
