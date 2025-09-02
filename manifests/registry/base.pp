@@ -11,6 +11,7 @@ class dockerinstall::registry::base (
   String $docker_image = 'registry:2.8.1',
   Stdlib::Unixpath $data_directory = $dockerinstall::registry::params::data_directory,
   Boolean $accesslog_disabled = false,
+  Boolean $traces_disabled = false,
 ) inherits dockerinstall::registry::params {
   include dockerinstall::registry::auth_token
   $rootcertbundle = $dockerinstall::registry::auth_token::rootcertbundle
@@ -51,6 +52,15 @@ class dockerinstall::registry::base (
     $accesslog_disabled_environment = {}
   }
 
+  if $traces_disabled {
+    $traces_disabled_environment = {
+      'OTEL_TRACES_EXPORTER' => 'none',
+    }
+  }
+  else {
+    $traces_disabled_environment = {}
+  }
+
   $compose_service = $dockerinstall::registry::params::compose_service
   $compose_project = $dockerinstall::registry::params::compose_project
 
@@ -68,7 +78,8 @@ class dockerinstall::registry::base (
       'REGISTRY_STORAGE_DELETE_ENABLED' => 'true',
     } +
     $auth_tonken_environment +
-    $accesslog_disabled_environment,
+    $accesslog_disabled_environment +
+    $traces_disabled_environment,
     docker_volume => [
       "${data_directory}:/var/lib/registry",
     ] +

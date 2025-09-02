@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.23.5
+
+**Features**
+
+* Added `traces_disabled` parameter to Docker registry base class for OpenTelemetry traces control
+* Added `OTEL_TRACES_EXPORTER` environment variable support to disable OpenTelemetry traces
+
+**Bugfixes**
+
+**Known Issues**
+
 ## Release 0.1.0
 
 **Features**
