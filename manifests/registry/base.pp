@@ -2,13 +2,25 @@
 #
 # Run registry container
 #
-# @param environment
-#   Additional registry container environment
+# @param docker_image
+#   Docker image to use for the registry container. Defaults to 'registry:3.0.0'
+#
+# @param data_directory
+#   Path to the directory where registry data will be stored on the host system.
+#   This directory will be mounted as /var/lib/registry inside the container.
+#
+# @param accesslog_disabled
+#   Boolean flag to disable access logging in the registry.
+#   When set to true, sets REGISTRY_LOG_ACCESSLOG_DISABLED=true environment variable.
+#
+# @param traces_disabled
+#   Boolean flag to disable OpenTelemetry traces in the registry.
+#   When set to true, sets OTEL_TRACES_EXPORTER=none environment variable.
 #
 # @example
 #   include dockerinstall::registry::base
 class dockerinstall::registry::base (
-  String $docker_image = 'registry:2.8.1',
+  String $docker_image = 'registry:3.0.0',
   Stdlib::Unixpath $data_directory = $dockerinstall::registry::params::data_directory,
   Boolean $accesslog_disabled = false,
   Boolean $traces_disabled = false,
