@@ -106,10 +106,10 @@ volumes:
   <%= vol %>:
 <%   end -%>
 <% end -%>
-<% if @project_secrets -%>
+<% if @project_secrets_final -%>
 
 secrets:
-<%   @project_secrets.each do |secret_name, secret_config| -%>
+<%   @project_secrets_final.each do |secret_name, secret_config| -%>
   <%= secret_name %>:
 <%     if secret_config.is_a?(Hash) -%>
 <%       secret_config.each do |typ, value| -%>

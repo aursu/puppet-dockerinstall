@@ -181,14 +181,18 @@ describe 'dockerinstall::webservice' do
       context 'when project secrets specified' do
         let(:params) do
           super().merge(
-            project_secrets: {
-              'github_key' => {
-                'file' => '/path/to/github.key',
+            project_secrets: [
+              {
+                'name' => 'github_key',
+                'type' => 'file',
+                'value' => '/path/to/github.key',
               },
-              'api_token' => {
-                'environment' => 'API_TOKEN',
+              {
+                'name' => 'api_token',
+                'type' => 'environment',
+                'value' => 'API_TOKEN',
               },
-            },
+            ],
           )
         end
 
@@ -206,15 +210,83 @@ describe 'dockerinstall::webservice' do
         }
       end
 
+      context 'when project secrets with setup flag specified' do
+        let(:params) do
+          super().merge(
+            project_name: 'testapp',
+            project_secrets: [
+              {
+                'name' => 'github_key',
+                'type' => 'file',
+                'value' => 'secret-key-content',
+                'setup' => true,
+                'filename' => 'github.pem',
+              },
+            ],
+          )
+        end
+
+        it {
+          is_expected.to contain_file('/var/lib/compose/testapp/secrets')
+            .with_ensure('directory')
+            .with_mode('0700')
+        }
+
+        it {
+          is_expected.to contain_file('/var/lib/compose/testapp/secrets/github.pem')
+            .with_ensure('file')
+            .with_content('secret-key-content')
+            .with_mode('0600')
+        }
+
+        it {
+          is_expected.to contain_dockerinstall__composeservice('testapp/namevar')
+            .with_configuration(%r{^secrets:$})
+            .with_configuration(%r{^[ ]{2}github_key:$})
+            .with_configuration(%r{^[ ]{4}file: secrets/github\.pem$})
+        }
+      end
+
+      context 'when project secrets filename ends with .env' do
+        let(:params) do
+          super().merge(
+            project_name: 'testapp',
+            project_secrets: [
+              {
+                'name' => 'db_password',
+                'type' => 'file',
+                'value' => 'secret-db-password',
+                'setup' => true,
+                'filename' => 'database.env',
+              },
+            ],
+          )
+        end
+
+        it {
+          is_expected.to contain_file('/var/lib/compose/testapp/secrets/database.env.sec')
+            .with_ensure('file')
+            .with_content('secret-db-password')
+            .with_mode('0600')
+        }
+
+        it {
+          is_expected.to contain_dockerinstall__composeservice('testapp/namevar')
+            .with_configuration(%r{^[ ]{4}file: secrets/database\.env\.sec$})
+        }
+      end
+
       context 'when both docker_secret and project_secrets specified' do
         let(:params) do
           super().merge(
             docker_secret: ['github_key'],
-            project_secrets: {
-              'github_key' => {
-                'file' => '/run/secrets/github.pem',
+            project_secrets: [
+              {
+                'name' => 'github_key',
+                'type' => 'file',
+                'value' => '/run/secrets/github.pem',
               },
-            },
+            ],
           )
         end
 

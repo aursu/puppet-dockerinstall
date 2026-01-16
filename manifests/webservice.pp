@@ -236,7 +236,7 @@ define dockerinstall::webservice (
         $secret_file_path = "${project_secrets_path}/${secret_filename}"
 
         # Create file if setup is true
-        if $secret_setup and $secret_filename {
+        if $secret_setup {
           unless $decomission {
             file { $secret_file_path:
               ensure  => file,
@@ -245,9 +245,11 @@ define dockerinstall::webservice (
               require => File[$project_secrets_path],
             }
           }
+          $secret_config = { 'file' => "secrets/${secret_filename}" }
         }
-
-        $secret_config = { 'file' => $secret_file_path }
+        else {
+          $secret_config = { 'file' => $secret_value }
+        }
       } else {
         # type == 'environment'
         $secret_config = { 'environment' => $secret_value }
