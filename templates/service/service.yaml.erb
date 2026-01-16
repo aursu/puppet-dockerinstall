@@ -32,6 +32,12 @@ services:
     env_file:
       - secrets/<%= @env_name %>.env
 <% end -%>
+<% if @docker_secret -%>
+    secrets:
+<%   Array(@docker_secret).each do |secret| -%>
+      - <%= secret %>
+<%   end -%>
+<% end -%>
 <% if @docker_volume -%>
     volumes:
 <%   Array(@docker_volume).each do |vol| -%>
@@ -98,5 +104,17 @@ networks:
 volumes:
 <%   Array(@project_volumes).each do |vol| -%>
   <%= vol %>:
+<%   end -%>
+<% end -%>
+<% if @project_secrets -%>
+
+secrets:
+<%   @project_secrets.each do |secret_name, secret_config| -%>
+  <%= secret_name %>:
+<%     if secret_config.is_a?(Hash) -%>
+<%       secret_config.each do |typ, value| -%>
+    <%= typ %>: <%= value %>
+<%       end -%>
+<%     end -%>
 <%   end -%>
 <% end -%>

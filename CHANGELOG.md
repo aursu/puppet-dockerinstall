@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.24.0
+
+**Features**
+
+* Added `docker_secret` parameter to dockerinstall::webservice for Docker Compose secrets configuration
+* Added `project_secrets` parameter to dockerinstall::webservice for project-level secrets definition
+* Fixed variable naming conflict: renamed internal `$project_secrets` to `$project_secrets_path`
+
+**Bugfixes**
+
+**Known Issues**
+
 ## Release 0.23.5
 
 **Features**

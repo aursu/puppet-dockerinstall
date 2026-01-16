@@ -159,6 +159,18 @@ define dockerinstall::webservice (
     ]
   ]       $docker_command       = undef,
   Boolean $privileged           = false,
+
+  Optional[Array[String]] $docker_secret = undef,
+  Optional[
+    Hash[
+      String,
+      Hash[
+        Enum['file', 'environment'],
+        Variant[String, Boolean]
+      ]
+    ]
+  ]       $project_secrets      = undef,
+
   Boolean $decomission          = false,
 ) {
   include dockerinstall::params
@@ -180,25 +192,25 @@ define dockerinstall::webservice (
   $project_directory = "${project_basedir}/${project_name}"
 
   # directory where project secrets are stored
-  $project_secrets   = "${project_directory}/secrets"
+  $project_secrets_path   = "${project_directory}/secrets"
 
   if $env_name and $secrets {
     if $decomission {
-      file { $project_secrets:
+      file { $project_secrets_path:
         ensure => absent,
         force  => true,
       }
-      file { "${project_secrets}/${env_name}.env":
+      file { "${project_secrets_path}/${env_name}.env":
         ensure  => absent,
       }
     }
     else {
-      file { $project_secrets:
+      file { $project_secrets_path:
         ensure => directory,
         mode   => '0700',
       }
 
-      file { "${project_secrets}/${env_name}.env":
+      file { "${project_secrets_path}/${env_name}.env":
         ensure  => file,
         content => template('dockerinstall/service/secrets.env.erb'),
         notify  => Dockerservice[$project_title],
