@@ -102,6 +102,18 @@
 #   access to all devices
 #   see: https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities
 #
+# @param docker_secret
+#   Array of secret names to reference in the service
+#   see: https://docs.docker.com/compose/compose-file/#secrets
+#
+# @param project_secrets
+#   Array of secret definitions (Dockerinstall::Secret struct)
+#   Each secret must have: name (String), type ('file' or 'environment'), value (String)
+#   Optional: setup (Boolean, default false), filename (String)
+#   When setup is true and type is 'file', creates a file at ${project_directory}/secrets/filename
+#   Filenames ending with .env will have .sec appended
+#   see: https://docs.docker.com/compose/compose-file/#secrets-configuration-reference
+#
 # @param decomission
 #   Compose service decomission (stop and removal)
 #
@@ -161,15 +173,7 @@ define dockerinstall::webservice (
   Boolean $privileged           = false,
 
   Optional[Array[String]] $docker_secret = undef,
-  Optional[
-    Hash[
-      String,
-      Hash[
-        Enum['file', 'environment'],
-        Variant[String, Boolean]
-      ]
-    ]
-  ]       $project_secrets      = undef,
+  Optional[Array[Dockerinstall::Secret]] $project_secrets = undef,
 
   Boolean $decomission          = false,
 ) {
@@ -193,6 +197,67 @@ define dockerinstall::webservice (
 
   # directory where project secrets are stored
   $project_secrets_path   = "${project_directory}/secrets"
+
+  if $decomission {
+    file { $project_secrets_path:
+      ensure => absent,
+      force  => true,
+    }
+  }
+  else {
+    file { $project_secrets_path:
+      ensure => directory,
+      mode   => '0700',
+    }
+  }
+
+  # Process project_secrets array and generate final hash for template
+  if $project_secrets {
+    $project_secrets_final = $project_secrets.reduce({}) |$memo, $secret| {
+      $secret_name = $secret['name']
+      $secret_type = $secret['type']
+      $secret_value = $secret['value']
+      $secret_setup = pick($secret['setup'], false)
+      $filename = $secret['filename']
+
+      # Generate secret configuration based on type
+      if $secret_type == 'file' {
+        # Determine the file path
+        if $filename {
+          # Ensure filename doesn't end with .env, if it does add .sec
+          if $filename =~ /\.env$/ {
+            $secret_filename = "${filename}.sec"
+          } else {
+            $secret_filename = $filename
+          }
+        } else {
+          $secret_filename = "${secret_name}.sec"
+        }
+        $secret_file_path = "${project_secrets_path}/${secret_filename}"
+
+        # Create file if setup is true
+        if $secret_setup and $secret_filename {
+          unless $decomission {
+            file { $secret_file_path:
+              ensure  => file,
+              content => $secret_value,
+              mode    => '0600',
+              require => File[$project_secrets_path],
+            }
+          }
+        }
+
+        $secret_config = { 'file' => $secret_file_path }
+      } else {
+        # type == 'environment'
+        $secret_config = { 'environment' => $secret_value }
+      }
+
+      $memo + { $secret_name => $secret_config }
+    }
+  } else {
+    $project_secrets_final = undef
+  }
 
   if $env_name and $secrets {
     if $decomission {
