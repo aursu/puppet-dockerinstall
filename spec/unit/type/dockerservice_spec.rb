@@ -17,7 +17,7 @@ describe Puppet::Type.type(:dockerservice) do
       configuration: '{}',
       catalog: catalog,
     }
-    expect { described_class.new(params) }.to raise_error(RuntimeError, %r{Service centos7curlbuild does not exist in configuration file})
+    expect { described_class.new(params) }.to raise_error(Puppet::Error, %r{Service centos7curlbuild does not exist in configuration file})
   end
 
   context 'when title_patterns' do

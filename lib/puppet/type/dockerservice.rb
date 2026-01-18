@@ -99,16 +99,25 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
     desc 'The directory where to store Docker Compose projects (it could be
       runtime or temporary directory). By default /var/run/compose'
 
-    # provider has a check for /run directory
-    defaultto { provider.class.basedir if provider.class.respond_to?(:basedir) }
+    # Determine default basedir based on system
+    defaultto do
+      if File.directory?('/run')
+        '/run/compose'
+      else
+        '/var/run/compose'
+      end
+    end
 
     validate do |value|
       super(value)
       path = resource.fixpath(value)
       raise Puppet::Error, 'Basedir must be absolute' unless Puppet::Util.absolute_path?(path)
 
-      # fail if base directory is not in catalog
-      raise 'File resource for base directory %{path} not found' % { path: path } unless @resource.catalog.resource(:file, path)
+      # fail if base directory is not in catalog (only when explicitly set)
+      # Skip validation for default values to allow implicit basedir usage
+      if @should
+        raise 'File resource for base directory %{path} not found' % { path: path } unless @resource.catalog.resource(:file, path)
+      end
     end
 
     munge do |value|
@@ -144,8 +153,17 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
       path = resource.fixpath(value)
       if Puppet::Util.absolute_path?(path)
         path
-      elsif @resource[:basedir]
-        File.join(@resource[:basedir], @resource[:project], path)
+      else
+        basedir = @resource[:basedir]
+        # If basedir is not set, determine default based on system
+        if basedir.nil?
+          basedir = if File.directory?('/run')
+                      '/run/compose'
+                    else
+                      '/var/run/compose'
+                    end
+        end
+        File.join(basedir, @resource[:project], path)
       end
     end
   end
@@ -172,7 +190,20 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
     validate do |value|
       raise Puppet::Error, 'Configuration must be a string' unless value.is_a?(String)
       raise Puppet::Error, 'Configuration must be a non-empty string' if value.empty?
+
+      # Validate YAML structure
       provider.configuration_validate(value) if provider.respond_to?(:configuration_validate)
+
+      # Check if service exists in configuration
+      begin
+        data = YAML.safe_load(value)
+        service_name = resource[:name]
+        unless data['services'] && data['services'].include?(service_name)
+          raise Puppet::Error, "Service #{service_name} does not exist in configuration file"
+        end
+      rescue YAML::SyntaxError => e
+        raise Puppet::Error, "Unable to parse configuration: #{e.message}"
+      end
     end
 
     munge do |value|
@@ -266,7 +297,38 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
   end
 
   validate do
-    provider.configuration_integrity if provider.respond_to?(:configuration_integrity)
+    raise Puppet::Error, 'Configuration parameter is required' unless self[:configuration]
+
+    # Validate build requirements - check if build parameter is explicitly set to true
+    if self[:build] && self[:build] != :false
+      begin
+        config_content = @parameters[:configuration].actual_content
+        raise Puppet::Error, 'Configuration content is not available' unless config_content
+
+        data = YAML.safe_load(config_content)
+        service_name = self[:name]
+        service = data['services'][service_name] if data['services']
+
+        if service
+          build_config = service['build']
+          unless service['image'] && build_config
+            raise Puppet::Error, "Service definition should contain 'image' and 'build' parameters"
+          end
+
+          # Validate build context
+          if build_config.is_a?(Hash) && !build_config['context']
+            raise Puppet::Error, "Service 'build' parameter should contain 'context' parameter"
+          end
+        end
+      rescue YAML::SyntaxError => e
+        raise Puppet::Error, "Unable to parse configuration: #{e.message}"
+      end
+    end
+
+    # Ensure provider is available and properly initialized
+    if provider && provider.respond_to?(:configuration_integrity)
+      provider.configuration_integrity
+    end
   end
 
   def configuration

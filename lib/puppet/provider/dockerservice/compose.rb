@@ -164,7 +164,9 @@ Puppet::Type.type(:dockerservice).provide(
     data     = YAML.safe_load(resource.configuration)
 
     # error if service does not exist in docker-compose yaml
-    raise 'Service %{name} does not exist in configuration file' % { name: name } unless data['services'] && data['services'].include?(name)
+    unless data['services'] && data['services'].include?(name)
+      raise Puppet::Error, "Service #{name} does not exist in configuration file"
+    end
 
     service = data['services'][name]
     build = service['build']
