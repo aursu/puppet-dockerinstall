@@ -119,61 +119,15 @@ Puppet::Type.type(:dockerservice).provide(
   end
 
   def configuration_validate(value)
-    data = YAML.safe_load(value)
-    raise Puppet::Error, _('%{path}: file does not contain a valid yaml hash') % { path: @resource[:path] } unless data.is_a?(Hash)
-  rescue YAML::SyntaxError => e
-    raise Puppet::Error, _("Unable to parse #{e.message}")
-  end
-
-  def docker_build_validate(build)
-    confpath = @resource[:path]
-    confdir  = File.dirname(confpath)
-
-    context = build['context']
-    # dockerfile = build['dockerfile'] || 'Dockerfile'
-    context_path = nil
-
-    raise Puppet::Error, "Service 'build' parameter should contain 'context' parameter" unless context
-
-    case context
-    # when context is URL - git repositories and URLs to tarball are supported
-    when %r{^https?://}
-      # https://docs.docker.com/engine/reference/commandline/build/#git-repositories
-      # https://docs.docker.com/engine/reference/commandline/build/#tarball-contexts
-      unless context.match?(%r{\.git(#.+)?$})
-        raise 'Docker build context must be valid Git repo URL'
-      end
-    when %r{^/}
-      context_path = context
-    else
-      context_path = File.join(confdir, context)
-    end
-
-    return unless context_path
-
-    raise Puppet::Error, _('Context path must be absolute, not %{entry}') % { entry: context_path } unless Puppet::Util.absolute_path?(context_path)
-
-    # raise Puppet::Error, "Docker build context directory does not exist: #{context_path}" unless File.directory?(context_path)
-    # dockerfile_path = File.join(context_path, dockerfile)
-
-    # raise Puppet::Error, "Docker file could not be found: #{dockerfile_path}" unless File.exist?(dockerfile_path)
+    PuppetX::Dockerinstall.validate_yaml_syntax(value, @resource[:path])
   end
 
   def configuration_integrity
-    name     = @resource[:name]
-    data     = YAML.safe_load(resource.configuration)
+    config_content = resource.configuration
+    service_name = @resource[:name]
+    confpath = @resource[:path]
+    build_enabled = @resource.build?
 
-    # error if service does not exist in docker-compose yaml
-    unless data['services'] && data['services'].include?(name)
-      raise Puppet::Error, "Service #{name} does not exist in configuration file"
-    end
-
-    service = data['services'][name]
-    build = service['build']
-
-    return unless @resource.build?
-
-    raise Puppet::Error, "Service definition should contain 'image' and 'build' parameters" unless service['image'] && build
-    docker_build_validate(build)
+    PuppetX::Dockerinstall.validate_configuration_integrity(config_content, service_name, confpath, build_enabled)
   end
 end

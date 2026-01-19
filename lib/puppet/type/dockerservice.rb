@@ -290,35 +290,10 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
   validate do
     raise Puppet::Error, 'Configuration parameter is required' unless self[:configuration]
 
-    # Validate build requirements - check if build parameter is explicitly set to true
+    # Basic build validation - provider will do more detailed checks
     if self[:build] && self[:build] != :false
-      begin
-        config_content = @parameters[:configuration].actual_content
-        raise Puppet::Error, 'Configuration content is not available' unless config_content
-
-        data = YAML.safe_load(config_content)
-        service_name = self[:name]
-        service = data['services'][service_name] if data['services']
-
-        if service
-          build_config = service['build']
-          unless service['image'] && build_config
-            raise Puppet::Error, "Service definition should contain 'image' and 'build' parameters"
-          end
-
-          # Validate build context
-          if build_config.is_a?(Hash) && !build_config['context']
-            raise Puppet::Error, "Service 'build' parameter should contain 'context' parameter"
-          end
-        end
-      rescue YAML::SyntaxError => e
-        raise Puppet::Error, "Unable to parse configuration: #{e.message}"
-      end
-    end
-
-    # Ensure provider is available and properly initialized
-    if provider && provider.respond_to?(:configuration_integrity)
-      provider.configuration_integrity
+      config_content = @parameters[:configuration].actual_content
+      PuppetX::Dockerinstall.validate_build_requirements(config_content, self[:name])
     end
   end
 
