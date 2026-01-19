@@ -182,19 +182,8 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
       raise Puppet::Error, 'Configuration must be a string' unless value.is_a?(String)
       raise Puppet::Error, 'Configuration must be a non-empty string' if value.empty?
 
-      # Validate YAML structure
-      provider.configuration_validate(value) if provider.respond_to?(:configuration_validate)
-
-      # Check if service exists in configuration
-      begin
-        data = YAML.safe_load(value)
-        service_name = resource[:name]
-        unless data['services'] && data['services'].include?(service_name)
-          raise Puppet::Error, "Service #{service_name} does not exist in configuration file"
-        end
-      rescue YAML::SyntaxError => e
-        raise Puppet::Error, "Unable to parse configuration: #{e.message}"
-      end
+      # Validate YAML structure and syntax
+      PuppetX::Dockerinstall.validate_yaml_syntax(value, resource[:path])
     end
 
     munge do |value|
@@ -291,9 +280,7 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
     raise Puppet::Error, 'Configuration parameter is required' unless self[:configuration]
 
     # Full configuration integrity validation (same as pre-January provider.configuration_integrity)
-    config_content = @parameters[:configuration].actual_content
-    build_enabled = self[:build] && self[:build] != :false
-    PuppetX::Dockerinstall.validate_configuration_integrity(config_content, self[:name], self[:path], build_enabled)
+    PuppetX::Dockerinstall.validate_configuration_integrity(configuration, self[:name], self[:path], build?)
   end
 
   def configuration
