@@ -6,7 +6,7 @@ require 'puppet_x/dockerinstall'
 describe PuppetX::Dockerinstall do
   describe '.default_basedir' do
     context 'when /run directory exists' do
-      before do
+      before(:each) do
         allow(File).to receive(:directory?).with('/run').and_return(true)
       end
 
@@ -16,7 +16,7 @@ describe PuppetX::Dockerinstall do
     end
 
     context 'when /run directory does not exist' do
-      before do
+      before(:each) do
         allow(File).to receive(:directory?).with('/run').and_return(false)
       end
 
@@ -247,7 +247,7 @@ describe PuppetX::Dockerinstall do
     context 'with absolute path' do
       let(:build) { { 'context' => '/opt/myapp/build' } }
 
-      before do
+      before(:each) do
         allow(Puppet::Util).to receive(:absolute_path?).with('/opt/myapp/build').and_return(true)
       end
 
@@ -259,7 +259,7 @@ describe PuppetX::Dockerinstall do
     context 'with relative path (becomes absolute)' do
       let(:build) { { 'context' => '.' } }
 
-      before do
+      before(:each) do
         allow(Puppet::Util).to receive(:absolute_path?).and_call_original
         allow(Puppet::Util).to receive(:absolute_path?)
           .with('/var/lib/compose/myapp').and_return(true)
