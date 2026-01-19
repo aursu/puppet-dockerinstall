@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.25.0
+
+**Features**
+
+* Refactored basedir determination logic to use shared helper module `PuppetX::Dockerinstall`
+* Fixed dockerservice type to properly handle basedir defaultto without provider initialization timing issues
+* Fixed path munging to use consistent basedir logic across type and providers
+* Added build parameter validation in type validate block for better error messages
+
+**Bugfixes**
+
+* Fixed basedir parameter to return default value when not explicitly set
+* Fixed configuration validation to properly check service existence
+* Fixed build validation to execute during resource creation
+
+**Known Issues**
+
 ## Release 0.24.0
 
 **Features**
