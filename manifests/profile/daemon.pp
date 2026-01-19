@@ -23,7 +23,7 @@ class dockerinstall::profile::daemon (
   $docker_tlsdir = $dockerinstall::params::docker_tlsdir
 
   class { 'dockerinstall::tls':
-    users_access  => $tls_users_access,
+    users_access => $tls_users_access,
   }
 
   class { 'dockerinstall::config':

@@ -268,7 +268,7 @@ define dockerinstall::webservice (
         force  => true,
       }
       file { "${project_secrets_path}/${env_name}.env":
-        ensure  => absent,
+        ensure => absent,
       }
     }
     else {

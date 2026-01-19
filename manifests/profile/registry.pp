@@ -32,7 +32,7 @@ class dockerinstall::profile::registry (
     # CA certificate
     # create CA certificate directory
     file { $internal_certdir:
-      ensure  => directory,
+      ensure => directory,
     }
 
     if $ssl_client_ca_certs {

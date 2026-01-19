@@ -25,12 +25,12 @@ class dockerinstall::tls (
 
   # CA certificate
   file { "${docker_tlsdir}/ca.pem":
-    source  => "file://${localcacert}",
+    source => "file://${localcacert}",
   }
 
   # Client certificate
   file { "${docker_tlsdir}/cert.pem":
-    source  => "file://${hostcert}",
+    source => "file://${hostcert}",
   }
 
   if $users_access {
