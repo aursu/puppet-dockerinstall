@@ -1,12 +1,16 @@
+require 'puppet_x/dockerinstall'
+
 Puppet::Type.type(:dockerservice).provide(
   :compose,
   # set ini_setting as the parent provider
-  :parent => Puppet::Type.type(:service).provider(:base),
+  :parent => Puppet::Type.type(:dockerservice).provider(:base),
 ) do
   @doc = 'Docker service provider'
 
+  # Delegate to helper module
+  # Child providers inherit this method
   def self.basedir
-    Puppet::Type::Dockerservice.default_basedir
+    PuppetX::Dockerinstall.default_basedir
   end
 
   commands compose: 'docker-compose'

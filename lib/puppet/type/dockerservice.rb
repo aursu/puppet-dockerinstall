@@ -1,5 +1,6 @@
 require 'yaml'
 require 'puppet/parameter/boolean'
+require 'puppet_x/dockerinstall'
 
 Puppet::Type.newtype(:dockerservice, self_refresh: true) do
   @doc = 'Docker Compose service'
@@ -64,15 +65,6 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
     ]
   end
 
-  # Determine default basedir based on system
-  def self.default_basedir
-    if File.directory?('/run')
-      '/run/compose'
-    else
-      '/var/run/compose'
-    end
-  end
-
   newparam(:project, namevar: true, :parent => DockerserviceParam) do
     desc 'Docker Compose project name. It could be absolute path to a project
       directory or just alternate project name'
@@ -108,9 +100,9 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
     desc 'The directory where to store Docker Compose projects (it could be
       runtime or temporary directory). By default /var/run/compose'
 
-    # Determine default basedir based on system
+    # Use helper to determine default basedir
     defaultto do
-      Puppet::Type::Dockerservice.default_basedir
+      PuppetX::Dockerinstall.default_basedir
     end
 
     validate do |value|
@@ -160,8 +152,8 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
         path
       else
         basedir = @resource[:basedir]
-        # If basedir is not set, use default
-        basedir ||= Puppet::Type::Dockerservice.default_basedir
+        # If basedir is not set, use helper's default
+        basedir ||= PuppetX::Dockerinstall.default_basedir
         File.join(basedir, @resource[:project], path)
       end
     end

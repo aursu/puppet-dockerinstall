@@ -5,10 +5,6 @@ Puppet::Type.type(:dockerservice).provide(
 ) do
   @doc = 'Docker service provider based on Docker Compose v2'
 
-  def self.basedir
-    Puppet::Type::Dockerservice.default_basedir
-  end
-
   commands compose: 'docker-compose'
 
   if command('compose')

@@ -5,10 +5,6 @@ Puppet::Type.type(:dockerservice).provide(
 ) do
   @doc = 'Docker service provider based on Docker Compose plugin'
 
-  def self.basedir
-    Puppet::Type::Dockerservice.default_basedir
-  end
-
   commands docker: 'docker'
 
   # Docker version 27.3.1, build ce12230
