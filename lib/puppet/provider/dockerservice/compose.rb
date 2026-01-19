@@ -6,11 +6,7 @@ Puppet::Type.type(:dockerservice).provide(
   @doc = 'Docker service provider'
 
   def self.basedir
-    if File.directory?('/run')
-      '/run/compose'
-    else
-      '/var/run/compose'
-    end
+    Puppet::Type::Dockerservice.default_basedir
   end
 
   commands compose: 'docker-compose'
