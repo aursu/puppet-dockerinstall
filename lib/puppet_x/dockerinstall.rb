@@ -24,19 +24,39 @@ module PuppetX::Dockerinstall
     end
   end
 
-  # Validate build requirements in service configuration
-  # Used by type during resource validation
+  # Parse YAML configuration with error handling
+  # Helper method to centralize YAML parsing logic
   #
-  # @param config_content [String] YAML content of docker-compose configuration
-  # @param service_name [String] Name of the service to validate
-  # @return [void]
+  # @param config_content [String] YAML content to parse
+  # @return [Hash] Parsed YAML data
+  # @raise [Puppet::Error] if YAML syntax is invalid
+  def self.parse_yaml_safe(config_content)
+    YAML.safe_load(config_content)
+  rescue YAML::SyntaxError => e
+    raise Puppet::Error, "Unable to parse YAML: #{e.message}"
+  end
+
+  # Get service configuration from parsed YAML data
+  # Helper method to retrieve and validate service existence
+  #
+  # @param data [Hash] Parsed YAML data
+  # @param service_name [String] Name of the service to retrieve
+  # @return [Hash] Service configuration
+  # @raise [Puppet::Error] if service doesn't exist in configuration
+  def self.get_service(data, service_name)
+    unless data['services']&.include?(service_name)
+      raise Puppet::Error, "Service #{service_name} does not exist in configuration file"
+    end
+    data['services'][service_name]
+  end
+
+  # Validate basic build configuration (image + build parameters)
+  # Helper method to check build configuration structure
+  #
+  # @param service [Hash] Service configuration from docker-compose
+  # @return [Hash, String] Build configuration
   # @raise [Puppet::Error] if build configuration is invalid
-  def self.validate_build_requirements(config_content, service_name)
-    data = YAML.safe_load(config_content)
-    service = data['services'][service_name] if data['services']
-
-    return unless service
-
+  def self.validate_build_config(service)
     build_config = service['build']
     unless service['image'] && build_config
       raise Puppet::Error, "Service definition should contain 'image' and 'build' parameters"
@@ -45,8 +65,21 @@ module PuppetX::Dockerinstall
     if build_config.is_a?(Hash) && !build_config['context']
       raise Puppet::Error, "Service 'build' parameter should contain 'context' parameter"
     end
-  rescue YAML::SyntaxError => e
-    raise Puppet::Error, "Invalid YAML syntax: #{e.message}"
+
+    build_config
+  end
+
+  # Validate build requirements in service configuration
+  # Used by type during resource validation
+  #
+  # @param config_content [String] YAML content of docker-compose configuration
+  # @param service_name [String] Name of the service to validate
+  # @return [void]
+  # @raise [Puppet::Error] if build configuration is invalid
+  def self.validate_build_requirements(config_content, service_name)
+    data = parse_yaml_safe(config_content)
+    service = get_service(data, service_name)
+    validate_build_config(service)
   end
 
   # Validate build context path
@@ -93,23 +126,13 @@ module PuppetX::Dockerinstall
   # @return [void]
   # @raise [Puppet::Error] if configuration is invalid
   def self.validate_configuration_integrity(config_content, service_name, confpath, build_enabled)
-    data = YAML.safe_load(config_content)
-
-    # error if service does not exist in docker-compose yaml
-    unless data['services'] && data['services'].include?(service_name)
-      raise Puppet::Error, "Service #{service_name} does not exist in configuration file"
-    end
+    data = parse_yaml_safe(config_content)
+    service = get_service(data, service_name)
 
     return unless build_enabled
 
-    service = data['services'][service_name]
-    build = service['build']
-
-    raise Puppet::Error, "Service definition should contain 'image' and 'build' parameters" unless service['image'] && build
-
+    build = validate_build_config(service)
     validate_build_context(build, confpath)
-  rescue YAML::SyntaxError => e
-    raise Puppet::Error, "Unable to parse #{e.message}"
   end
 
   # Validate YAML configuration syntax and structure
@@ -120,9 +143,7 @@ module PuppetX::Dockerinstall
   # @return [void]
   # @raise [Puppet::Error] if YAML is invalid
   def self.validate_yaml_syntax(config_content, confpath)
-    data = YAML.safe_load(config_content)
+    data = parse_yaml_safe(config_content)
     raise Puppet::Error, "#{confpath}: file does not contain a valid yaml hash" unless data.is_a?(Hash)
-  rescue YAML::SyntaxError => e
-    raise Puppet::Error, "Unable to parse #{e.message}"
   end
 end
