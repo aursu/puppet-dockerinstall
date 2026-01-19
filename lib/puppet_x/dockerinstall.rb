@@ -81,19 +81,6 @@ module PuppetX::Dockerinstall
     build_config
   end
 
-  # Validate build requirements in service configuration
-  # Used by type during resource validation
-  #
-  # @param config_content [String] YAML content of docker-compose configuration
-  # @param service_name [String] Name of the service to validate
-  # @return [void]
-  # @raise [Puppet::Error] if build configuration is invalid
-  def self.validate_build_requirements(config_content, service_name)
-    data = parse_yaml_safe(config_content)
-    service = get_service(data, service_name)
-    validate_build_config(service)
-  end
-
   # Validate build context path
   # Used by provider during configuration integrity check
   #

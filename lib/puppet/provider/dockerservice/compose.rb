@@ -117,17 +117,4 @@ Puppet::Type.type(:dockerservice).provide(
       start if @resource[:ensure] == :running
     end
   end
-
-  def configuration_validate(value)
-    PuppetX::Dockerinstall.validate_yaml_syntax(value, @resource[:path])
-  end
-
-  def configuration_integrity
-    config_content = resource.configuration
-    service_name = @resource[:name]
-    confpath = @resource[:path]
-    build_enabled = @resource.build?
-
-    PuppetX::Dockerinstall.validate_configuration_integrity(config_content, service_name, confpath, build_enabled)
-  end
 end
