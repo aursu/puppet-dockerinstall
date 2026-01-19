@@ -290,11 +290,10 @@ Puppet::Type.newtype(:dockerservice, self_refresh: true) do
   validate do
     raise Puppet::Error, 'Configuration parameter is required' unless self[:configuration]
 
-    # Basic build validation - provider will do more detailed checks
-    if self[:build] && self[:build] != :false
-      config_content = @parameters[:configuration].actual_content
-      PuppetX::Dockerinstall.validate_build_requirements(config_content, self[:name])
-    end
+    # Full configuration integrity validation (same as pre-January provider.configuration_integrity)
+    config_content = @parameters[:configuration].actual_content
+    build_enabled = self[:build] && self[:build] != :false
+    PuppetX::Dockerinstall.validate_configuration_integrity(config_content, self[:name], self[:path], build_enabled)
   end
 
   def configuration
