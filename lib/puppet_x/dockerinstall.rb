@@ -36,6 +36,18 @@ module PuppetX::Dockerinstall
     raise Puppet::Error, "Unable to parse YAML: #{e.message}"
   end
 
+  # Validate YAML configuration syntax and structure
+  # Used by provider's configuration property validation
+  #
+  # @param config_content [String] YAML content to validate
+  # @param confpath [String] Path to configuration file (for error messages)
+  # @return [void]
+  # @raise [Puppet::Error] if YAML is invalid
+  def self.validate_yaml_syntax(config_content, confpath)
+    data = parse_yaml_safe(config_content)
+    raise Puppet::Error, "#{confpath}: file does not contain a valid yaml hash" unless data.is_a?(Hash)
+  end
+
   # Get service configuration from parsed YAML data
   # Helper method to retrieve and validate service existence
   #
@@ -133,17 +145,5 @@ module PuppetX::Dockerinstall
 
     build = validate_build_config(service)
     validate_build_context(build, confpath)
-  end
-
-  # Validate YAML configuration syntax and structure
-  # Used by provider's configuration property validation
-  #
-  # @param config_content [String] YAML content to validate
-  # @param confpath [String] Path to configuration file (for error messages)
-  # @return [void]
-  # @raise [Puppet::Error] if YAML is invalid
-  def self.validate_yaml_syntax(config_content, confpath)
-    data = parse_yaml_safe(config_content)
-    raise Puppet::Error, "#{confpath}: file does not contain a valid yaml hash" unless data.is_a?(Hash)
   end
 end
