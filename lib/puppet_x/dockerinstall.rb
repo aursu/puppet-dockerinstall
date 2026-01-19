@@ -53,10 +53,11 @@ module PuppetX::Dockerinstall
   # Used by provider during configuration integrity check
   #
   # @param build [Hash, String] Build configuration from docker-compose
-  # @param confdir [String] Directory containing docker-compose.yml
+  # @param confpath [String] Path to docker-compose.yml file
   # @return [void]
   # @raise [Puppet::Error] if build context is invalid
-  def self.validate_build_context(build, confdir)
+  def self.validate_build_context(build, confpath)
+    confdir = File.dirname(confpath)
     context = build['context']
     context_path = nil
 
@@ -106,8 +107,7 @@ module PuppetX::Dockerinstall
 
     raise Puppet::Error, "Service definition should contain 'image' and 'build' parameters" unless service['image'] && build
 
-    confdir = File.dirname(confpath)
-    validate_build_context(build, confdir)
+    validate_build_context(build, confpath)
   rescue YAML::SyntaxError => e
     raise Puppet::Error, "Unable to parse #{e.message}"
   end
