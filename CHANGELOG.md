@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.26.0
+
+**Features**
+
+* Added comprehensive unit tests for `PuppetX::Dockerinstall` module covering all validation methods
+* Enhanced YAML parsing and validation
+* Improved code organization by moving validation logic to shared `PuppetX::Dockerinstall` module
+* Added helper methods
+
+**Bugfixes**
+
+* Fixed Rubocop conventions
+* Fixed puppet-lint warnings
+* Removed dead code: unused `configuration_validate` and `configuration_integrity` methods from compose provider
+* Removed unused `validate_build_requirements` method from PuppetX module
+* Fixed line length violations in puppet manifests
+
+**Improvements**
+
+* Standardized code style across all Ruby files
+* Added `.puppet-lint.rc` configuration for parameter documentation checks
+* Enhanced documentation comments in `PuppetX::Dockerinstall` module
+
+**Known Issues**
+
 ## Release 0.25.0
 
 **Features**
