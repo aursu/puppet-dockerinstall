@@ -198,13 +198,16 @@ define dockerinstall::webservice (
   # directory where project secrets are stored
   $project_secrets_path   = "${project_directory}/secrets"
 
+  # Determine if we need the secrets directory
+  $need_secrets_dir = $project_secrets or ($env_name and $secrets)
+
   if $decomission {
     file { $project_secrets_path:
       ensure => absent,
       force  => true,
     }
   }
-  else {
+  elsif $need_secrets_dir {
     file { $project_secrets_path:
       ensure => directory,
       mode   => '0700',
@@ -263,25 +266,17 @@ define dockerinstall::webservice (
 
   if $env_name and $secrets {
     if $decomission {
-      file { $project_secrets_path:
-        ensure => absent,
-        force  => true,
-      }
       file { "${project_secrets_path}/${env_name}.env":
         ensure => absent,
       }
     }
     else {
-      file { $project_secrets_path:
-        ensure => directory,
-        mode   => '0700',
-      }
-
       file { "${project_secrets_path}/${env_name}.env":
         ensure  => file,
         content => template('dockerinstall/service/secrets.env.erb'),
         notify  => Dockerservice[$project_title],
         mode    => '0600',
+        require => File[$project_secrets_path],
       }
     }
   }

@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.27.0
+
+**Bugfixes**
+
+* Fixed duplicate File resource declaration in `dockerinstall::webservice` when both `project_secrets` and `env_name`/`secrets` parameters are specified
+* Added test coverage for edge case with simultaneous `project_secrets`, `env_name`, and `secrets` parameters
+* Refactored secrets directory management to use conditional creation based on `$need_secrets_dir` variable
+
+**Improvements**
+
+* Improved resource management logic by consolidating duplicate File resource declarations
+* Enhanced test suite with additional edge case coverage
+
+**Known Issues**
+
 ## Release 0.26.0
 
 **Features**

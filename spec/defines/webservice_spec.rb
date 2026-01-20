@@ -303,6 +303,38 @@ describe 'dockerinstall::webservice' do
             .with_configuration(%r{^[ ]{4}file: /run/secrets/github\.pem$})
         }
       end
+
+      context 'when project_secrets, env_name and secrets are all specified' do
+        let(:params) do
+          super().merge(
+            env_name: 'prod',
+            secrets: {
+              'DB_PASSWORD' => 'secret123',
+            },
+            project_secrets: [
+              {
+                'name' => 'app_key',
+                'type' => 'file',
+                'value' => 'my-secret-key',
+              },
+            ],
+          )
+        end
+
+        it { is_expected.to compile }
+
+        it {
+          is_expected.to contain_file('/var/lib/compose/namevar/secrets')
+            .with_ensure('directory')
+            .with_mode('0700')
+        }
+
+        it {
+          is_expected.to contain_file('/var/lib/compose/namevar/secrets/prod.env')
+            .with_ensure('file')
+            .with_mode('0600')
+        }
+      end
     end
   end
 end
