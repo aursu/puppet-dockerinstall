@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.28.0
+
+**Features**
+
+* Enhanced `project_volumes` parameter to support flexible Docker Compose volume configurations
+* Added support for volume configuration with `driver` and `driver_opts` for advanced storage backends (e.g., NFS)
+* Added support for volume labels in both hash and array formats
+* Added support for volume `name` and `external` properties for external volume management
+* Added support for mixed volume configurations (combining string declarations and hash configurations)
+
+**Improvements**
+
+* Enhanced service.yaml.erb template to handle nested hash configurations for driver_opts
+* Enhanced template to properly quote values in nested configurations for YAML compliance
+* Enhanced template to support array values for labels and other volume properties
+* Added comprehensive test suite with 130 examples covering all volume configuration patterns
+
+**Known Issues**
+
 ## Release 0.27.0
 
 **Bugfixes**
