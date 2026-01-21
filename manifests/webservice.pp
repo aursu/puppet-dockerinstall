@@ -136,7 +136,7 @@ define dockerinstall::webservice (
   Optional[Array[String]] $expose_ports = undef,
   Optional[Array[String]] $docker_volume = undef,
   Optional[Array[String, 1]] $docker_extra_hosts = undef,
-  Optional[Array[String]] $project_volumes = undef,
+  Optional[Array[Dockerinstall::Volume]] $project_volumes = undef,
   Optional[Integer] $docker_mtu = undef,
   Optional[
     Hash[

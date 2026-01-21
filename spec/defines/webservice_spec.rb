@@ -335,6 +335,76 @@ describe 'dockerinstall::webservice' do
             .with_mode('0600')
         }
       end
+
+      context 'when project_volumes as string array specified' do
+        let(:params) do
+          super().merge(
+            project_volumes: ['db-data', 'web-data'],
+          )
+        end
+
+        it { is_expected.to compile }
+
+        it {
+          is_expected.to contain_dockerinstall__composeservice('namevar/namevar')
+            .with_configuration(%r{^volumes:$})
+            .with_configuration(%r{^[ ]{2}db-data:$})
+            .with_configuration(%r{^[ ]{2}web-data:$})
+        }
+      end
+
+      context 'when project_volumes with driver specified' do
+        let(:params) do
+          super().merge(
+            project_volumes: [
+              {
+                'db-data' => {
+                  'driver' => 'foobar',
+                },
+              },
+            ],
+          )
+        end
+
+        it { is_expected.to compile }
+
+        it {
+          is_expected.to contain_dockerinstall__composeservice('namevar/namevar')
+            .with_configuration(%r{^volumes:$})
+            .with_configuration(%r{^[ ]{2}db-data:$})
+            .with_configuration(%r{^[ ]{4}driver: foobar$})
+        }
+      end
+
+      context 'when project_volumes with driver_opts specified' do
+        let(:params) do
+          super().merge(
+            project_volumes: [
+              {
+                'example' => {
+                  'driver_opts' => {
+                    'type' => 'nfs',
+                    'o' => 'addr=10.40.0.199,nolock,soft,rw',
+                    'device' => ':/docker/example',
+                  },
+                },
+              },
+            ],
+          )
+        end
+
+        it { is_expected.to compile }
+
+        it {
+          is_expected.to contain_dockerinstall__composeservice('namevar/namevar')
+            .with_configuration(%r{^volumes:$})
+            .with_configuration(%r{^[ ]{2}example:$})
+            .with_configuration(%r{^[ ]{4}driver_opts:$})
+            .with_configuration(%r{^[ ]{6}type: "nfs"$})
+            .with_configuration(%r{^[ ]{6}o: "addr=10\.40\.0\.199,nolock,soft,rw"$})
+            .with_configuration(%r{^[ ]{6}device: ":/docker/example"$})
+        }
+      end
     end
   end
 end
