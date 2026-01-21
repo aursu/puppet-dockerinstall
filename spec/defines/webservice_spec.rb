@@ -435,6 +435,36 @@ describe 'dockerinstall::webservice' do
             .with_configuration(%r{^[ ]{6}com\.example\.label-with-empty-value: ""$})
         }
       end
+
+      context 'when project_volumes with labels as array specified' do
+        let(:params) do
+          super().merge(
+            project_volumes: [
+              {
+                'db-data' => {
+                  'labels' => [
+                    'com.example.description=Database volume',
+                    'com.example.department=IT/Ops',
+                    'com.example.label-with-empty-value',
+                  ],
+                },
+              },
+            ],
+          )
+        end
+
+        it { is_expected.to compile }
+
+        it {
+          is_expected.to contain_dockerinstall__composeservice('namevar/namevar')
+            .with_configuration(%r{^volumes:$})
+            .with_configuration(%r{^[ ]{2}db-data:$})
+            .with_configuration(%r{^[ ]{4}labels:$})
+            .with_configuration(%r{^[ ]{6}- "com\.example\.description=Database volume"$})
+            .with_configuration(%r{^[ ]{6}- "com\.example\.department=IT/Ops"$})
+            .with_configuration(%r{^[ ]{6}- "com\.example\.label-with-empty-value"$})
+        }
+      end
     end
   end
 end

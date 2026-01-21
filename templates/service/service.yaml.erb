@@ -114,6 +114,11 @@ volumes:
 <%             value.each do |subkey, subvalue| -%>
       <%= subkey %>: "<%= subvalue %>"
 <%             end -%>
+<%           elsif value.is_a?(Array) -%>
+    <%= key %>:
+<%             value.each do |item| -%>
+      - "<%= item %>"
+<%             end -%>
 <%           else -%>
     <%= key %>: <%= value %>
 <%           end -%>
