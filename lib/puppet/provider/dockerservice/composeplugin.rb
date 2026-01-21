@@ -12,29 +12,25 @@ Puppet::Type.type(:dockerservice).provide(
   # and new format (v5.x): 'docker compose version' -> "Docker Compose version v5.0.2"
   if command('docker')
     confine true: begin
-                    # Try new format first (v5+)
-                    output = docker('compose', 'version')
-                    output.match?(%r{version v[0-9]+\.[0-9]+\.[0-9]+})
+                    output = begin
+                               docker('compose', 'version')
+                             rescue Puppet::ExecutionFailure
+                               docker('compose', '--version')
+                             end
+                    output.match?(%r{version v?[0-9]+\.[0-9]+\.[0-9]+})
                   rescue Puppet::ExecutionFailure
-                    # Fall back to old format (v2)
-                    begin
-                      output = docker('compose', '--version')
-                      output.match?(%r{version [0-9]+\.[0-9]+\.[0-9]+})
-                    rescue Puppet::ExecutionFailure
-                      false
-                    end
+                    false
                   end
   end
 
   def version
     @version ||= begin
-                   # Try new format first (v5+): "Docker Compose version v5.0.2"
-                   output = docker('compose', 'version')
-                   output[%r{version v([0-9]+\.[0-9]+\.[0-9]+)}, 1]
-                 rescue Puppet::ExecutionFailure
-                   # Fall back to old format (v2): "version 2.40.3"
-                   output = docker('compose', '--version')
-                   output[%r{version ([0-9]+\.[0-9]+\.[0-9]+)}, 1]
+                   output = begin
+                              docker('compose', 'version')
+                            rescue Puppet::ExecutionFailure
+                              docker('compose', '--version')
+                            end
+                   output[%r{version v?([0-9]+\.[0-9]+\.[0-9]+)}, 1]
                  end
   end
 
