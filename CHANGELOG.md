@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.28.1
+
+**Improvements**
+
+* Updated default Docker Compose version to 5.0.2
+* Updated test suite regex patterns to match Docker Compose v5.x version format
+
+**Known Issues**
+
 ## Release 0.28.0
 
 **Features**
