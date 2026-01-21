@@ -465,6 +465,81 @@ describe 'dockerinstall::webservice' do
             .with_configuration(%r{^[ ]{6}- "com\.example\.label-with-empty-value"$})
         }
       end
+
+      context 'when project_volumes with name specified' do
+        let(:params) do
+          super().merge(
+            project_volumes: [
+              {
+                'db-data' => {
+                  'name' => 'my-app-data',
+                },
+              },
+            ],
+          )
+        end
+
+        it { is_expected.to compile }
+
+        it {
+          is_expected.to contain_dockerinstall__composeservice('namevar/namevar')
+            .with_configuration(%r{^volumes:$})
+            .with_configuration(%r{^[ ]{2}db-data:$})
+            .with_configuration(%r{^[ ]{4}name: my-app-data$})
+        }
+      end
+
+      context 'when project_volumes with external and name specified' do
+        let(:params) do
+          super().merge(
+            project_volumes: [
+              {
+                'db-data' => {
+                  'external' => true,
+                  'name' => 'actual-name-of-volume',
+                },
+              },
+            ],
+          )
+        end
+
+        it { is_expected.to compile }
+
+        it {
+          is_expected.to contain_dockerinstall__composeservice('namevar/namevar')
+            .with_configuration(%r{^volumes:$})
+            .with_configuration(%r{^[ ]{2}db-data:$})
+            .with_configuration(%r{^[ ]{4}external: true$})
+            .with_configuration(%r{^[ ]{4}name: actual-name-of-volume$})
+        }
+      end
+
+      context 'when project_volumes mixed with external and simple string' do
+        let(:params) do
+          super().merge(
+            project_volumes: [
+              {
+                'db-data' => {
+                  'external' => true,
+                  'name' => 'actual-name-of-volume',
+                },
+              },
+              'web-data',
+            ],
+          )
+        end
+
+        it { is_expected.to compile }
+
+        it {
+          is_expected.to contain_dockerinstall__composeservice('namevar/namevar')
+            .with_configuration(%r{^volumes:$})
+            .with_configuration(%r{^[ ]{2}db-data:$})
+            .with_configuration(%r{^[ ]{4}external: true$})
+            .with_configuration(%r{^[ ]{4}name: actual-name-of-volume$})
+            .with_configuration(%r{^[ ]{2}web-data:$})
+        }
+      end
     end
   end
 end
