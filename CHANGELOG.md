@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.28.2
+
+**Improvements**
+
+* Enhanced Docker Compose version detection for compatibility with both v2.x and v5.x formats
+* Fixed `composeplugin` provider to use `docker compose version` command (instead of `--version` flag)
+* Updated `compose` provider version regex to support all Docker Compose versions (not just v1/v2)
+* Refactored `composev2` provider version detection with fallback support
+* Added unit tests for `composeplugin` provider version parsing
+
+**Known Issues**
+
 ## Release 0.28.1
 
 **Improvements**
