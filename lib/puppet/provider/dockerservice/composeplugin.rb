@@ -7,31 +7,20 @@ Puppet::Type.type(:dockerservice).provide(
 
   commands docker: 'docker'
 
-  # Docker version 27.3.1, build ce12230
-  # Supports both old format (v2.x): 'docker compose --version' -> "version 2.40.3"
-  # and new format (v5.x): 'docker compose version' -> "Docker Compose version v5.0.2"
+  # Docker Compose plugin version detection
+  # Command: 'docker compose version' -> "Docker Compose version vX.Y.Z"
+  # Works for both v2.x and v5.x plugin versions
   if command('docker')
     confine true: begin
-                    output = begin
-                               docker('compose', 'version')
-                             rescue Puppet::ExecutionFailure
-                               docker('compose', '--version')
-                             end
-                    output.match?(%r{version v?[0-9]+\.[0-9]+\.[0-9]+})
+                    output = docker('compose', 'version')
+                    output.match?(%r{version v[0-9]+\.[0-9]+\.[0-9]+})
                   rescue Puppet::ExecutionFailure
                     false
                   end
   end
 
   def version
-    @version ||= begin
-                   output = begin
-                              docker('compose', 'version')
-                            rescue Puppet::ExecutionFailure
-                              docker('compose', '--version')
-                            end
-                   output[%r{version v?([0-9]+\.[0-9]+\.[0-9]+)}, 1]
-                 end
+    @version ||= docker('compose', 'version')[%r{version v([0-9]+\.[0-9]+\.[0-9]+)}, 1]
   end
 
   # Don't support them specifying runlevels; always use the runlevels

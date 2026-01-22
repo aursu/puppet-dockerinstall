@@ -46,7 +46,7 @@ Puppet::Type.type(:dockerservice).provide(
   end
 
   def version
-    @version ||= compose('--version')[%r{version v?((1|2)\.[0-9]+\.[0-9]+)}, 1]
+    @version ||= compose('--version')[%r{version v?([0-9]+\.[0-9]+\.[0-9]+)}, 1]
   end
 
   def status
