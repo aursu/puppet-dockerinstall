@@ -1,3 +1,4 @@
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', '..'))
 require 'yaml'
 require 'puppet/parameter/boolean'
 require 'puppet_x/dockerinstall'

@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.28.4
+
+**Bugfixes**
+
+* Fixed Ruby `LoadError` for `puppet_x/dockerinstall` by adding proper `$LOAD_PATH` configuration
+* Added `$LOAD_PATH.unshift` to `dockerservice` type and `compose` provider to ensure Ruby can locate shared utility module
+* Resolved "no such file to load -- puppet_x/dockerinstall" error on Puppet server
+
+**Known Issues**
+
 ## Release 0.28.3
 
 **Features**
