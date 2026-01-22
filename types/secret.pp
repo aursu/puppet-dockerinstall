@@ -4,4 +4,6 @@ type Dockerinstall::Secret = Struct[{
     value                => String,
     Optional[setup]      => Boolean,
     Optional[filename]   => String,
+    Optional[uid]        => Pattern[/^[1-9][0-9]*/],
+    Optional[gid]        => Pattern[/^[1-9][0-9]*/]
 }]

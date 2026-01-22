@@ -245,6 +245,8 @@ define dockerinstall::webservice (
               ensure  => file,
               content => $secret_value,
               mode    => '0600',
+              owner   => $secret['uid'],
+              group   => $secret['gid'],
               require => File[$project_secrets_path],
             }
           }

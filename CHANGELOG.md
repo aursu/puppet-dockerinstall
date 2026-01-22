@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.28.3
+
+**Features**
+
+* Added `uid` and `gid` optional parameters to `Dockerinstall::Secret` type for setting file ownership
+* Enhanced `dockerinstall::webservice` to apply `owner` and `group` attributes when creating secret files
+
+**Known Issues**
+
 ## Release 0.28.2
 
 **Improvements**
