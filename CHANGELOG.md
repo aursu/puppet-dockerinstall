@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.29.0
+
+**Features**
+
+* **`dockerinstall::webservice`'s `decomission` now actually removes the service.** It previously removed the project secrets and set the compose service to `stopped`, which left the containers, the project network and the compose configuration file on disk — a service switched off rather than decommissioned, whose published ports return on the next `up`. The branch now takes the project down with `compose down --remove-orphans`, then removes the compose configuration file and the project directory. Ordered deliberately: `compose down` needs the file to identify what it is tearing down, so the file is removed only after the project is down, and the `exec` is guarded with `onlyif test -f <compose file>` so it is a no-op once gone.
+* ⚠ **The decomission branch deliberately does not declare `dockerinstall::composeservice`.** The `dockerservice` type writes the compose configuration as a *property*, so declaring the service in this branch would rewrite the very file being removed and the two owners would fight on every run. This is also why the type's `stopped` value is no longer used here — `compose stop` cannot express removal, and the type has no `absent`.
+* **`decomission_volumes`** (default `false`) — additionally pass `--volumes`, removing named volumes the project declares. Off by default because volume contents are not recoverable and a project's data is often the one thing worth keeping.
+* **`decomission_image`** (default `false`, requires `manage_image`) — additionally remove the service image from the host. Off by default because an image is frequently shared with other projects on the same host.
+
 ## Release 0.28.4
 
 **Bugfixes**

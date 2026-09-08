@@ -115,7 +115,28 @@
 #   see: https://docs.docker.com/compose/compose-file/#secrets-configuration-reference
 #
 # @param decomission
-#   Compose service decomission (stop and removal)
+#   Compose service decomission. Takes the project down with
+#   `compose down --remove-orphans`, then removes the compose configuration file
+#   and the project directory, secrets included.
+#
+#   ⚠ This branch deliberately does **not** declare
+#   `dockerinstall::composeservice`. The `dockerservice` type writes the compose
+#   configuration as a *property*, so declaring the service here would rewrite the
+#   file this branch removes, and the two owners would fight on every run. It is
+#   also why `dockerservice`'s `stopped` is not used: `compose stop` leaves the
+#   containers, the project network and the configuration in place, which is a
+#   service switched off rather than one removed — its published ports return on
+#   the next `up`.
+#
+# @param decomission_volumes
+#   During decomission, also remove named volumes the project declares
+#   (`compose down --volumes`). Default `false`: volume contents are not
+#   recoverable, and a project's data is often the one thing worth keeping.
+#
+# @param decomission_image
+#   During decomission, also remove the service image from the host. Requires
+#   `manage_image`. Default `false`, because an image is frequently shared with
+#   other projects on the same host.
 #
 define dockerinstall::webservice (
   String  $docker_image,
@@ -176,6 +197,8 @@ define dockerinstall::webservice (
   Optional[Array[Dockerinstall::Secret]] $project_secrets = undef,
 
   Boolean $decomission          = false,
+  Boolean $decomission_volumes  = false,
+  Boolean $decomission_image    = false,
 ) {
   include dockerinstall::params
   $project_basedir   = $dockerinstall::params::compose_libdir
@@ -302,18 +325,63 @@ define dockerinstall::webservice (
   }
 
   if $decomission {
-    $service_ensure = stopped
+    # Effective compose configuration path, mirroring what
+    # dockerinstall::composeservice and the dockerservice type derive when
+    # `configuration_path` is not supplied.
+    $compose_file = pick($configuration_path, "${project_directory}/docker-compose.yml")
+
+    if $decomission_volumes {
+      $down_args = ['down', '--remove-orphans', '--volumes']
+    }
+    else {
+      $down_args = ['down', '--remove-orphans']
+    }
+
+    # ⚠ `dockerservice` knows only `stopped` and `running`, and its `stop` runs
+    # `compose stop` — which leaves the containers, the project network and the
+    # configuration file in place. That is a service switched off, not removed:
+    # its published ports come straight back on the next `up`.
+    #
+    # So this branch takes the project down itself, and deliberately does NOT
+    # declare `dockerinstall::composeservice`. The dockerservice type writes the
+    # compose configuration as a *property*, so declaring the service here would
+    # rewrite the very file this branch removes and the two would fight on every
+    # run — the same resource under two owners with opposite intent.
+    exec { "compose-down-${project_title}":
+      command  => "docker compose -f ${compose_file} -p ${project_name} ${join($down_args, ' ')}",
+      onlyif   => "test -f ${compose_file}",
+      path     => ['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin'],
+      provider => shell,
+      before   => File[$compose_file],
+    }
+
+    # Order matters: `compose down` needs the file to identify what it is tearing
+    # down, so the file goes only after the project is down.
+    file { $compose_file:
+      ensure => absent,
+    }
+
+    file { $project_directory:
+      ensure  => absent,
+      force   => true,
+      require => File[$compose_file],
+    }
+
+    if $manage_image and $decomission_image {
+      dockerimage { $docker_image:
+        ensure  => absent,
+        require => File[$project_directory],
+      }
+    }
   }
   else {
-    $service_ensure = running
-  }
-
-  # docker-compose service
-  dockerinstall::composeservice { $project_title:
-    ensure             => $service_ensure,
-    project_basedir    => $project_basedir,
-    configuration      => template('dockerinstall/service/service.yaml.erb'),
-    configuration_path => $configuration_path,
-    build_image        => $build_image,
+    # docker-compose service
+    dockerinstall::composeservice { $project_title:
+      ensure             => running,
+      project_basedir    => $project_basedir,
+      configuration      => template('dockerinstall/service/service.yaml.erb'),
+      configuration_path => $configuration_path,
+      build_image        => $build_image,
+    }
   }
 }
