@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.32.0
+
+**Features**
+
+* **`dockerinstall::profile::registry` gains `api_listen_ip`, `api_allow` and `api_port`** - an optional second vhost serving the registry API over TLS, restricted to an explicit list of source addresses, proxying to the registry on loopback. `undef` by default, so nothing is created for existing users.
+* **Why it exists.** The main vhost is built for docker clients: it can require mutual TLS and it gates `/v2/*` behind the registry auth-token map. A client that speaks the registry API directly with its own bearer token - GitLab's registry integration is the usual one - satisfies neither, which is why such setups traditionally reach the container's published port over plain HTTP from wherever they happen to be. This replaces that with TLS and an allow-list. Measured against a live pair of hosts: `/v2/_catalog` answers 200 through this vhost and 403 through the main one.
+* ⚠ Two details that are load-bearing rather than stylistic, both recorded in the code. `use_default_location` is set explicitly because this module defaults it to **false**: without it the vhost renders as a bare TLS listener with no location at all - no `proxy_pass`, and **no allow/deny either**, so the access restriction silently does not exist while nginx starts happily and answers 404. And `listen_port` equals `ssl_port` because `nginx::resource::server` computes `ssl_only` from that equality rather than taking a flag; anything else leaves a plain-HTTP listener on the port.
+* All parameters of the class are documented now. It had none, so documenting only the new ones would have left ten lint warnings behind.
+
 ## Release 0.31.0
 
 **Features**
