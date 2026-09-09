@@ -46,7 +46,7 @@
 #   vhost replaces that with TLS terminated by nginx and an explicit allow-list,
 #   proxying to the registry on loopback.
 #
-#   ⚠ Must be a specific address, never `0.0.0.0`: where
+#   Must be a specific address, never `0.0.0.0`: where
 #   `dockerinstall::registry::base::listen_ip` is `127.0.0.1`, a wildcard bind on
 #   the same port collides with the container's own publication.
 #
@@ -175,7 +175,7 @@ class dockerinstall::profile::registry (
   # Second vhost: the registry API over TLS, for consumers the main vhost cannot
   # serve. See the api_listen_ip documentation for why one is sometimes needed.
   #
-  # ⚠ `use_default_location` is REQUIRED and is not the module default. Without
+  # `use_default_location` is REQUIRED and is not the module default. Without
   # it nginx::resource::server renders a bare TLS listener with no location at
   # all — no proxy_pass, and no allow/deny either, so the access restriction
   # silently does not exist while nginx starts happily and answers 404. Verified

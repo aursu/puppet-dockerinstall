@@ -70,7 +70,9 @@ describe 'dockerinstall::profile::daemon' do
         # Pinned because the proxy derives proxy_ssl_name from the node certname,
         # and the default node name in this harness is the container hostname.
         let(:node) { 'dockerhost.example.com' }
-        let(:pre_condition) { "class { 'nginx': }" }
+        # stream is required by daemon_proxy since 0.35.0 - the proxy moved from
+        # an http server to a stream one to survive Docker's TCP half-close.
+        let(:pre_condition) { "class { 'nginx': stream => true }" }
         let(:params) do
           {
             tls_enable: true,

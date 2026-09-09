@@ -1,6 +1,6 @@
 {
   "name": "aursu-dockerinstall",
-  "version": "0.34.0",
+  "version": "0.35.0",
   "author": "aursu",
   "summary": "Docker CE installation and start",
   "license": "Apache-2.0",
@@ -14,7 +14,7 @@
     },
     {
       "name": "aursu/lsys_nginx",
-      "version_requirement": ">= 0.47.0 < 1.0.0"
+      "version_requirement": ">= 0.49.0 < 1.0.0"
     },
     {
       "name": "aursu/puppet",

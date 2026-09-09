@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.35.0
+
+**Bugfixes**
+
+* **`dockerinstall::daemon_proxy` is now a `stream` (layer 4) server, not an http one.** The http version was broken in a way that looked healthy: `docker version`, `ps` and `logs` worked, containers ran, exit codes propagated, and nginx logged `101` for every hijack - but `run`, `exec` and any piped stdin produced no output at all.
+
+  The cause is TCP half-close. A Docker client with nothing more to send shuts down its write side while still reading output, and the daemon understands that; `ngx_http_proxy_module` treats an upgraded connection as a WebSocket and tears the whole tunnel down on the client's FIN, so the return path dies before any output crosses it. Measured rather than inferred: holding stdin open made the identical command work through the same proxy. `proxy_half_close`, which fixes it, exists only in `ngx_stream_proxy_module`.
+
+**Features**
+
+* The Common Name check moves from an `if ... return 403` in an http location to an njs `js_access` handler, because the stream module cannot refuse a connection based on a variable - its access module filters by address only, and there is no `return` in stream context. **The allow-list stays in Puppet-rendered nginx maps**; the JavaScript is a fixed shim that reads `$docker_ok` and never changes when the list does.
+* New `js_dir` parameter, defaulting to `/usr/lib/nginx/njs` - the sibling of `/usr/lib/nginx/modules`, where the njs module itself installs. nginx defines no standard location for njs scripts.
+* `manage_nginx_core` now enables `njs` and `stream` on `lsys_nginx`, and gains `njs_package_ensure`. Where another profile owns nginx, that profile must set both - without `stream` there is no `conf.stream.d`, and without `njs` nginx will not start because the generated configuration names a module that is not loaded.
+* Requires `aursu/lsys_nginx >= 0.49.0` for those two parameters.
+
+**Notes**
+
+* The CN extraction regex keeps its `(^|,)` anchor, and there is a spec asserting it. Unanchored, `CN=` matches anywhere in the subject DN including inside another attribute's value, so a certificate carrying `OU=xCN=allowed.example.com,CN=attacker` would yield the allow-listed name and pass.
+* Rejections happen in two places and it is worth knowing which: an unknown CA, an expired certificate or no certificate at all is refused by the TLS handshake, since the server sets `ssl_verify_client on` - the njs handler never runs. A valid certificate whose CN is not listed is refused by the handler, and logged there.
+
 ## Release 0.34.0
 
 **Features**

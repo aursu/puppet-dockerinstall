@@ -4,11 +4,12 @@ require 'spec_helper'
 
 describe 'dockerinstall::daemon_proxy' do
   # manage_nginx_core defaults to false, so the base case is a host whose nginx
-  # is owned by another profile - which is the normal deployment.
+  # is owned by another profile - the normal deployment. stream must be on, or
+  # there is no conf.stream.d for any of this to land in.
   let(:pre_condition) do
     [
       'include dockerinstall',
-      "class { 'nginx': }",
+      "class { 'nginx': stream => true }",
     ].join("\n")
   end
 
@@ -29,8 +30,6 @@ describe 'dockerinstall::daemon_proxy' do
 
       it { is_expected.to compile }
 
-      # The default: another profile owns nginx core, so this class must not
-      # declare it.
       it { is_expected.not_to contain_class('lsys_nginx') }
 
       context 'on a host that runs Docker and no web server' do
@@ -38,14 +37,34 @@ describe 'dockerinstall::daemon_proxy' do
         let(:params) { super().merge('manage_nginx_core' => true) }
 
         it { is_expected.to compile }
-        it { is_expected.to contain_class('lsys_nginx') }
+
+        # njs and stream are not optional extras here - the proxy cannot work
+        # without either, so this class turns both on rather than leaving them
+        # to be discovered when nginx fails to start.
+        it {
+          is_expected.to contain_class('lsys_nginx')
+            .with_njs(true)
+            .with_stream(true)
+        }
+      end
+
+      context 'when the stream module is not enabled' do
+        let(:pre_condition) do
+          [
+            'include dockerinstall',
+            "class { 'nginx': }",
+          ].join("\n")
+        end
+
+        it { is_expected.to compile.and_raise_error(%r{requires the nginx stream module}) }
       end
 
       # The CN has to be extracted before it can be compared, because nginx has
-      # no native Common Name variable.
+      # no native Common Name variable. Both maps live in stream context.
       context 'the CN extraction map' do
         it {
           is_expected.to contain_nginx__resource__map('ssl_client_s_dn_cn')
+            .with_context('stream')
             .with_string('$ssl_client_s_dn')
             .with_default('""')
         }
@@ -64,6 +83,7 @@ describe 'dockerinstall::daemon_proxy' do
       context 'the allow-list map' do
         it {
           is_expected.to contain_nginx__resource__map('docker_ok')
+            .with_context('stream')
             .with_string('$ssl_client_s_dn_cn')
             .with_default('0')
         }
@@ -85,8 +105,8 @@ describe 'dockerinstall::daemon_proxy' do
           }
         end
 
-        # An empty list renders `map ... { default 0; }`, which is valid nginx
-        # and refuses everyone. It fails closed, so it warns rather than fails.
+        # An empty list renders `map ... { default 0; }`, which refuses every
+        # client. It fails closed, so it warns rather than fails.
         context 'with an empty allow_cn' do
           let(:params) { super().merge('allow_cn' => []) }
 
@@ -98,64 +118,67 @@ describe 'dockerinstall::daemon_proxy' do
         end
       end
 
-      # The $connection_upgrade map is depended on, never declared here: both
-      # aursu/nginx and aursu/gitlabinstall already render it, and a second copy
-      # stops nginx from starting.
-      it { is_expected.not_to contain_nginx__resource__map('connection_upgrade') }
+      context 'the njs shim' do
+        it { is_expected.to contain_file('/usr/lib/nginx/njs').with_ensure('directory') }
 
-      context 'when nginx::proxy_connection_upgrade is disabled elsewhere' do
-        let(:pre_condition) do
-          [
-            'include dockerinstall',
-            "class { 'nginx': proxy_connection_upgrade => false }",
-          ].join("\n")
+        # The policy is deliberately NOT in the JavaScript - it reads the
+        # map-derived variable, so the shim never changes when the list does.
+        it {
+          is_expected.to contain_file('/usr/lib/nginx/njs/dockerd_access.js')
+            .with_content(%r{s\.variables\.docker_ok})
+            .with_content(%r{s\.deny\(\)})
+        }
+
+        it 'keeps the allow-list out of the shim' do
+          expect(catalogue.resource('file', '/usr/lib/nginx/njs/dockerd_access.js')[:content])
+            .not_to match(%r{builder\.example\.com})
         end
 
+        # js_import is only valid at stream level, so it cannot live inside the
+        # server block and needs a file of its own.
         it {
-          is_expected.to compile.and_raise_error(%r{requires the .connection_upgrade map})
+          is_expected.to contain_file('/etc/nginx/conf.stream.d/00-dockerd-njs.conf')
+            .with_content(%r{js_import dockerproxy from /usr/lib/nginx/njs/dockerd_access\.js;})
         }
       end
 
-      context 'the vhost' do
-        let(:vhost) { "#{os_facts[:networking]['fqdn']}-dockerd" }
+      context 'the stream server' do
+        let(:host) { "#{os_facts[:networking]['fqdn']}-dockerd" }
 
         it {
-          is_expected.to contain_nginx__resource__server(vhost)
+          is_expected.to contain_nginx__resource__streamhost(host)
             .with_listen_ip('10.0.0.10')
             .with_listen_port(2376)
-            .with_ssl_port(2376)
-            .with_ssl_verify_client('on')
-            .with_proxy('https://127.0.0.1:2376')
-            .with_proxy_http_version('1.1')
-            .with_use_default_location(true)
+            .with_listen_options('ssl')
+            .with_proxy('127.0.0.1:2376')
         }
 
-        # Without use_default_location the vhost renders with no location block
-        # at all - no proxy_pass and no CN check - and nginx answers 404 happily.
-        it 'refuses the request when the CN is not allow-listed' do
-          expect(catalogue.resource('nginx::resource::server', vhost)[:location_raw_prepend])
-            .to eq(['if ($docker_ok = 0) { return 403; }'])
+        # proxy_half_close is the whole reason this is a stream server rather
+        # than an http one: without it a Docker client that half-closes has its
+        # return path torn down, which looks like success and delivers nothing.
+        it 'sets proxy_half_close' do
+          expect(catalogue.resource('nginx::resource::streamhost', host)[:raw_append])
+            .to include('proxy_half_close on;')
         end
 
-        # Docker hijacks the connection for exec and attach, so these must be
-        # present or every CI job fails while `docker version` keeps working.
-        it 'passes the upgrade headers through' do
-          raw = catalogue.resource('nginx::resource::server', vhost)[:location_raw_append]
-          expect(raw).to include('proxy_set_header Upgrade $http_upgrade;')
-          expect(raw).to include('proxy_set_header Connection $connection_upgrade;')
+        it 'terminates mutual TLS and hands the decision to njs' do
+          raw = catalogue.resource('nginx::resource::streamhost', host)[:raw_prepend]
+          expect(raw).to include('ssl_verify_client on;')
+          expect(raw).to include('ssl_client_certificate /etc/puppetlabs/puppet/ssl/certs/ca.pem;')
+          expect(raw).to include('js_access dockerproxy.access;')
         end
 
         # Puppet-signed certs have no IP SANs, so verifying a loopback upstream
-        # by address fails the name check and every request 502s.
+        # by address fails the name check and every connection fails.
         it 'overrides the upstream name that is verified' do
-          expect(catalogue.resource('nginx::resource::server', vhost)[:location_raw_append])
+          expect(catalogue.resource('nginx::resource::streamhost', host)[:raw_append])
             .to include('proxy_ssl_name dockerhost.example.com;')
         end
 
         it 'authenticates to the daemon with a client certificate' do
-          raw = catalogue.resource('nginx::resource::server', vhost)[:location_raw_append]
+          raw = catalogue.resource('nginx::resource::streamhost', host)[:raw_append]
+          expect(raw).to include('proxy_ssl on;')
           expect(raw).to include('proxy_ssl_certificate /etc/docker/tls/cert.pem;')
-          expect(raw).to include('proxy_ssl_certificate_key /etc/docker/tls/key.pem;')
           expect(raw).to include('proxy_ssl_trusted_certificate /etc/docker/tls/ca.pem;')
         end
       end
@@ -170,8 +193,8 @@ describe 'dockerinstall::daemon_proxy' do
         end
 
         it {
-          is_expected.to contain_nginx__resource__server('docker.example.com-dockerd')
-            .with_proxy('https://127.0.0.1:2375')
+          is_expected.to contain_nginx__resource__streamhost('docker.example.com-dockerd')
+            .with_proxy('127.0.0.1:2375')
             .with_listen_port(2376)
         }
       end
