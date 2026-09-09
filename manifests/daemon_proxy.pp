@@ -101,6 +101,16 @@
 #   analogue; it does not exist on Debian-family hosts, where this package puts
 #   everything under `/usr/lib/nginx`. Override per platform if needed.
 #
+# @param stream_conf_dir
+#   Directory the stream-context configuration is written to.
+#
+#   Deliberately a parameter rather than a read of `$nginx::conf_dir`. With
+#   `manage_nginx_core` false this class does not declare the nginx class, and
+#   the profile that does may be evaluated *after* this one - at which point
+#   `$nginx::conf_dir` is an unknown variable and the catalogue fails outright.
+#   The same ordering hazard is why the stream check below is wrapped in
+#   `defined(Class['nginx'])`.
+#
 # @param manage_nginx_core
 #   Whether this class brings up nginx itself, via `lsys_nginx`, with `njs` and
 #   `stream` enabled.
@@ -156,6 +166,7 @@ class dockerinstall::daemon_proxy (
   Optional[Stdlib::Fqdn] $server_name = undef,
   Nginx::Time $proxy_timeout = '3600s',
   Stdlib::Absolutepath $js_dir = '/usr/lib/nginx/njs',
+  Stdlib::Absolutepath $stream_conf_dir = '/etc/nginx/conf.stream.d',
   Boolean $manage_nginx_core = false,
   String[1] $njs_package_ensure = 'installed',
   Boolean $manage_web_user = true,
@@ -271,7 +282,7 @@ class dockerinstall::daemon_proxy (
 
   # Purging does not remove this because Puppet manages it; the reasoning for a
   # separate file, and for the 00- prefix, is in the template.
-  file { "${nginx::conf_dir}/conf.stream.d/00-dockerd-njs.conf":
+  file { "${stream_conf_dir}/00-dockerd-njs.conf":
     ensure  => file,
     owner   => 'root',
     group   => 'root',
@@ -317,6 +328,6 @@ class dockerinstall::daemon_proxy (
   File["${js_dir}/dockerd_access.js"]
   -> Nginx::Resource::Streamhost["${vhost_name}-dockerd"]
 
-  File["${nginx::conf_dir}/conf.stream.d/00-dockerd-njs.conf"]
+  File["${stream_conf_dir}/00-dockerd-njs.conf"]
   -> Nginx::Resource::Streamhost["${vhost_name}-dockerd"]
 }

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.35.1
+
+**Bugfixes**
+
+* **`dockerinstall::daemon_proxy` no longer reads `$nginx::conf_dir`**, which broke catalogue compilation outright: `Unknown variable: 'nginx::conf_dir'`. With `manage_nginx_core` false this class does not declare the nginx class, and the profile that does is frequently evaluated *after* it - at which point the variable does not exist yet. The path now comes from a `stream_conf_dir` parameter defaulting to `/etc/nginx/conf.stream.d`.
+* This is the same ordering hazard the `stream` check already guards against with `defined(Class['nginx'])`. Unit tests did not catch it because rspec-puppet's `pre_condition` always runs first, so nginx is never "declared later" in a spec - the failure only appears against a real node. A `stream_conf_dir` test now guards against reintroducing the read, since sourcing the path from the nginx class again would ignore the parameter.
+
 ## Release 0.35.0
 
 **Bugfixes**

@@ -48,6 +48,21 @@ describe 'dockerinstall::daemon_proxy' do
         }
       end
 
+      # Regression guard for the ordering bug that broke ci2's catalogue: this
+      # class used to build the path from $nginx::conf_dir, which is unreadable
+      # when the profile owning nginx is evaluated after this one. It cannot be
+      # reproduced directly - rspec-puppet's pre_condition always runs first, so
+      # nginx is never "declared later" here. What this does catch is a
+      # reintroduction of that read: sourcing the path from $nginx::conf_dir
+      # again would ignore the parameter and put the file back under /etc/nginx.
+      context 'with a non-default stream_conf_dir' do
+        let(:params) { super().merge('stream_conf_dir' => '/opt/nginx/conf.stream.d') }
+
+        it {
+          is_expected.to contain_file('/opt/nginx/conf.stream.d/00-dockerd-njs.conf')
+        }
+      end
+
       context 'when the stream module is not enabled' do
         let(:pre_condition) do
           [
