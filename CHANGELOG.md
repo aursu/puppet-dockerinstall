@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.34.0
+
+**Features**
+
+* **`dockerinstall::profile::daemon` now composes `dockerinstall::daemon_proxy`** via `proxy_enable`, rather than leaving a site profile to declare it. Everything the proxy needs is already known here - the TLS asset directory, the CA path, the node's certname, and above all the daemon's own `tls_listen_ip`, which becomes the proxy's `upstream_host`. Those two are the pair that must never disagree, and composing them in one class means they cannot.
+* New parameters: `proxy_enable`, `proxy_allow_cn`, `proxy_listen_ip` (defaults to the node's primary address), `proxy_port` (2376), `proxy_ssl_name` (defaults to the node's certname) and `proxy_manage_nginx_core`. All default to off or to derived values, so nothing changes for existing users.
+* **`proxy_enable` without `tls_enable` fails at compile time.** The proxy authenticates to the daemon with a client certificate, so a daemon not listening with TLS gives it nothing to reach - better a catalogue error than a vhost proxying to a closed port.
+
 ## Release 0.33.0
 
 **Features**

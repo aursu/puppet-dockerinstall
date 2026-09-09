@@ -50,14 +50,47 @@
 #   of the default 0400. Needed when a proxy running as another user has to
 #   authenticate to the daemon on clients' behalf.
 #
+# @param proxy_enable
+#   Put `dockerinstall::daemon_proxy` in front of the API: nginx doing mutual TLS
+#   plus a client-certificate Common Name allow-list, which the daemon itself
+#   cannot express. Composed here rather than declared by a site profile so the
+#   paths and the upstream address come from the same place that configures the
+#   daemon - in particular the proxy's upstream is `tls_listen_ip`, so the two
+#   cannot drift apart.
+#
+#   Requires `tls_enable`. Pair it with a loopback `tls_listen_ip`, or the daemon
+#   stays reachable on the network beside the proxy and the allow-list is
+#   decorative.
+#
+# @param proxy_allow_cn
+#   Common Names the proxy admits. Empty denies everyone, which is safe but
+#   rarely intended - `dockerinstall::daemon_proxy` warns about it.
+#
+# @param proxy_listen_ip
+#   Address the proxy listens on. Defaults to the node's primary address.
+#
+# @param proxy_port
+#   Port the proxy listens on. Defaults to 2376, the port clients already use.
+#
+# @param proxy_ssl_name
+#   Name the upstream daemon certificate is verified against. Defaults to the
+#   node's certname, which is what a Puppet-issued certificate carries.
+#
+# @param proxy_manage_nginx_core
+#   Whether the proxy brings up nginx itself. Default false; see
+#   `dockerinstall::daemon_proxy::manage_nginx_core`.
+#
 # @example
 #   include dockerinstall::profile::daemon
 #
-# @example API on loopback only, key readable by the nginx worker
+# @example API on loopback only, fronted by the CN allow-list proxy
 #   class { 'dockerinstall::profile::daemon':
-#     tls_enable    => true,
-#     tls_listen_ip => '127.0.0.1',
-#     tls_key_group => 'www-data',
+#     tls_enable      => true,
+#     tls_listen_ip   => '127.0.0.1',
+#     tls_key_group   => 'www-data',
+#     proxy_enable    => true,
+#     proxy_listen_ip => '10.0.0.10',
+#     proxy_allow_cn  => ['builder.example.com'],
 #   }
 class dockerinstall::profile::daemon (
   Optional[String] $network_bridge_ip = undef,
@@ -73,6 +106,12 @@ class dockerinstall::profile::daemon (
   Boolean $tls_users_access = false,
   Optional[Stdlib::IP::Address] $tls_listen_ip = undef,
   Optional[String[1]] $tls_key_group = undef,
+  Boolean $proxy_enable = false,
+  Array[String[1]] $proxy_allow_cn = [],
+  Optional[Stdlib::IP::Address] $proxy_listen_ip = undef,
+  Stdlib::Port $proxy_port = 2376,
+  Optional[String[1]] $proxy_ssl_name = undef,
+  Boolean $proxy_manage_nginx_core = false,
 ) {
   include dockerinstall::profile::install
   include dockerinstall::params
@@ -142,6 +181,34 @@ class dockerinstall::profile::daemon (
     * => $tls_settings + $tcp_settings,
   }
   contain dockerinstall::service
+
+  # The API proxy is composed here, not left to a site profile, so every path it
+  # needs comes from the same place that configures the daemon. Its upstream is
+  # $tls_listen_ip by construction, which is the one value that must not drift.
+  if $proxy_enable {
+    unless $tls_enable {
+      fail(join([
+            'dockerinstall::profile::daemon: proxy_enable requires tls_enable. The',
+            'proxy authenticates to the daemon with a client certificate, so the',
+            'daemon has to be listening with TLS for there to be anything to reach.',
+      ], ' '))
+    }
+
+    $localcacert = $dockerinstall::params::localcacert
+
+    class { 'dockerinstall::daemon_proxy':
+      listen_ip         => pick($proxy_listen_ip, $facts['networking']['ip']),
+      allow_cn          => $proxy_allow_cn,
+      port              => $proxy_port,
+      upstream_host     => pick($tls_listen_ip, '127.0.0.1'),
+      ssl_cert          => "${docker_tlsdir}/cert.pem",
+      ssl_key           => "${docker_tlsdir}/key.pem",
+      ssl_client_ca     => $localcacert,
+      ssl_ca            => "${docker_tlsdir}/ca.pem",
+      proxy_ssl_name    => pick($proxy_ssl_name, $trusted['certname']),
+      manage_nginx_core => $proxy_manage_nginx_core,
+    }
+  }
 
   class { 'dockerinstall::compose': }
 
