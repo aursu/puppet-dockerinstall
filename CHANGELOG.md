@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.33.0
+
+**Features**
+
+* **New class `dockerinstall::daemon_proxy`** - nginx in front of the Docker daemon API doing mutual TLS plus a client-certificate **Common Name allow-list**. The daemon's own `--tlsverify` only checks that a client certificate chains to the configured CA; where that CA also signs every host and user certificate in an estate, chain-to-CA is not identity. This adds the check the daemon has no way to express, so a validly signed certificate whose CN is not listed gets 403.
+* **`dockerinstall::profile::daemon` gains `tls_listen_ip`** - the address the TLS API binds to. The bind was previously hardcoded to `tcp://0.0.0.0:2376`. `undef` keeps that wildcard, so no existing node moves; a loopback address takes the API off the network, which is the intended pairing with `daemon_proxy`.
+* **`dockerinstall::tls` gains `key_group`**, plumbed through `dockerinstall::profile::daemon` as `tls_key_group` - mode `0640` with a named group, for the case where a proxy running as another user must authenticate to the daemon. It **fails at compile time** if combined with `users_access`: the two are opposite intentions about the same file, and a silent mode surprise on a private key is worth an error.
+* `dockerinstall::daemon_proxy` takes `manage_nginx_core`, **defaulting to false** - unlike `dockerinstall::registry::nginx`, where nginx is the deliverable and true is right. This class only adds a vhost in front of an already-running daemon, so taking ownership of the host's web server as a side effect would be the wrong default. Set it true on a host that runs Docker and no web server at all.
+* All parameters of `dockerinstall::profile::daemon` are documented now. It had none, so documenting only the new ones would have left lint warnings behind.
+
+**Notes on four details that are load-bearing rather than stylistic**, all recorded in the code:
+
+* **The `$connection_upgrade` map is depended on, not re-implemented.** `aursu/nginx` already renders it in `00-proxy.conf` whenever `nginx::proxy_connection_upgrade` is true (its default; `aursu/lsys_nginx` sets it explicitly), and `aursu/gitlabinstall` renders the same map in `98-gitlab-global-proxy` when its `manage_service` is false. The map must exist **exactly once**: a second copy is `duplicate variable "connection_upgrade"`, none at all is `unknown "connection_upgrade" variable`, and both are nginx **startup** failures that take every other vhost on the host with them.
+* **The Common Name is extracted with `~(^|,)CN=(?<CN>[^,]+)`, and the anchor is a security control.** Unanchored, `CN=` matches anywhere in the subject DN - including inside another attribute's value - and nginx captures the first match, so a certificate carrying `OU=xCN=allowed.example.com,CN=attacker` would yield the allow-listed name and pass. There is a spec asserting the anchored form; do not relax it.
+* **`proxy_ssl_name` is mandatory.** Certificates issued by a Puppet CA carry the FQDN in the Common Name and have no IP SANs, so verifying a loopback upstream as `127.0.0.1` fails the name check and every request returns 502.
+* **Docker hijacks the connection** for `exec`, `attach` and `run -it`, so the vhost sets `proxy_http_version 1.1` with the `Upgrade`/`Connection` headers. Without them the simple calls keep working while those fail - a smoke test that only runs `docker version` passes over a broken proxy.
+
 ## Release 0.32.0
 
 **Features**
