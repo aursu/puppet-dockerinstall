@@ -17,13 +17,35 @@
 #   Boolean flag to disable OpenTelemetry traces in the registry.
 #   When set to true, sets OTEL_TRACES_EXPORTER=none environment variable.
 #
+# @param listen_ip
+#   Host address the registry port is published on. Default `undef` publishes on
+#   every interface (`5000:5000`), which is Docker's own behaviour and what this
+#   class did before the parameter existed.
+#
+#   Set it to an internal address so the registry is not offered on every
+#   interface a host happens to have — including ones added later. The registry's
+#   external surface is then whatever fronts it on `:443`, not the container port.
+#
+#   ⚠ **Anything reaching the registry on `localhost:5000` must move to the same
+#   address.** On a host where GitLab manages this registry that means
+#   `registry_api_url`, which defaults to `http://localhost:5000`: GitLab uses it
+#   to delete tags, report image sizes and run cleanup policies, and it fails
+#   quietly rather than loudly when the address stops answering. Change both or
+#   neither.
+#
 # @example
 #   include dockerinstall::registry::base
+#
+# @example Publish on one internal address only
+#   class { 'dockerinstall::registry::base':
+#     listen_ip => '10.0.0.10',
+#   }
 class dockerinstall::registry::base (
   String $docker_image = 'registry:3.0.0',
   Stdlib::Unixpath $data_directory = $dockerinstall::registry::params::data_directory,
   Boolean $accesslog_disabled = false,
   Boolean $traces_disabled = false,
+  Optional[Stdlib::IP::Address] $listen_ip = undef,
 ) inherits dockerinstall::registry::params {
   include dockerinstall::registry::auth_token
   $rootcertbundle = $dockerinstall::registry::auth_token::rootcertbundle
@@ -76,15 +98,23 @@ class dockerinstall::registry::base (
   $compose_service = $dockerinstall::registry::params::compose_service
   $compose_project = $dockerinstall::registry::params::compose_project
 
+  # Publishing on a specific host address rather than all interfaces is a
+  # deliberate opt-in: the default keeps Docker's own behaviour so nothing moves
+  # for existing consumers.
+  if $listen_ip {
+    $publish_ports = ["${listen_ip}:5000:5000"]
+  }
+  else {
+    $publish_ports = ['5000:5000']
+  }
+
   # According to documentaton https://docs.docker.com/registry/deploying/
   # we use registry:2 image from docker.io/library repository
   dockerinstall::webservice { $compose_project:
     service_name  => $compose_service,
     manage_image  => true,
     docker_image  => $docker_image,
-    expose_ports  => [
-      '5000:5000',
-    ],
+    expose_ports  => $publish_ports,
     # Use the delete structure to enable the deletion of image blobs and manifests by digest
     environment   => {
       'REGISTRY_STORAGE_DELETE_ENABLED' => 'true',

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.30.0
+
+**Features**
+
+* **`dockerinstall::registry::base::listen_ip`** - publish the registry port on one host address instead of every interface. Default `undef` keeps Docker's own behaviour, so nothing moves for existing consumers; setting it renders `<ip>:5000:5000` rather than `5000:5000`. The registry's external surface is then whatever fronts it on `:443`, not the container port.
+* ⚠ **Anything reaching the registry on `localhost:5000` has to move to the same address.** Where GitLab manages the registry that means `registry_api_url`, which defaults to `http://localhost:5000` and is what GitLab uses to delete tags, report image sizes and run cleanup policies. It fails quietly rather than loudly when the address stops answering, so the two settings change together or not at all. The parameter documentation says so at the point of use.
+
 ## Release 0.29.0
 
 **Features**
