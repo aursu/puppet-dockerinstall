@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.31.0
+
+**Features**
+
+* **`dockerinstall::registry::nginx::upstream_host`** - the address nginx proxies to for the registry, default `localhost`. The upstream members hash was a local variable read from `params`, so it could not be reached from Hiera at all; it is now built from this parameter.
+* ⚠ **Set it whenever `dockerinstall::registry::base::listen_ip` names a specific non-loopback address.** The two belong together: binding the container to an internal address while nginx still proxies to `localhost` leaves nginx unable to reach it, and **every pull through the registry fails with 502 Bad Gateway** - measured on a live registry on 2026-09-09. Loopback needs no change here; a specific address does. The registry's nginx error log names the upstream it could not reach, which is the quickest way to recognise it.
+* All ten parameters of `dockerinstall::registry::nginx` are now documented. The class previously had none, so adding one would have left nine lint warnings behind.
+
 ## Release 0.30.0
 
 **Features**

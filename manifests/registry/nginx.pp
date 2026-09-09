@@ -2,10 +2,66 @@
 #
 # Registry Nginx setup
 #
+# @param server_name
+#   Virtual host name nginx serves the registry under.
+#
+# @param ssl
+#   Whether to serve the registry over HTTPS.
+#
+# @param ssl_cert
+#   Path to the server certificate. Required when `ssl` is true.
+#
+# @param ssl_key
+#   Path to the server private key. Required when `ssl` is true.
+#
+# @param ssl_client_ca_auth
+#   Whether to require a client certificate (mutual TLS) from registry clients.
+#
+# @param manage_nginx_core
+#   Whether this class manages nginx itself. Set false where another profile on
+#   the host already owns nginx core, and declare `class nginx` there.
+#
+# @param manage_web_user
+#   Whether to manage the web server user and group.
+#
+# @param manage_document_root
+#   Whether to manage the document root directory.
+#
+# @param global_ssl_redirect
+#   Whether to redirect plain HTTP to HTTPS for this virtual host.
+#
+# @param nginx_tokens_map
+#   Path to the nginx map file used for registry auth token handling.
+#
+# @param upstream_host
+#   Host nginx proxies to for the registry itself. Default `localhost`, which is
+#   correct while the registry publishes its port on every interface or on
+#   loopback.
+#
+#   ⚠ **Set this whenever `dockerinstall::registry::base::listen_ip` names a
+#   specific non-loopback address.** The two belong together: binding the
+#   container to an internal address while nginx still proxies to `localhost`
+#   leaves nginx unable to reach it, and **every pull through the registry fails
+#   with 502 Bad Gateway** — measured on a live registry on 2026-09-09. The
+#   registry's own error log names the upstream it could not reach, which is the
+#   quickest way to recognise it.
+#
+#   Loopback needs no change here; a specific address does.
+#
 # @example
 #   include dockerinstall::registry::nginx
+#
+# @example Registry bound to an internal address rather than loopback
+#   class { 'dockerinstall::registry::base':
+#     listen_ip => '10.0.0.10',
+#   }
+#   class { 'dockerinstall::registry::nginx':
+#     server_name   => 'registry.example.com',
+#     upstream_host => '10.0.0.10',
+#   }
 class dockerinstall::registry::nginx (
   String $server_name,
+  Stdlib::Host $upstream_host = 'localhost',
   Boolean $ssl = false,
   Optional[String] $ssl_cert = undef,
   Optional[String] $ssl_key = undef,
@@ -21,7 +77,16 @@ class dockerinstall::registry::nginx (
 
   $auth_token_enable = $dockerinstall::registry::auth_token::enable
 
-  $nginx_upstream_members = $dockerinstall::registry::params::nginx_upstream_members
+  # Built from upstream_host rather than taken from params, so the address nginx
+  # proxies to can follow the address the registry container is bound to. The
+  # port is fixed at 5000 because dockerinstall::registry::base publishes the
+  # container's 5000 regardless of which host address it binds.
+  $nginx_upstream_members = {
+    "${upstream_host}:5000" => {
+      server => $upstream_host,
+      port   => 5000,
+    },
+  }
   $internal_cacert        = $dockerinstall::registry::params::internal_cacert
 
   $user_home              = $lsys_nginx::params::user_home
