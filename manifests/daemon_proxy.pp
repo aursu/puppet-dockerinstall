@@ -103,17 +103,17 @@
 #
 # @param stream_conf_dir
 #   Directory the stream-context configuration is written to. Left `undef` it is
-#   derived from `${nginx::conf_dir}/conf.stream.d`, which is the source of
-#   truth - a hardcoded default would be the same value written down twice, with
-#   nothing keeping the second copy true.
+#   derived from `${nginx::params::conf_dir}/conf.stream.d` - the same default
+#   both `nginx` and `lsys_nginx` derive their own conf_dir from, rather than a
+#   literal written down a second time with nothing keeping it true.
 #
-#   Deriving it requires the nginx class to have been evaluated first. With
-#   `manage_nginx_core` false that is the declaring profile's responsibility: put
-#   the profile that owns nginx ahead of this one. Getting it wrong fails loudly
-#   at compile time - `Unknown variable: 'nginx::conf_dir'` - rather than quietly
-#   writing to a directory nginx does not read.
+#   The derivation reads `nginx::params`, not `$nginx::conf_dir`. The params
+#   class is bare and parameterless, so including it is safe from anywhere and
+#   imposes no ordering; `$nginx::conf_dir` only exists after the nginx class has
+#   been evaluated, which cannot be relied on when another profile owns it.
 #
-#   Set this explicitly only where that ordering genuinely cannot be arranged.
+#   Set this explicitly where a site overrides `nginx::conf_dir` away from the
+#   platform default, since the derivation cannot see that.
 #
 # @param manage_nginx_core
 #   Whether this class brings up nginx itself, via `lsys_nginx`, with `njs` and
@@ -216,15 +216,33 @@ class dockerinstall::daemon_proxy (
   $vhost_name  = pick($server_name, $facts['networking']['fqdn'])
   $daemon_port = pick($upstream_port, $port)
 
-  # if/else rather than pick() here, and the difference matters: Puppet evaluates
-  # function arguments eagerly, so pick($stream_conf_dir, "${nginx::conf_dir}/...")
-  # would still read the nginx class even when the parameter is set - and fail
-  # for the very layouts the parameter exists to rescue.
+  # Derived from nginx::params rather than from $nginx::conf_dir, and that is the
+  # whole point: nginx::params is a bare parameterless params class, so including
+  # it is always safe and carries no ordering requirement, while $nginx::conf_dir
+  # only exists once the nginx class itself has been evaluated - which, with
+  # manage_nginx_core false, is another profile's business and frequently
+  # happens after this one. Reading it there fails the catalogue outright with
+  # "Unknown variable: 'nginx::conf_dir'".
+  #
+  # It is still the source of truth rather than a literal: both nginx::conf_dir
+  # and lsys_nginx's own conf_dir default to nginx::params::conf_dir, and it is
+  # platform-aware - /etc/nginx on Linux, /usr/local/etc/nginx on FreeBSD.
+  #
+  # The one case it gets wrong is a site that overrides conf_dir away from that
+  # default. stream_conf_dir is the override for exactly that, which is why it
+  # stays.
+  #
+  # if/else rather than pick(): Puppet evaluates function arguments eagerly, so
+  # pick($stream_conf_dir, "${nginx::params::conf_dir}/...") would read the params
+  # class even when the parameter is set. Harmless here, but the same shape bites
+  # whenever the fallback is not free.
+  include nginx::params
+
   if $stream_conf_dir {
     $stream_dir = $stream_conf_dir
   }
   else {
-    $stream_dir = "${nginx::conf_dir}/conf.stream.d"
+    $stream_dir = "${nginx::params::conf_dir}/conf.stream.d"
   }
 
   # Best effort, and deliberately guarded: the value is only readable once the

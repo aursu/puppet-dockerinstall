@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.36.1
+
+**Bugfixes**
+
+* **The stream configuration directory is derived from `nginx::params::conf_dir`, not `$nginx::conf_dir`.** 0.36.0 restored the read of the nginx class on the theory that the declaring profile could simply be ordered to evaluate nginx first. Measured against a real node, that did not hold - the catalogue still failed with `Unknown variable: 'nginx::conf_dir'` after the reorder.
+* `nginx::params` is a bare, parameterless params class, so including it is safe from anywhere and imposes no ordering requirement at all. It remains the source of truth rather than a literal: both `nginx::conf_dir` and `lsys_nginx`'s own conf_dir default to it, and it is platform-aware. `stream_conf_dir` still overrides, for sites that move conf_dir away from that default - which is the one case the derivation cannot see.
+
 ## Release 0.36.0
 
 **Bugfixes**
