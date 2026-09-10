@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.36.0
+
+**Bugfixes**
+
+* **`stream_conf_dir` now derives from `${nginx::conf_dir}/conf.stream.d` again**, instead of defaulting to a hardcoded `/etc/nginx/conf.stream.d`. 0.35.1 fixed the compile failure by writing the same value down a second time, where nothing kept it true: a site that moved `nginx::conf_dir` would have had this configuration written to a directory nginx does not read, and the only symptom would have been `js_import` never loading.
+* The parameter remains, as `Optional` and `undef` by default, for layouts where the nginx class genuinely cannot be evaluated first. **The ordering is the real fix** - the profile declaring this class must declare the profile that owns nginx ahead of it - and getting it wrong still fails loudly at compile time rather than quietly.
+* The derivation uses `if`/`else` rather than `pick()` deliberately: Puppet evaluates function arguments eagerly, so `pick($stream_conf_dir, "${nginx::conf_dir}/...")` would read the nginx class even when the parameter is set, failing for exactly the layouts the parameter exists to rescue.
+
 ## Release 0.35.1
 
 **Bugfixes**

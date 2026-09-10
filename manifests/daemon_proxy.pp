@@ -102,14 +102,18 @@
 #   everything under `/usr/lib/nginx`. Override per platform if needed.
 #
 # @param stream_conf_dir
-#   Directory the stream-context configuration is written to.
+#   Directory the stream-context configuration is written to. Left `undef` it is
+#   derived from `${nginx::conf_dir}/conf.stream.d`, which is the source of
+#   truth - a hardcoded default would be the same value written down twice, with
+#   nothing keeping the second copy true.
 #
-#   Deliberately a parameter rather than a read of `$nginx::conf_dir`. With
-#   `manage_nginx_core` false this class does not declare the nginx class, and
-#   the profile that does may be evaluated *after* this one - at which point
-#   `$nginx::conf_dir` is an unknown variable and the catalogue fails outright.
-#   The same ordering hazard is why the stream check below is wrapped in
-#   `defined(Class['nginx'])`.
+#   Deriving it requires the nginx class to have been evaluated first. With
+#   `manage_nginx_core` false that is the declaring profile's responsibility: put
+#   the profile that owns nginx ahead of this one. Getting it wrong fails loudly
+#   at compile time - `Unknown variable: 'nginx::conf_dir'` - rather than quietly
+#   writing to a directory nginx does not read.
+#
+#   Set this explicitly only where that ordering genuinely cannot be arranged.
 #
 # @param manage_nginx_core
 #   Whether this class brings up nginx itself, via `lsys_nginx`, with `njs` and
@@ -166,7 +170,7 @@ class dockerinstall::daemon_proxy (
   Optional[Stdlib::Fqdn] $server_name = undef,
   Nginx::Time $proxy_timeout = '3600s',
   Stdlib::Absolutepath $js_dir = '/usr/lib/nginx/njs',
-  Stdlib::Absolutepath $stream_conf_dir = '/etc/nginx/conf.stream.d',
+  Optional[Stdlib::Absolutepath] $stream_conf_dir = undef,
   Boolean $manage_nginx_core = false,
   String[1] $njs_package_ensure = 'installed',
   Boolean $manage_web_user = true,
@@ -211,6 +215,17 @@ class dockerinstall::daemon_proxy (
   # and the $port default - so pick() cannot hit its all-undef error case.
   $vhost_name  = pick($server_name, $facts['networking']['fqdn'])
   $daemon_port = pick($upstream_port, $port)
+
+  # if/else rather than pick() here, and the difference matters: Puppet evaluates
+  # function arguments eagerly, so pick($stream_conf_dir, "${nginx::conf_dir}/...")
+  # would still read the nginx class even when the parameter is set - and fail
+  # for the very layouts the parameter exists to rescue.
+  if $stream_conf_dir {
+    $stream_dir = $stream_conf_dir
+  }
+  else {
+    $stream_dir = "${nginx::conf_dir}/conf.stream.d"
+  }
 
   # Best effort, and deliberately guarded: the value is only readable once the
   # nginx class has been evaluated, and with manage_nginx_core false that is
@@ -282,7 +297,7 @@ class dockerinstall::daemon_proxy (
 
   # Purging does not remove this because Puppet manages it; the reasoning for a
   # separate file, and for the 00- prefix, is in the template.
-  file { "${stream_conf_dir}/00-dockerd-njs.conf":
+  file { "${stream_dir}/00-dockerd-njs.conf":
     ensure  => file,
     owner   => 'root',
     group   => 'root',
@@ -328,6 +343,6 @@ class dockerinstall::daemon_proxy (
   File["${js_dir}/dockerd_access.js"]
   -> Nginx::Resource::Streamhost["${vhost_name}-dockerd"]
 
-  File["${stream_conf_dir}/00-dockerd-njs.conf"]
+  File["${stream_dir}/00-dockerd-njs.conf"]
   -> Nginx::Resource::Streamhost["${vhost_name}-dockerd"]
 }
