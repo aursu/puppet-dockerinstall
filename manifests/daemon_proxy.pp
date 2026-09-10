@@ -32,15 +32,19 @@
 #   in `ngx_stream_proxy_module`. Do not move this back to an http server block.
 #
 # @note
-#   The stream module cannot refuse a connection based on a variable - its access
-#   module filters by address only, and there is no `return` in stream context -
-#   so the deny verb comes from njs. The policy stays in nginx maps that Puppet
-#   renders; the JavaScript is a fixed shim that does not change when the
-#   allow-list does.
+#   **The allow-list decides which upstream `proxy_pass` targets, and that is not
+#   a stylistic choice.** The stream module has no conditional at content phase -
+#   no `if`, and `return` cannot be selected per connection alongside
+#   `proxy_pass` - so the only lever that varies per connection is the upstream
+#   address. Allow-listed Common Names map to the daemon; everything else maps to
+#   a listener that answers and immediately closes.
 #
-#   njs is a dynamic module whose package hard-depends on an exact nginx release,
-#   so `lsys_nginx` must be told to install it and to enable `stream`. See
-#   `manage_nginx_core` for which side owns that.
+#   An njs `js_access` handler was tried first and does not work: **that phase
+#   runs before the TLS handshake completes**, so `$ssl_client_s_dn` is still
+#   empty when it reads it and every client is refused. `proxy_pass` with a
+#   variable is resolved at the content phase, after the handshake, which is why
+#   this form sees the certificate and the njs one could not. Measured on a live
+#   host, both directions. Do not reach for njs here again.
 #
 # @param allow_cn
 #   Client-certificate Common Names permitted to reach the daemon. Everything
@@ -90,39 +94,17 @@
 #   Stream proxy timeout. The default would cut off a long `docker logs -f`,
 #   `events`, or a slow build, so this is raised deliberately.
 #
-# @param js_dir
-#   Directory the njs shim is written to.
+# @param deny_listen_ip
+#   Address of the refusal listener. Loopback: it exists only to close
+#   connections that failed the Common Name check, and must never be reachable.
 #
-#   Defaults to `/usr/lib/nginx/njs`, the sibling of `/usr/lib/nginx/modules`
-#   where the njs module itself is installed. nginx defines no standard location
-#   for njs *scripts* - its own documentation uses `/etc/nginx/njs` - but that
-#   treats them as configuration, and this shim is code with no policy in it:
-#   the allow-list lives in the maps. `/usr/libexec/nginx` would be the RedHat
-#   analogue; it does not exist on Debian-family hosts, where this package puts
-#   everything under `/usr/lib/nginx`. Override per platform if needed.
-#
-# @param stream_conf_dir
-#   Directory the stream-context configuration is written to. Left `undef` it is
-#   derived from `${nginx::params::conf_dir}/conf.stream.d` - the same default
-#   both `nginx` and `lsys_nginx` derive their own conf_dir from, rather than a
-#   literal written down a second time with nothing keeping it true.
-#
-#   Three sources, in order of preference: this parameter, then
-#   `$nginx::conf_dir` when the nginx class has already been evaluated, then
-#   `nginx::params::conf_dir`.
-#
-#   The middle branch is the real configured value but cannot be relied on -
-#   when another profile owns nginx it may be evaluated after this class, and
-#   reading it then fails the catalogue with `Unknown variable`. The params class
-#   is bare and parameterless, so it is always safe and always the value both
-#   `nginx` and `lsys_nginx` derive their own default from.
-#
-#   Set this explicitly only where a site moves `conf_dir` away from that default
-#   *and* the ordering cannot be arranged.
+# @param deny_port
+#   Port for the refusal listener. A high port by default rather than something
+#   like `1`, so it needs no privilege and reads as deliberate.
 #
 # @param manage_nginx_core
-#   Whether this class brings up nginx itself, via `lsys_nginx`, with `njs` and
-#   `stream` enabled.
+#   Whether this class brings up nginx itself, via `lsys_nginx`, with `stream`
+#   enabled.
 #
 #   Default false, unlike `dockerinstall::registry::nginx` where nginx is the
 #   deliverable. This class only adds a listener in front of a daemon that is
@@ -130,14 +112,8 @@
 #   effect would be the wrong default: on any host that already has nginx from a
 #   registry or GitLab profile that is a duplicate declaration.
 #
-#   Left false, **the profile that owns nginx must set `lsys_nginx::njs` and
-#   `lsys_nginx::stream` to true**, and pin `lsys_nginx::njs_package_ensure`
-#   alongside `lsys_nginx::package_ensure`. Without `stream` there is no
-#   `conf.stream.d`; without `njs` nginx will not start, because the generated
-#   configuration names a module that is not loaded.
-#
-# @param njs_package_ensure
-#   Passed to `lsys_nginx` when `manage_nginx_core` is true. Ignored otherwise.
+#   Left false, **the profile that owns nginx must set `lsys_nginx::stream` to
+#   true**. Without it there is no `conf.stream.d` and none of this renders.
 #
 # @param manage_web_user
 #   Whether to manage the web server user and group. Only used when
@@ -174,10 +150,10 @@ class dockerinstall::daemon_proxy (
   Optional[Stdlib::Port] $upstream_port = undef,
   Optional[Stdlib::Fqdn] $server_name = undef,
   Nginx::Time $proxy_timeout = '3600s',
-  Stdlib::Absolutepath $js_dir = '/usr/lib/nginx/njs',
+  Stdlib::IP::Address $deny_listen_ip = '127.0.0.1',
+  Stdlib::Port $deny_port = 12376,
   Optional[Stdlib::Absolutepath] $stream_conf_dir = undef,
   Boolean $manage_nginx_core = false,
-  String[1] $njs_package_ensure = 'installed',
   Boolean $manage_web_user = true,
   Boolean $manage_document_root = true,
   Boolean $global_ssl_redirect = true,
@@ -189,9 +165,9 @@ class dockerinstall::daemon_proxy (
   include nginx::params
 
   # A host may run Docker and no web server at all, in which case this class has
-  # to bring nginx up itself - with njs and stream, both of which this proxy
-  # depends on. That is the exception, not the rule, so it is opt-in: the host's
-  # web server usually belongs to a registry or GitLab profile that declares it.
+  # to bring nginx up itself, with stream enabled. That is the exception, not the
+  # rule, so it is opt-in: the host's web server usually belongs to a registry or
+  # GitLab profile that declares it.
   #
   # Deliberately NOT `include nginx` here. nginx::resource::* require the base
   # class but do not declare it, and an include-like declaration would collide
@@ -202,8 +178,6 @@ class dockerinstall::daemon_proxy (
       manage_user          => $manage_web_user,
       manage_document_root => $manage_document_root,
       global_ssl_redirect  => $global_ssl_redirect,
-      njs                  => true,
-      njs_package_ensure   => $njs_package_ensure,
       stream               => true,
     }
   }
@@ -296,47 +270,36 @@ class dockerinstall::daemon_proxy (
     ],
   }
 
-  # The allow-list itself. Anything not matched falls through to 0 and is
-  # refused by the njs handler.
+  # The allow-list itself, expressed as the upstream each Common Name reaches.
+  # Anything not matched falls through to the refusal listener.
   $cn_mappings = $allow_cn.map |$cn| {
-    { 'key' => "\"${cn}\"", 'value' => '1' }
+    { 'key' => "\"${cn}\"", 'value' => "${upstream_host}:${daemon_port}" }
   }
 
-  nginx::resource::map { 'docker_ok':
+  nginx::resource::map { 'docker_backend':
     context  => 'stream',
     string   => '$ssl_client_s_dn_cn',
-    default  => '0',
+    default  => "${deny_listen_ip}:${deny_port}",
     mappings => $cn_mappings,
   }
 
-  file { $js_dir:
-    ensure => directory,
-    owner  => 'root',
-    group  => 'root',
-    mode   => '0755',
+  # Declared absent for one release: 0.36.2 and earlier shipped an njs shim here,
+  # and removing a resource from a manifest orphans the file rather than deleting
+  # it. Drop these two once every consumer has converged.
+  file { '/usr/lib/nginx/njs/dockerd_access.js':
+    ensure => absent,
   }
 
-  # file() rather than a puppet:/// source, matching the idiom already used in
-  # dockerinstall::registry::nginx. Two reasons beyond consistency: a missing
-  # file fails the catalogue on the master instead of the agent, and the content
-  # lands in the catalogue - so a --noop shows the actual JavaScript diff rather
-  # than an opaque checksum change. For an access handler that is worth having.
-  file { "${js_dir}/dockerd_access.js":
-    ensure  => file,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0644',
-    content => file('dockerinstall/njs/dockerd_access.js'),
-  }
-
-  # Purging does not remove this because Puppet manages it; the reasoning for a
-  # separate file, and for the 00- prefix, is in the template.
   file { "${stream_dir}/00-dockerd-njs.conf":
+    ensure => absent,
+  }
+
+  file { "${stream_dir}/00-dockerd-deny.conf":
     ensure  => file,
     owner   => 'root',
     group   => 'root',
     mode    => '0644',
-    content => template('dockerinstall/njs/js_import.conf.erb'),
+    content => template('dockerinstall/stream/dockerd_deny.conf.erb'),
   }
 
   # `listen_options => 'ssl'` is what terminates TLS here; the certificate
@@ -350,7 +313,7 @@ class dockerinstall::daemon_proxy (
     listen_port        => $port,
     listen_options     => 'ssl',
     ipv6_enable        => false,
-    proxy              => "${upstream_host}:${daemon_port}",
+    proxy              => '$docker_backend',
     proxy_read_timeout => $proxy_timeout,
     raw_prepend        => [
       "ssl_certificate ${ssl_cert};",
@@ -358,7 +321,6 @@ class dockerinstall::daemon_proxy (
       "ssl_client_certificate ${ssl_client_ca};",
       'ssl_verify_client on;',
       'ssl_verify_depth 2;',
-      'js_access dockerproxy.access;',
     ],
     raw_append         => [
       'proxy_half_close on;',
@@ -373,10 +335,7 @@ class dockerinstall::daemon_proxy (
     ],
   }
 
-  # The shim and its import must exist before nginx is told to load them.
-  File["${js_dir}/dockerd_access.js"]
-  -> Nginx::Resource::Streamhost["${vhost_name}-dockerd"]
-
-  File["${stream_dir}/00-dockerd-njs.conf"]
+  # The refusal listener must exist before anything can be pointed at it.
+  File["${stream_dir}/00-dockerd-deny.conf"]
   -> Nginx::Resource::Streamhost["${vhost_name}-dockerd"]
 }

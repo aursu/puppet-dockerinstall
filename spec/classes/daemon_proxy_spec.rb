@@ -38,14 +38,10 @@ describe 'dockerinstall::daemon_proxy' do
 
         it { is_expected.to compile }
 
-        # njs and stream are not optional extras here - the proxy cannot work
-        # without either, so this class turns both on rather than leaving them
-        # to be discovered when nginx fails to start.
-        it {
-          is_expected.to contain_class('lsys_nginx')
-            .with_njs(true)
-            .with_stream(true)
-        }
+        # stream is not an optional extra - none of this renders without
+        # conf.stream.d - so this class turns it on rather than leaving it to be
+        # discovered when the configuration silently does nothing.
+        it { is_expected.to contain_class('lsys_nginx').with_stream(true) }
       end
 
       # Regression guard for the ordering bug that broke ci2's catalogue: this
@@ -95,66 +91,71 @@ describe 'dockerinstall::daemon_proxy' do
         end
       end
 
-      context 'the allow-list map' do
+      # The allow-list decides which upstream proxy_pass targets, because the
+      # stream module has no conditional at content phase. Allow-listed names get
+      # the daemon; everything else gets the refusal listener.
+      context 'the upstream map' do
         it {
-          is_expected.to contain_nginx__resource__map('docker_ok')
+          is_expected.to contain_nginx__resource__map('docker_backend')
             .with_context('stream')
             .with_string('$ssl_client_s_dn_cn')
-            .with_default('0')
+            .with_default('127.0.0.1:12376')
         }
 
-        it 'quotes each permitted CN and maps it to 1' do
-          expect(catalogue.resource('nginx::resource::map', 'docker_ok')[:mappings])
-            .to eq([{ 'key' => '"builder.example.com"', 'value' => '1' }])
+        it 'points each permitted CN at the daemon' do
+          expect(catalogue.resource('nginx::resource::map', 'docker_backend')[:mappings])
+            .to eq([{ 'key' => '"builder.example.com"', 'value' => '127.0.0.1:2376' }])
         end
 
         context 'with several CNs' do
           let(:params) { super().merge('allow_cn' => ['a.example.com', 'b.example.com']) }
 
           it {
-            expect(catalogue.resource('nginx::resource::map', 'docker_ok')[:mappings])
+            expect(catalogue.resource('nginx::resource::map', 'docker_backend')[:mappings])
               .to eq([
-                       { 'key' => '"a.example.com"', 'value' => '1' },
-                       { 'key' => '"b.example.com"', 'value' => '1' },
+                       { 'key' => '"a.example.com"', 'value' => '127.0.0.1:2376' },
+                       { 'key' => '"b.example.com"', 'value' => '127.0.0.1:2376' },
                      ])
           }
         end
 
-        # An empty list renders `map ... { default 0; }`, which refuses every
-        # client. It fails closed, so it warns rather than fails.
+        # An empty list leaves only the default, so every client reaches the
+        # refusal listener. It fails closed, so it warns rather than fails.
         context 'with an empty allow_cn' do
           let(:params) { super().merge('allow_cn' => []) }
 
           it { is_expected.to compile }
 
           it {
-            expect(catalogue.resource('nginx::resource::map', 'docker_ok')[:mappings]).to eq([])
+            expect(catalogue.resource('nginx::resource::map', 'docker_backend')[:mappings]).to eq([])
+          }
+        end
+
+        context 'with a non-default refusal listener' do
+          let(:params) { super().merge('deny_listen_ip' => '127.0.0.2', 'deny_port' => 9999) }
+
+          it {
+            is_expected.to contain_nginx__resource__map('docker_backend')
+              .with_default('127.0.0.2:9999')
           }
         end
       end
 
-      context 'the njs shim' do
-        it { is_expected.to contain_file('/usr/lib/nginx/njs').with_ensure('directory') }
-
-        # The policy is deliberately NOT in the JavaScript - it reads the
-        # map-derived variable, so the shim never changes when the list does.
+      context 'the refusal listener' do
+        # A real listener that answers and closes, rather than an address nothing
+        # happens to be bound to: a closed port refuses by accident of absence,
+        # logs at ERROR level indistinguishably from the daemon being down, and
+        # silently becomes a proxy to whatever binds it next.
         it {
-          is_expected.to contain_file('/usr/lib/nginx/njs/dockerd_access.js')
-            .with_content(%r{s\.variables\.docker_ok})
-            .with_content(%r{s\.deny\(\)})
+          is_expected.to contain_file('/etc/nginx/conf.stream.d/00-dockerd-deny.conf')
+            .with_content(%r{listen 127\.0\.0\.1:12376;})
+            .with_content(%r{return "";})
         }
 
-        it 'keeps the allow-list out of the shim' do
-          expect(catalogue.resource('file', '/usr/lib/nginx/njs/dockerd_access.js')[:content])
-            .not_to match(%r{builder\.example\.com})
-        end
-
-        # js_import is only valid at stream level, so it cannot live inside the
-        # server block and needs a file of its own.
-        it {
-          is_expected.to contain_file('/etc/nginx/conf.stream.d/00-dockerd-njs.conf')
-            .with_content(%r{js_import dockerproxy from /usr/lib/nginx/njs/dockerd_access\.js;})
-        }
+        # 0.36.2 and earlier shipped an njs shim. Removing a resource from a
+        # manifest orphans the file, so these are declared absent for one release.
+        it { is_expected.to contain_file('/usr/lib/nginx/njs/dockerd_access.js').with_ensure('absent') }
+        it { is_expected.to contain_file('/etc/nginx/conf.stream.d/00-dockerd-njs.conf').with_ensure('absent') }
       end
 
       context 'the stream server' do
@@ -165,7 +166,7 @@ describe 'dockerinstall::daemon_proxy' do
             .with_listen_ip('10.0.0.10')
             .with_listen_port(2376)
             .with_listen_options('ssl')
-            .with_proxy('127.0.0.1:2376')
+            .with_proxy('$docker_backend')
         }
 
         # proxy_half_close is the whole reason this is a stream server rather
@@ -176,11 +177,13 @@ describe 'dockerinstall::daemon_proxy' do
             .to include('proxy_half_close on;')
         end
 
-        it 'terminates mutual TLS and hands the decision to njs' do
+        # njs was tried and does not work here: js_access runs before the TLS
+        # handshake, so $ssl_client_s_dn is empty and every client is refused.
+        it 'terminates mutual TLS and decides by upstream, not by njs' do
           raw = catalogue.resource('nginx::resource::streamhost', host)[:raw_prepend]
           expect(raw).to include('ssl_verify_client on;')
           expect(raw).to include('ssl_client_certificate /etc/puppetlabs/puppet/ssl/certs/ca.pem;')
-          expect(raw).to include('js_access dockerproxy.access;')
+          expect(raw.join).not_to match(%r{js_access})
         end
 
         # Puppet-signed certs have no IP SANs, so verifying a loopback upstream
@@ -207,9 +210,13 @@ describe 'dockerinstall::daemon_proxy' do
           )
         end
 
+        it 'points the allow-listed CN at the separate upstream port' do
+          expect(catalogue.resource('nginx::resource::map', 'docker_backend')[:mappings])
+            .to eq([{ 'key' => '"builder.example.com"', 'value' => '127.0.0.1:2375' }])
+        end
+
         it {
           is_expected.to contain_nginx__resource__streamhost('docker.example.com-dockerd')
-            .with_proxy('127.0.0.1:2375')
             .with_listen_port(2376)
         }
       end

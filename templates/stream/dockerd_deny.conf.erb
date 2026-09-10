@@ -1,0 +1,20 @@
+# MANAGED BY PUPPET - dockerinstall::daemon_proxy
+#
+# The refusal target for clients whose certificate Common Name is not on the
+# allow-list. The $docker_backend map sends them here; allow-listed clients go
+# to the daemon.
+#
+# This exists as a real listener rather than as an address nothing happens to be
+# bound to. Pointing the default branch at a closed port also refuses the
+# connection, but it does so by accident of absence: it logs
+# "connect() failed (111: Connection refused) while proxying connection" at
+# ERROR level, which is indistinguishable from the daemon being down, and it
+# silently becomes a proxy to whatever binds that port next.
+#
+# ngx_stream_return_module answers, sends nothing, and closes. The refusal is
+# then a declared decision rather than an inferred one, and it leaves the error
+# log for actual errors.
+server {
+  listen <%= @deny_listen_ip %>:<%= @deny_port %>;
+  return "";
+}

@@ -1,9 +1,0 @@
-# MANAGED BY PUPPET - dockerinstall::daemon_proxy
-#
-# js_import is only valid at stream level, never inside a server block, so it
-# cannot ride along in the streamhost resource and needs a file of its own. The
-# 00- prefix keeps it ahead of that server in the conf.stream.d include glob.
-#
-# The module name declared here - dockerproxy - is what the streamhost's
-# `js_access dockerproxy.access` refers to. The two move together.
-js_import dockerproxy from <%= @js_dir %>/dockerd_access.js;

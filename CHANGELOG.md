@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.37.0
+
+**Bugfixes**
+
+* **`dockerinstall::daemon_proxy` decides by upstream, not by njs.** The njs `js_access` handler shipped in 0.35.0 refused every client, and the reason is a phase ordering rather than a bug in the shim: **that phase runs before the TLS handshake completes**, so `$ssl_client_s_dn` is still empty when it reads it and every Common Name falls through to deny. It failed closed, so nothing was exposed, but no amount of tuning the handler could fix it.
+
+  `proxy_pass` with a **variable** is resolved at the content phase, after the handshake, so it sees the certificate. The allow-list is now a map from Common Name to upstream address: allow-listed names reach the daemon, everything else reaches a refusal listener. Measured on a live host in both directions, including connection hijacking and piped stdin.
+
+**Features**
+
+* **The refusal target is a real listener**, `ngx_stream_return_module` answering and closing, configurable through `deny_listen_ip` and `deny_port`. Pointing the default branch at a closed port would also refuse the connection, but by accident of absence: it logs `connect() failed (111: Connection refused)` at ERROR level, indistinguishable from the daemon being down, and it silently becomes a proxy to whatever binds that port next.
+* **njs is no longer required.** `js_dir` and `njs_package_ensure` are gone, and `manage_nginx_core` enables only `stream` on `lsys_nginx`. `lsys_nginx::njs` remains available and correct for other consumers; this one simply no longer needs it - which also removes the nginx release coupling `nginx-module-njs` forced.
+* The njs shim and its `js_import` include are declared `absent` for one release, since removing a resource from a manifest orphans the file rather than deleting it. Drop those two declarations once every consumer has converged.
+
+**Notes**
+
+* The proxy remains a `stream` server, and that is unrelated to njs: an http proxy cannot carry the Docker API at all, because nginx tears the tunnel down on the client's TCP half-close. `proxy_half_close` exists only in `ngx_stream_proxy_module`. See 0.35.0.
+* The deny is now a TCP close rather than a 403. The stream access log still records `$ssl_client_s_dn`, so refusals stay auditable - keep that field in the log format.
+
 ## Release 0.36.2
 
 * **The stream configuration directory now prefers `$nginx::conf_dir` and falls back to `nginx::params::conf_dir`.** 0.36.1 used the params class unconditionally, which is safe but only ever the platform *default* - a site that moved `conf_dir` would still have been wrong. The class now takes the real configured value whenever the nginx class has already been evaluated, and the params default otherwise, so ordering the declaration correctly is rewarded without being required.
