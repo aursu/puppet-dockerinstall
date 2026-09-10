@@ -107,13 +107,18 @@
 #   both `nginx` and `lsys_nginx` derive their own conf_dir from, rather than a
 #   literal written down a second time with nothing keeping it true.
 #
-#   The derivation reads `nginx::params`, not `$nginx::conf_dir`. The params
-#   class is bare and parameterless, so including it is safe from anywhere and
-#   imposes no ordering; `$nginx::conf_dir` only exists after the nginx class has
-#   been evaluated, which cannot be relied on when another profile owns it.
+#   Three sources, in order of preference: this parameter, then
+#   `$nginx::conf_dir` when the nginx class has already been evaluated, then
+#   `nginx::params::conf_dir`.
 #
-#   Set this explicitly where a site overrides `nginx::conf_dir` away from the
-#   platform default, since the derivation cannot see that.
+#   The middle branch is the real configured value but cannot be relied on -
+#   when another profile owns nginx it may be evaluated after this class, and
+#   reading it then fails the catalogue with `Unknown variable`. The params class
+#   is bare and parameterless, so it is always safe and always the value both
+#   `nginx` and `lsys_nginx` derive their own default from.
+#
+#   Set this explicitly only where a site moves `conf_dir` away from that default
+#   *and* the ordering cannot be arranged.
 #
 # @param manage_nginx_core
 #   Whether this class brings up nginx itself, via `lsys_nginx`, with `njs` and
@@ -177,6 +182,12 @@ class dockerinstall::daemon_proxy (
   Boolean $manage_document_root = true,
   Boolean $global_ssl_redirect = true,
 ) {
+  # nginx::params is a bare, parameterless params class: including it is safe
+  # from anywhere and imposes no ordering requirement, which is precisely why the
+  # stream configuration directory is derived from it rather than from
+  # $nginx::conf_dir. See the stream_conf_dir documentation.
+  include nginx::params
+
   # A host may run Docker and no web server at all, in which case this class has
   # to bring nginx up itself - with njs and stream, both of which this proxy
   # depends on. That is the exception, not the rule, so it is opt-in: the host's
@@ -236,12 +247,17 @@ class dockerinstall::daemon_proxy (
   # pick($stream_conf_dir, "${nginx::params::conf_dir}/...") would read the params
   # class even when the parameter is set. Harmless here, but the same shape bites
   # whenever the fallback is not free.
-  include nginx::params
-
   if $stream_conf_dir {
     $stream_dir = $stream_conf_dir
   }
+  elsif defined(Class['nginx']) {
+    # The real configured value, when the nginx class has already been evaluated.
+    $stream_dir = "${nginx::conf_dir}/conf.stream.d"
+  }
   else {
+    # Otherwise the platform default both nginx and lsys_nginx derive from. Right
+    # for every site that does not move conf_dir, and the parameter above covers
+    # the ones that do.
     $stream_dir = "${nginx::params::conf_dir}/conf.stream.d"
   }
 

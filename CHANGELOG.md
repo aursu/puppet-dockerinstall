@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.36.2
+
+* **The stream configuration directory now prefers `$nginx::conf_dir` and falls back to `nginx::params::conf_dir`.** 0.36.1 used the params class unconditionally, which is safe but only ever the platform *default* - a site that moved `conf_dir` would still have been wrong. The class now takes the real configured value whenever the nginx class has already been evaluated, and the params default otherwise, so ordering the declaration correctly is rewarded without being required.
+* `include nginx::params` moves to the top of the class, where a class-wide dependency belongs, rather than sitting next to the one expression that uses it.
+
 ## Release 0.36.1
 
 **Bugfixes**
