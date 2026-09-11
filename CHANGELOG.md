@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.38.0
+
+**Breaking changes**
+
+* **The registry vhost's TLS settings now follow the Mozilla SSL Configuration Generator,
+  intermediate profile.** `ssl_protocols` moves from `TLSv1.2` to `TLSv1.2 TLSv1.3`, the cipher
+  list is cut from ten to the six Mozilla ECDHE suites, and `ssl_ecdh_curve` is set to
+  `X25519:prime256v1:secp384r1`. Clients that cannot negotiate one of those six will fail.
+
+**Features**
+
+* **The registry now offers TLS 1.3.** It was pinned to `TLSv1.2` only. Measured against the live
+  estate on 2026-09-11, this per-vhost pin — not the `nginx` class default — was what determined
+  the negotiated protocol, so this is the change that actually moves the handshake on the registry
+  host.
+
+**Notes**
+
+* Pairs with `cryengineplayground/baseprofile` 0.13.0 and `aursu/nginx` 8.2.1. The class-level
+  defaults in `aursu/nginx` are overridden by this vhost, so that release alone changes nothing
+  here.
+
 ## Release 0.37.0
 
 **Bugfixes**
